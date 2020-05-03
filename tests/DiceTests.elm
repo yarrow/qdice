@@ -1,6 +1,6 @@
 module DiceTests exposing (..)
 
-import Dice exposing (diceRoller, oneDie, val)
+import Dice exposing (diceRoller, oneDie, pips)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Random
@@ -13,12 +13,12 @@ oneDieSuite =
         [ test "Input values less than 1 become 1" <|
             \_ ->
                 oneDie 0
-                    |> val
+                    |> pips
                     |> Expect.equal 1
         , test "Input values greater than 6 become 6" <|
             \_ ->
                 oneDie 7
-                    |> val
+                    |> pips
                     |> Expect.equal 6
         , test "Die values 1 through 6 survive unchanged" <|
             \_ ->
@@ -27,7 +27,7 @@ oneDieSuite =
                         List.range 1 6
                 in
                 List.map oneDie oneToSix
-                    |> List.map val
+                    |> List.map pips
                     |> Expect.equal oneToSix
         ]
 
@@ -39,18 +39,18 @@ diceRollerSuite =
             \_ ->
                 Random.step (diceRoller 0) (Random.initialSeed 42)
                     |> Tuple.first
-                    |> List.map val
+                    |> List.map pips
                     |> Expect.equalLists []
         , test "diceRoller 1 returns a list with one random die" <|
             \_ ->
                 Random.step (diceRoller 1) (Random.initialSeed 42)
                     |> Tuple.first
-                    |> List.map val
+                    |> List.map pips
                     |> Expect.equalLists [ 6 ]
         , test "diceRoller 5 returns a list with five random dice" <|
             \_ ->
                 Random.step (diceRoller 5) (Random.initialSeed 42)
                     |> Tuple.first
-                    |> List.map val
+                    |> List.map pips
                     |> Expect.equalLists [ 1, 3, 1, 1, 6 ]
         ]

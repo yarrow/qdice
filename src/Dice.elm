@@ -1,4 +1,4 @@
-module Dice exposing (diceRoller, oneDie, val)
+module Dice exposing (diceRoller, oneDie, pips)
 
 import Random exposing (Generator)
 
@@ -22,8 +22,8 @@ oneDie n =
     OneDie (clamp minDie maxDie n)
 
 
-val : OneDie -> Int
-val (OneDie n) =
+pips : OneDie -> Int
+pips (OneDie n) =
     n
 
 
