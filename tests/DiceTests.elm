@@ -2,7 +2,7 @@ module DiceTests exposing (..)
 
 import Dice exposing (diceRoller, oneDie, pips)
 import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, list, string)
+import Fuzz exposing (Fuzzer, int, intRange, list, string)
 import Random
 import Test exposing (..)
 
@@ -29,6 +29,18 @@ oneDieSuite =
                 List.map oneDie oneToSix
                     |> List.map pips
                     |> Expect.equal oneToSix
+        , fuzz (intRange 0 7) "The url for a die with `n` pips contains '/die-`n`.`" <|
+            \n ->
+                let
+                    d =
+                        Dice.oneDie n
+
+                    fragment =
+                        "/die-" ++ String.fromInt (Dice.pips d) ++ "."
+                in
+                Dice.url d
+                    |> String.contains fragment
+                    |> Expect.true ("Expected to see " ++ fragment)
         ]
 
 

@@ -1,0 +1,10 @@
+button {
+  float: left; background-color: #60b5cc; border: 0; color: rgb(44, 44, 44);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 10px 30px;
+}
+
+button:hover {
+  background-color: #80d5ec;
+}
