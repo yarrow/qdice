@@ -56,6 +56,12 @@ viewSuite =
                     |> Query.fromHtml
                     |> Query.find [ tag "button", id "roll-dice" ]
                     |> Query.has [ text "Roll Dice" ]
+        , test "We start with no dice" <|
+            \_ ->
+                view initialModel
+                    |> Query.fromHtml
+                    |> Query.findAll [ tag "img" ]
+                    |> Query.count (Expect.equal 0)
         , test "When there are dice, there are five dice" <|
             \_ ->
                 view withDice
