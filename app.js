@@ -5227,12 +5227,12 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Main$initialModel = {dice: $elm$core$Maybe$Nothing};
+var $author$project$App$initialModel = {dice: $elm$core$Maybe$Nothing};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Main$GotDice = function (a) {
+var $author$project$App$GotDice = function (a) {
 	return {$: 'GotDice', a: a};
 };
 var $elm$random$Random$Generator = function (a) {
@@ -5436,14 +5436,14 @@ var $elm$random$Random$generate = F2(
 			$elm$random$Random$Generate(
 				A2($elm$random$Random$map, tagger, generator)));
 	});
-var $author$project$Main$update = F2(
+var $author$project$App$update = F2(
 	function (msg, model) {
 		if (msg.$ === 'RollDice') {
 			return _Utils_Tuple2(
 				model,
 				A2(
 					$elm$random$Random$generate,
-					$author$project$Main$GotDice,
+					$author$project$App$GotDice,
 					$author$project$Dice$diceRoller(5)));
 		} else {
 			var dice = msg.a;
@@ -5456,7 +5456,7 @@ var $author$project$Main$update = F2(
 				$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Main$RollDice = {$: 'RollDice'};
+var $author$project$App$RollDice = {$: 'RollDice'};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$img = _VirtualDom_node('img');
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -5481,7 +5481,7 @@ var $author$project$Dice$url = function (d) {
 	return 'assets/die-' + ($elm$core$String$fromInt(
 		$author$project$Dice$pips(d)) + '.png');
 };
-var $author$project$Main$dieImg = function (d) {
+var $author$project$App$dieImg = function (d) {
 	return A2(
 		$elm$html$Html$img,
 		_List_fromArray(
@@ -5522,7 +5522,7 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$Main$view = function (model) {
+var $author$project$App$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
@@ -5543,14 +5543,14 @@ var $author$project$Main$view = function (model) {
 					]),
 				A2(
 					$elm$core$List$map,
-					$author$project$Main$dieImg,
+					$author$project$App$dieImg,
 					A2($elm$core$Maybe$withDefault, _List_Nil, model.dice))),
 				A2(
 				$elm$html$Html$button,
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$id('roll-dice'),
-						$elm$html$Html$Events$onClick($author$project$Main$RollDice)
+						$elm$html$Html$Events$onClick($author$project$App$RollDice)
 					]),
 				_List_fromArray(
 					[
@@ -5558,16 +5558,16 @@ var $author$project$Main$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Main$main = $elm$browser$Browser$element(
+var $author$project$App$main = $elm$browser$Browser$element(
 	{
 		init: function (_v0) {
-			return _Utils_Tuple2($author$project$Main$initialModel, $elm$core$Platform$Cmd$none);
+			return _Utils_Tuple2($author$project$App$initialModel, $elm$core$Platform$Cmd$none);
 		},
 		subscriptions: function (_v1) {
 			return $elm$core$Platform$Sub$none;
 		},
-		update: $author$project$Main$update,
-		view: $author$project$Main$view
+		update: $author$project$App$update,
+		view: $author$project$App$view
 	});
-_Platform_export({'Main':{'init':$author$project$Main$main(
+_Platform_export({'App':{'init':$author$project$App$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));
