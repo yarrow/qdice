@@ -1,10 +1,35 @@
-module Dice exposing (OneDie, diceRoller, fiveDice, oneDie, pips, url)
+module Dice exposing (OnRoll(..), OneDie, diceRoller, fiveDice, onRoll, oneDie, pips, url)
 
 import Random exposing (Generator)
 
 
+type OnRoll
+    = Keep
+    | Reroll
+
+
 type alias Fields =
-    { pips : Int }
+    { pips : Int
+    , onRoll : OnRoll
+    }
+
+
+oneDie : Int -> OneDie
+oneDie n =
+    OneDie
+        { pips = clamp minDie maxDie n
+        , onRoll = Keep
+        }
+
+
+pips : OneDie -> Int
+pips (OneDie die) =
+    die.pips
+
+
+onRoll : OneDie -> OnRoll
+onRoll (OneDie die) =
+    die.onRoll
 
 
 type OneDie
@@ -19,16 +44,6 @@ minDie =
 maxDie : Int
 maxDie =
     6
-
-
-oneDie : Int -> OneDie
-oneDie n =
-    OneDie { pips = clamp minDie maxDie n }
-
-
-pips : OneDie -> Int
-pips (OneDie die) =
-    die.pips
 
 
 url : OneDie -> String
