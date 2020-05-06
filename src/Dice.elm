@@ -3,8 +3,12 @@ module Dice exposing (OneDie, diceRoller, fiveDice, oneDie, pips, url)
 import Random exposing (Generator)
 
 
+type alias Fields =
+    { pips : Int }
+
+
 type OneDie
-    = OneDie Int
+    = OneDie Fields
 
 
 minDie : Int
@@ -19,12 +23,12 @@ maxDie =
 
 oneDie : Int -> OneDie
 oneDie n =
-    OneDie (clamp minDie maxDie n)
+    OneDie { pips = clamp minDie maxDie n }
 
 
 pips : OneDie -> Int
-pips (OneDie n) =
-    n
+pips (OneDie die) =
+    die.pips
 
 
 url : OneDie -> String
