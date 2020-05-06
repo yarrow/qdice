@@ -1,11 +1,10 @@
 module AppTests exposing (..)
 
--- import Random
-
-import App exposing (Msg(..), initialModel, main, update, view)
-import Dice exposing (oneDie)
+import App exposing (Model, Msg(..), initialModel, main, update, view)
+import Dice
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
+import Random
 import Test exposing (..)
 
 
@@ -19,6 +18,16 @@ initialModelSuite =
         ]
 
 
+dice_5 : List Dice.OneDie
+dice_5 =
+    Random.step Dice.fiveDice (Random.initialSeed 0) |> Tuple.first
+
+
+withDice : Model
+withDice =
+    update (GotDice dice_5) initialModel |> Tuple.first
+
+
 updateSuite : Test
 updateSuite =
     describe "Properties of update" <|
@@ -29,12 +38,8 @@ updateSuite =
                     |> Expect.equal initialModel
         , test "(GotDice someDice) installs (Just someDice) as the model's .dice value" <|
             \_ ->
-                let
-                    someDice =
-                        [ oneDie 1, oneDie 4, oneDie 6 ]
-                in
-                update (GotDice someDice) initialModel
+                update (GotDice dice_5) initialModel
                     |> Tuple.first
                     |> .dice
-                    |> Expect.equal (Just someDice)
+                    |> Expect.equal (Just dice_5)
         ]

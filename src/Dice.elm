@@ -1,4 +1,4 @@
-module Dice exposing (DiceGenerator, OneDie, diceRoller, oneDie, pips, url)
+module Dice exposing (OneDie, diceRoller, fiveDice, oneDie, pips, url)
 
 import Random exposing (Generator)
 
@@ -39,3 +39,8 @@ type alias DiceGenerator =
 diceRoller : Int -> DiceGenerator
 diceRoller n =
     Random.list n (Random.map oneDie (Random.int minDie maxDie))
+
+
+fiveDice : DiceGenerator
+fiveDice =
+    diceRoller 5

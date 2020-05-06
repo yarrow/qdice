@@ -1,6 +1,6 @@
 module DiceTests exposing (..)
 
-import Dice exposing (diceRoller, oneDie, pips)
+import Dice exposing (diceRoller, fiveDice, oneDie, pips)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, intRange, list, string)
 import Random
@@ -9,7 +9,7 @@ import Test exposing (..)
 
 oneDieSuite : Test
 oneDieSuite =
-    describe "The OneDie type" <|
+    describe "The Dice.OneDie type" <|
         [ test "Input values less than 1 become 1" <|
             \_ ->
                 oneDie 0
@@ -65,4 +65,10 @@ diceRollerSuite =
                     |> Tuple.first
                     |> List.map pips
                     |> Expect.equalLists [ 1, 3, 1, 1, 6 ]
+        , fuzz (intRange Random.minInt Random.maxInt) "fiveDice always returns five dice" <|
+            \seed ->
+                Random.step fiveDice (Random.initialSeed seed)
+                    |> Tuple.first
+                    |> List.length
+                    |> Expect.equal 5
         ]
