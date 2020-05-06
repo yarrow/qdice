@@ -23,12 +23,17 @@ update msg model =
             ( { model | dice = Just dice }, Cmd.none )
 
 
-dieRow : Dice.OneDie -> Html.Html Msg
-dieRow d =
+rowWith : List (Html msg) -> Html msg
+rowWith stuff =
     tr [ class "dice-row" ]
-        [ td [ class "dice", align "center" ] [ img [ src (Dice.url d) ] [] ]
+        [ td [ class "dice", align "center" ] stuff
         , td [ class "dice" ] []
         ]
+
+
+rowWithDie : Dice.OneDie -> Html msg
+rowWithDie d =
+    rowWith [ img [ src (Dice.url d) ] [] ]
 
 
 view : Model -> Html Msg
@@ -40,7 +45,7 @@ view model =
                 div [ class "dice", id "dice" ] []
 
             Just theDice ->
-                table [ class "dice", id "dice" ] (List.map dieRow theDice)
+                table [ class "dice", id "dice" ] (List.map rowWithDie theDice)
         , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
         ]
 
