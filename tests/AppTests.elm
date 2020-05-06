@@ -31,6 +31,11 @@ withDice =
     update (GotDice dice_5) initialModel |> Tuple.first
 
 
+diceOf : Model -> List Dice.OneDie
+diceOf model =
+    Maybe.withDefault [] model.dice
+
+
 updateSuite : Test
 updateSuite =
     describe "Properties of update" <|
@@ -41,10 +46,8 @@ updateSuite =
                     |> Expect.equal initialModel
         , test "(GotDice someDice) installs (Just someDice) as the model's .dice value" <|
             \_ ->
-                update (GotDice dice_5) initialModel
-                    |> Tuple.first
-                    |> .dice
-                    |> Expect.equal (Just dice_5)
+                diceOf withDice
+                    |> Expect.equal dice_5
         ]
 
 
