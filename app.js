@@ -5458,7 +5458,6 @@ var $author$project$App$update = F2(
 	});
 var $author$project$App$RollDice = {$: 'RollDice'};
 var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$html$Html$img = _VirtualDom_node('img');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -5467,12 +5466,17 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			key,
 			$elm$json$Json$Encode$string(string));
 	});
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
+var $elm$html$Html$img = _VirtualDom_node('img');
 var $elm$html$Html$Attributes$src = function (url) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
 		'src',
 		_VirtualDom_noJavaScriptOrHtmlUri(url));
 };
+var $elm$html$Html$td = _VirtualDom_node('td');
+var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Dice$pips = function (_v0) {
 	var n = _v0.a;
 	return n;
@@ -5481,15 +5485,41 @@ var $author$project$Dice$url = function (d) {
 	return 'assets/die-' + ($elm$core$String$fromInt(
 		$author$project$Dice$pips(d)) + '.png');
 };
-var $author$project$App$dieImg = function (d) {
+var $author$project$App$dieRow = function (d) {
 	return A2(
-		$elm$html$Html$img,
+		$elm$html$Html$tr,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$src(
-				$author$project$Dice$url(d))
+				$elm$html$Html$Attributes$class('dice')
 			]),
-		_List_Nil);
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$td,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('dice'),
+						$elm$html$Html$Attributes$align('center')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$img,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$src(
+								$author$project$Dice$url(d))
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$td,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('dice')
+					]),
+				_List_Nil)
+			]));
 };
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
@@ -5511,17 +5541,9 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
+var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
 var $author$project$App$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -5535,16 +5557,29 @@ var $author$project$App$view = function (model) {
 					[
 						$elm$html$Html$text('Quarantine Dice')
 					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$id('dice')
-					]),
-				A2(
-					$elm$core$List$map,
-					$author$project$App$dieImg,
-					A2($elm$core$Maybe$withDefault, _List_Nil, model.dice))),
+				function () {
+				var _v0 = model.dice;
+				if (_v0.$ === 'Nothing') {
+					return A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('dice'),
+								$elm$html$Html$Attributes$id('dice')
+							]),
+						_List_Nil);
+				} else {
+					var theDice = _v0.a;
+					return A2(
+						$elm$html$Html$table,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('dice'),
+								$elm$html$Html$Attributes$id('dice')
+							]),
+						A2($elm$core$List$map, $author$project$App$dieRow, theDice));
+				}
+			}(),
 				A2(
 				$elm$html$Html$button,
 				_List_fromArray(

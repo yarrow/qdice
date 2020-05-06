@@ -23,17 +23,24 @@ update msg model =
             ( { model | dice = Just dice }, Cmd.none )
 
 
-dieImg : Dice.OneDie -> Html.Html Msg
-dieImg d =
-    img [ src (Dice.url d) ] []
+dieRow : Dice.OneDie -> Html.Html Msg
+dieRow d =
+    tr [ class "dice-row" ]
+        [ td [ class "dice", align "center" ] [ img [ src (Dice.url d) ] [] ]
+        , td [ class "dice" ] []
+        ]
 
 
 view : Model -> Html Msg
 view model =
     div []
         [ h1 [] [ text "Quarantine Dice" ]
-        , div [ id "dice" ]
-            (List.map dieImg (Maybe.withDefault [] model.dice))
+        , case model.dice of
+            Nothing ->
+                div [ class "dice", id "dice" ] []
+
+            Just theDice ->
+                table [ class "dice", id "dice" ] (List.map dieRow theDice)
         , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
         ]
 

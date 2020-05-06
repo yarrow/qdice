@@ -8,3 +8,16 @@ button {
 button:hover {
   background-color: #80d5ec;
 }
+
+table {
+    table-layout: fixed;
+    border-collapse: collapse;
+    border-spacing: 0;
+    text-align: center;
+}
+td {
+    width: 81px;
+    height: 81px;
+    border: 2px solid #60b5cc;
+    background-color: #80d5ec;
+}

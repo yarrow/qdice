@@ -4,6 +4,7 @@ import App exposing (Model, Msg(..), initialModel, main, update, view)
 import Dice
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
+import Html.Attributes as Attr
 import Random
 import Test exposing (..)
 import Test.Html.Query as Query
@@ -67,5 +68,11 @@ viewSuite =
                 view withDice
                     |> Query.fromHtml
                     |> Query.findAll [ tag "img" ]
+                    |> Query.count (Expect.equal 5)
+        , test "There are five dice rows" <|
+            \_ ->
+                view withDice
+                    |> Query.fromHtml
+                    |> Query.findAll [ tag "tr", attribute <| Attr.class "dice-row" ]
                     |> Query.count (Expect.equal 5)
         ]
