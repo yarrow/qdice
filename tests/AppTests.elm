@@ -6,6 +6,8 @@ import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Random
 import Test exposing (..)
+import Test.Html.Query as Query
+import Test.Html.Selector exposing (attribute, id, tag, text)
 
 
 initialModelSuite : Test
@@ -42,4 +44,16 @@ updateSuite =
                     |> Tuple.first
                     |> .dice
                     |> Expect.equal (Just dice_5)
+        ]
+
+
+viewSuite : Test
+viewSuite =
+    describe "Properties of view" <|
+        [ test "The app has a 'Roll Dice' button" <|
+            \_ ->
+                view initialModel
+                    |> Query.fromHtml
+                    |> Query.find [ tag "button", id "roll-dice" ]
+                    |> Query.has [ text "Roll Dice" ]
         ]
