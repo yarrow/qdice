@@ -31,8 +31,8 @@ rowWith stuff =
         ]
 
 
-rowWithDie : Dice.OneDie -> Html msg
-rowWithDie d =
+rowWithDie : Int -> Dice.OneDie -> Html msg
+rowWithDie _ d =
     rowWith [ img [ src (Dice.url d) ] [] ]
 
 
@@ -46,7 +46,7 @@ view model =
                     List.repeat 5 (rowWith [])
 
                 Just theDice ->
-                    List.map rowWithDie theDice
+                    List.indexedMap rowWithDie theDice
         , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
         ]
 
