@@ -40,12 +40,13 @@ view : Model -> Html Msg
 view model =
     div []
         [ h1 [] [ text "Quarantine Dice" ]
-        , case model.dice of
-            Nothing ->
-                div [ class "dice", id "dice" ] []
+        , table [ class "dice", id "dice" ] <|
+            case model.dice of
+                Nothing ->
+                    List.repeat 5 (rowWith [])
 
-            Just theDice ->
-                table [ class "dice", id "dice" ] (List.map rowWithDie theDice)
+                Just theDice ->
+                    List.map rowWithDie theDice
         , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
         ]
 

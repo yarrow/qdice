@@ -75,4 +75,10 @@ viewSuite =
                     |> Query.fromHtml
                     |> Query.findAll [ tag "tr", attribute <| Attr.class "dice-row" ]
                     |> Query.count (Expect.equal 5)
+        , test "There are five dice rows in the initial Model too" <|
+            \_ ->
+                view initialModel
+                    |> Query.fromHtml
+                    |> Query.findAll [ tag "tr", attribute <| Attr.class "dice-row" ]
+                    |> Query.count (Expect.equal 5)
         ]
