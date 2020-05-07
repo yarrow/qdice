@@ -133,4 +133,10 @@ viewSuite =
                     |> Query.fromHtml
                     |> Query.findAll [ tag "tr", attribute <| Attr.class "dice-row" ]
                     |> Query.count (Expect.equal 5)
+        , test "The inital model shows 3 remainingRolls" <|
+            \_ ->
+                view initialModel
+                    |> Query.fromHtml
+                    |> Query.find [ tag "caption" ]
+                    |> Query.has [ text "3 rolls remaining" ]
         ]

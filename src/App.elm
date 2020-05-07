@@ -109,8 +109,10 @@ view model =
     div []
         [ h1 [] [ text "Quarantine Dice" ]
         , table [ class "dice", id "dice" ] <|
-            tr [] [ th [] [ text "Reroll" ], th [] [ text "Keep" ] ]
-                :: (case model.dice of
+            [ caption [] [ text (String.fromInt model.remainingRolls ++ " rolls remaining") ]
+            , tr [] [ th [] [ text "Reroll" ], th [] [ text "Keep" ] ]
+            ]
+                ++ (case model.dice of
                         Nothing ->
                             List.repeat 5 blankRow
 
