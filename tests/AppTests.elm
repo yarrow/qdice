@@ -54,12 +54,25 @@ updateSuite =
 
             reroll =
                 ( 1, Reroll )
+
+            keepAll =
+                Dice.makeDice [ keep, keep, keep, keep, keep ]
         in
         [ test "RollDice doesn't change the model" <|
             \_ ->
                 update RollDice initialModel
                     |> Tuple.first
                     |> Expect.equal initialModel
+        , test "RollDice sends Cmd.none if remainingRolls is 0" <|
+            \_ ->
+                update RollDice { modelWithRandomDice | remainingRolls = 0 }
+                    |> Tuple.second
+                    |> Expect.equal Cmd.none
+        , test "RollDice sends Cmd.none if there are no dice to be rerolled" <|
+            \_ ->
+                update RollDice (modelWithDice keepAll)
+                    |> Tuple.second
+                    |> Expect.equal Cmd.none
         , test "In the initial model, (GotDice someDice) installs (Just someDice) as the model's .dice value" <|
             \_ ->
                 diceOf modelWithRandomDice
@@ -71,9 +84,6 @@ updateSuite =
         , test "`DieFlipped 0` causes the 0th die to flip its NextRoll status" <|
             \_ ->
                 let
-                    keepAll =
-                        Dice.makeDice [ keep, keep, keep, keep, keep ]
-
                     rerollFirst =
                         Dice.makeDice [ reroll, keep, keep, keep, keep ]
                 in

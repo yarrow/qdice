@@ -56,11 +56,25 @@ refreshDice incoming current =
                     new :: refreshDice tailIncoming tailCurrent
 
 
+rollAllowed : Model -> Bool
+rollAllowed model =
+    model.remainingRolls > 0 && (rerollCount model > 0)
+
+
+gotDiceIfRollAllowed : Model -> Cmd Msg
+gotDiceIfRollAllowed model =
+    if rollAllowed model then
+        Random.generate GotDice (Dice.diceRoller (rerollCount model))
+
+    else
+        Cmd.none
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         RollDice ->
-            ( model, Random.generate GotDice (Dice.diceRoller (rerollCount model)) )
+            ( model, gotDiceIfRollAllowed model )
 
         GotDice incomingDice ->
             let
