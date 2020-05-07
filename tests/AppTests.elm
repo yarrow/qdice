@@ -48,10 +48,10 @@ updateSuite =
             \_ ->
                 diceOf withDice
                     |> Expect.equal dice_5
-        , test "Initially, all dice have onRoll == Keep" <|
+        , test "Initially, all dice have nextRoll == Keep" <|
             \_ ->
-                List.all (\d -> Dice.onRoll d == Dice.Keep) (diceOf withDice)
-                    |> Expect.true "Initially, all dice have an OnRoll of Keep"
+                List.all (\d -> Dice.nextRoll d == Dice.Keep) (diceOf withDice)
+                    |> Expect.true "Initially, all dice have an NextRoll of Keep"
         ]
 
 

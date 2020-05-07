@@ -80,34 +80,34 @@ randomDie seed =
         |> Tuple.first
 
 
-onRollSuite : Test
-onRollSuite =
-    describe "the onRoll field" <|
-        [ fuzz (intRange Random.minInt Random.maxInt) "A new die's onRoll is Keep" <|
+nextRollSuite : Test
+nextRollSuite =
+    describe "the nextRoll field" <|
+        [ fuzz (intRange Random.minInt Random.maxInt) "A new die's nextRoll is Keep" <|
             \seed ->
                 randomDie seed
-                    |> List.map Dice.onRoll
+                    |> List.map Dice.nextRoll
                     |> Expect.equalLists [ Dice.Keep ]
-        , fuzz (intRange Random.minInt Random.maxInt) "flipOnRoll changes Keep to Reroll and vice-versa" <|
+        , fuzz (intRange Random.minInt Random.maxInt) "flipNextRoll changes Keep to Reroll and vice-versa" <|
             \seed ->
                 let
                     hasKeep =
                         randomDie seed
 
                     hasReroll =
-                        List.map Dice.flipOnRoll hasKeep
+                        List.map Dice.flipNextRoll hasKeep
 
                     alsoKeep =
-                        List.map Dice.flipOnRoll hasReroll
+                        List.map Dice.flipNextRoll hasReroll
                 in
-                List.map Dice.onRoll (hasKeep ++ hasReroll ++ alsoKeep)
+                List.map Dice.nextRoll (hasKeep ++ hasReroll ++ alsoKeep)
                     |> Expect.equalLists [ Dice.Keep, Dice.Reroll, Dice.Keep ]
         ]
 
 
 reroll : Int -> Dice.OneDie
 reroll n =
-    Dice.flipOnRoll (oneDie n)
+    Dice.flipNextRoll (oneDie n)
 
 
 keep : Int -> Dice.OneDie
@@ -117,7 +117,7 @@ keep =
 
 flipNthSuite : Test
 flipNthSuite =
-    describe "flipNth n dice performs flipOnRoll on the nth element of dice" <|
+    describe "flipNth n dice performs flipNextRoll on the nth element of dice" <|
         [ test "flipNth 0" <|
             \_ ->
                 Dice.flipNth 0 [ keep 1, reroll 2 ]

@@ -1,17 +1,17 @@
-module Dice exposing (OnRoll(..), OneDie, diceRoller, fiveDice, flipNth, flipOnRoll, onRoll, oneDie, pips, url)
+module Dice exposing (NextRoll(..), OneDie, diceRoller, fiveDice, flipNth, flipNextRoll, nextRoll, oneDie, pips, url)
 
 import Array
 import Random exposing (Generator)
 
 
-type OnRoll
+type NextRoll
     = Keep
     | Reroll
 
 
 type alias Fields =
     { pips : Int
-    , onRoll : OnRoll
+    , nextRoll : NextRoll
     }
 
 
@@ -23,7 +23,7 @@ oneDie : Int -> OneDie
 oneDie n =
     OneDie
         { pips = clamp minDie maxDie n
-        , onRoll = Keep
+        , nextRoll = Keep
         }
 
 
@@ -32,17 +32,17 @@ pips (OneDie die) =
     die.pips
 
 
-onRoll : OneDie -> OnRoll
-onRoll (OneDie die) =
-    die.onRoll
+nextRoll : OneDie -> NextRoll
+nextRoll (OneDie die) =
+    die.nextRoll
 
 
-flipOnRoll : OneDie -> OneDie
-flipOnRoll (OneDie d) =
+flipNextRoll : OneDie -> OneDie
+flipNextRoll (OneDie d) =
     OneDie
         { pips = d.pips
-        , onRoll =
-            case d.onRoll of
+        , nextRoll =
+            case d.nextRoll of
                 Keep ->
                     Reroll
 
@@ -80,7 +80,7 @@ flipNth n dice =
             dice
 
         Just aDie ->
-            Array.set n (flipOnRoll aDie) diceArray
+            Array.set n (flipNextRoll aDie) diceArray
                 |> Array.toList
 
 
