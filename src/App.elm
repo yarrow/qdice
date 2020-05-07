@@ -11,6 +11,7 @@ import Random
 type Msg
     = RollDice
     | GotDice (List Dice.OneDie)
+    | DieFlipped Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -22,20 +23,22 @@ update msg model =
         GotDice dice ->
             ( { model | dice = Just dice }, Cmd.none )
 
+        DieFlipped j ->
+            let
+                newDice =
+                    case model.dice of
+                        Nothing ->
+                            Nothing
+
+                        Just dice ->
+                            Just (Dice.flipNth j dice)
+            in
+            ( { model | dice = newDice }, Cmd.none )
+
 
 tdDie : Int -> Dice.OneDie -> Html msg
 tdDie _ d =
     td [ class "dice" ] [ img [ src (Dice.url d) ] [] ]
-
-
-tdBlank : Html msg
-tdBlank =
-    td [ class "dice" ] []
-
-
-blankRow : Html msg
-blankRow =
-    tr [ class "dice-row" ] [ tdBlank, tdBlank ]
 
 
 dieRow : Int -> Dice.OneDie -> Html msg
@@ -46,17 +49,14 @@ dieRow j d =
         ]
 
 
-rowWith : List (Html msg) -> Html msg
-rowWith stuff =
-    tr [ class "dice-row" ]
-        [ td [ class "dice" ] stuff
-        , td [ class "dice" ] []
-        ]
+tdBlank : Html msg
+tdBlank =
+    td [ class "dice" ] []
 
 
-rowWithDie : Int -> Dice.OneDie -> Html msg
-rowWithDie _ d =
-    rowWith [ img [ src (Dice.url d) ] [] ]
+blankRow : Html msg
+blankRow =
+    tr [ class "dice-row" ] [ tdBlank, tdBlank ]
 
 
 view : Model -> Html Msg
