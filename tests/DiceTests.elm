@@ -1,6 +1,6 @@
 module DiceTests exposing (..)
 
-import Dice exposing (diceRoller, fiveDice, oneDie, pips)
+import Dice exposing (NextRoll(..), OneDie, diceRoller, fiveDice, flipNextRoll, flipNth, makeDice, makeDie, nextRoll, oneDie, pips)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, intRange, list, string)
 import Random
@@ -33,10 +33,10 @@ oneDieSuite =
             \n ->
                 let
                     d =
-                        Dice.oneDie n
+                        oneDie n
 
                     fragment =
-                        "/die-" ++ String.fromInt (Dice.pips d) ++ "."
+                        "/die-" ++ String.fromInt (pips d) ++ "."
                 in
                 Dice.url d
                     |> String.contains fragment
@@ -74,9 +74,9 @@ diceRollerSuite =
         ]
 
 
-randomDie : Int -> List Dice.OneDie
+randomDie : Int -> List OneDie
 randomDie seed =
-    Random.step (Dice.diceRoller 1) (Random.initialSeed seed)
+    Random.step (diceRoller 1) (Random.initialSeed seed)
         |> Tuple.first
 
 
@@ -86,8 +86,8 @@ nextRollSuite =
         [ fuzz (intRange Random.minInt Random.maxInt) "A new die's nextRoll is Keep" <|
             \seed ->
                 randomDie seed
-                    |> List.map Dice.nextRoll
-                    |> Expect.equalLists [ Dice.Keep ]
+                    |> List.map nextRoll
+                    |> Expect.equalLists [ Keep ]
         , fuzz (intRange Random.minInt Random.maxInt) "flipNextRoll changes Keep to Reroll and vice-versa" <|
             \seed ->
                 let
@@ -95,24 +95,14 @@ nextRollSuite =
                         randomDie seed
 
                     hasReroll =
-                        List.map Dice.flipNextRoll hasKeep
+                        List.map flipNextRoll hasKeep
 
                     alsoKeep =
-                        List.map Dice.flipNextRoll hasReroll
+                        List.map flipNextRoll hasReroll
                 in
-                List.map Dice.nextRoll (hasKeep ++ hasReroll ++ alsoKeep)
-                    |> Expect.equalLists [ Dice.Keep, Dice.Reroll, Dice.Keep ]
+                List.map nextRoll (hasKeep ++ hasReroll ++ alsoKeep)
+                    |> Expect.equalLists [ Keep, Reroll, Keep ]
         ]
-
-
-reroll : Int -> Dice.OneDie
-reroll n =
-    Dice.flipNextRoll (oneDie n)
-
-
-keep : Int -> Dice.OneDie
-keep =
-    oneDie
 
 
 flipNthSuite : Test
@@ -120,6 +110,6 @@ flipNthSuite =
     describe "flipNth n dice performs flipNextRoll on the nth element of dice" <|
         [ test "flipNth 0" <|
             \_ ->
-                Dice.flipNth 0 [ keep 1, reroll 2 ]
-                    |> Expect.equalLists [ reroll 1, reroll 2 ]
+                flipNth 0 (makeDice [ ( 1, Keep ), ( 2, Reroll ) ])
+                    |> Expect.equalLists (makeDice [ ( 1, Reroll ), ( 2, Reroll ) ])
         ]

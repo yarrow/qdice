@@ -1,4 +1,4 @@
-module Dice exposing (NextRoll(..), OneDie, diceRoller, fiveDice, flipNth, flipNextRoll, nextRoll, oneDie, pips, url)
+module Dice exposing (NextRoll(..), OneDie, diceRoller, fiveDice, flipNextRoll, flipNth, makeDice, makeDie, nextRoll, oneDie, pips, url)
 
 import Array
 import Random exposing (Generator)
@@ -35,6 +35,16 @@ pips (OneDie die) =
 nextRoll : OneDie -> NextRoll
 nextRoll (OneDie die) =
     die.nextRoll
+
+
+makeDie : ( Int, NextRoll ) -> OneDie
+makeDie ( n, nextStatus ) =
+    OneDie { pips = n, nextRoll = nextStatus }
+
+
+makeDice : List ( Int, NextRoll ) -> List OneDie
+makeDice raw =
+    List.map makeDie raw
 
 
 flipNextRoll : OneDie -> OneDie
