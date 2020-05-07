@@ -36,17 +36,20 @@ update msg model =
             ( { model | dice = newDice }, Cmd.none )
 
 
-tdDie : Int -> Dice.OneDie -> Html msg
-tdDie _ d =
+tdDie : Dice.OneDie -> Html msg
+tdDie d =
     td [ class "dice" ] [ img [ src (Dice.url d) ] [] ]
 
 
-dieRow : Int -> Dice.OneDie -> Html msg
+dieRow : Int -> Dice.OneDie -> Html Msg
 dieRow j d =
-    tr [ class "dice-row" ]
-        [ tdBlank
-        , tdDie j d
-        ]
+    tr [ class "dice-row", onClick (DieFlipped j) ] <|
+        case Dice.nextRoll d of
+            Dice.Keep ->
+                [ tdBlank, tdDie d ]
+
+            Dice.Reroll ->
+                [ tdDie d, tdBlank ]
 
 
 tdBlank : Html msg
