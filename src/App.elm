@@ -123,12 +123,13 @@ view model =
 
 type alias Model =
     { dice : Maybe (List Dice.OneDie)
+    , remainingRolls : Int
     }
 
 
 initialModel : Model
 initialModel =
-    { dice = Nothing }
+    { dice = Nothing, remainingRolls = 3 }
 
 
 main : Program () Model Msg

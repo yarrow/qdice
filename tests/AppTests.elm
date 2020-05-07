@@ -18,6 +18,10 @@ initialModelSuite =
             \_ ->
                 initialModel.dice
                     |> Expect.equal Nothing
+        , test "We start with three rolls available" <|
+            \_ ->
+                initialModel.remainingRolls
+                    |> Expect.equal 3
         ]
 
 
