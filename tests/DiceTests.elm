@@ -103,3 +103,23 @@ onRollSuite =
                 List.map Dice.onRoll (hasKeep ++ hasReroll ++ alsoKeep)
                     |> Expect.equalLists [ Dice.Keep, Dice.Reroll, Dice.Keep ]
         ]
+
+
+reroll : Int -> Dice.OneDie
+reroll n =
+    Dice.flipOnRoll (oneDie n)
+
+
+keep : Int -> Dice.OneDie
+keep =
+    oneDie
+
+
+flipNthSuite : Test
+flipNthSuite =
+    describe "flipNth n dice performs flipOnRoll on the nth element of dice" <|
+        [ test "flipNth 0" <|
+            \_ ->
+                Dice.flipNth 0 [ keep 1, reroll 2 ]
+                    |> Expect.equalLists [ reroll 1, reroll 2 ]
+        ]

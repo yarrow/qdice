@@ -1,5 +1,6 @@
-module Dice exposing (OnRoll(..), OneDie, diceRoller, fiveDice, flipOnRoll, onRoll, oneDie, pips, url)
+module Dice exposing (OnRoll(..), OneDie, diceRoller, fiveDice, flipNth, flipOnRoll, onRoll, oneDie, pips, url)
 
+import Array
 import Random exposing (Generator)
 
 
@@ -12,6 +13,10 @@ type alias Fields =
     { pips : Int
     , onRoll : OnRoll
     }
+
+
+type OneDie
+    = OneDie Fields
 
 
 oneDie : Int -> OneDie
@@ -46,10 +51,6 @@ flipOnRoll (OneDie d) =
         }
 
 
-type OneDie
-    = OneDie Fields
-
-
 minDie : Int
 minDie =
     1
@@ -63,6 +64,24 @@ maxDie =
 url : OneDie -> String
 url d =
     "assets/die-" ++ String.fromInt (pips d) ++ ".png"
+
+
+flipNth : Int -> List OneDie -> List OneDie
+flipNth n dice =
+    let
+        diceArray =
+            Array.fromList dice
+
+        oldDie =
+            diceArray |> Array.get n
+    in
+    case oldDie of
+        Nothing ->
+            dice
+
+        Just aDie ->
+            Array.set n (flipOnRoll aDie) diceArray
+                |> Array.toList
 
 
 type alias DiceGenerator =
