@@ -14,14 +14,56 @@ type Msg
     | DieFlipped Int
 
 
+type alias DiceList =
+    List Dice.OneDie
+
+
+rerollCount : Model -> Int
+rerollCount model =
+    case model.dice of
+        Nothing ->
+            5
+
+        Just dice ->
+            List.length (List.filter (\die -> Dice.nextRoll die == Dice.Reroll) dice)
+
+
+mergeDice : DiceList -> Maybe DiceList -> Maybe DiceList
+mergeDice incoming current =
+    case current of
+        Nothing ->
+            Just incoming
+
+        Just oldDice ->
+            Just (refreshDice incoming oldDice)
+
+
+refreshDice : DiceList -> DiceList -> DiceList
+refreshDice incoming current =
+    case ( incoming, current ) of
+        ( [], _ ) ->
+            current
+
+        ( _, [] ) ->
+            []
+
+        ( new :: tailIncoming, old :: tailCurrent ) ->
+            case Dice.nextRoll old of
+                Dice.Keep ->
+                    old :: refreshDice incoming tailCurrent
+
+                Dice.Reroll ->
+                    new :: refreshDice tailIncoming tailCurrent
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         RollDice ->
-            ( model, Random.generate GotDice (Dice.diceRoller 5) )
+            ( model, Random.generate GotDice (Dice.diceRoller (rerollCount model)) )
 
-        GotDice dice ->
-            ( { model | dice = Just dice }, Cmd.none )
+        GotDice incomingDice ->
+            ( { model | dice = mergeDice incomingDice model.dice }, Cmd.none )
 
         DieFlipped j ->
             let
@@ -67,12 +109,14 @@ view model =
     div []
         [ h1 [] [ text "Quarantine Dice" ]
         , table [ class "dice", id "dice" ] <|
-            case model.dice of
-                Nothing ->
-                    List.repeat 5 blankRow
+            tr [] [ th [] [ text "Reroll" ], th [] [ text "Keep" ] ]
+                :: (case model.dice of
+                        Nothing ->
+                            List.repeat 5 blankRow
 
-                Just theDice ->
-                    List.indexedMap dieRow theDice
+                        Just theDice ->
+                            List.indexedMap dieRow theDice
+                   )
         , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
         ]
 

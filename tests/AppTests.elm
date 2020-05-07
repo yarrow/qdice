@@ -1,7 +1,7 @@
 module AppTests exposing (..)
 
 import App exposing (Model, Msg(..), initialModel, main, update, view)
-import Dice
+import Dice exposing (NextRoll(..))
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Html.Attributes as Attr
@@ -44,28 +44,29 @@ diceOf model =
 updateSuite : Test
 updateSuite =
     describe "Properties of update" <|
+        let
+            keep =
+                ( 1, Keep )
+
+            reroll =
+                ( 1, Reroll )
+        in
         [ test "RollDice doesn't change the model" <|
             \_ ->
                 update RollDice initialModel
                     |> Tuple.first
                     |> Expect.equal initialModel
-        , test "(GotDice someDice) installs (Just someDice) as the model's .dice value" <|
+        , test "In the initial model, (GotDice someDice) installs (Just someDice) as the model's .dice value" <|
             \_ ->
                 diceOf modelWithRandomDice
                     |> Expect.equal randomDice
         , test "Initially, all dice have nextRoll == Keep" <|
             \_ ->
-                List.all (\d -> Dice.nextRoll d == Dice.Keep) randomDice
+                List.all (\d -> Dice.nextRoll d == Keep) randomDice
                     |> Expect.true "Initially, all dice have an NextRoll of Keep"
         , test "`DieFlipped 0` causes the 0th die to flip its NextRoll status" <|
             \_ ->
                 let
-                    keep =
-                        ( 1, Dice.Keep )
-
-                    reroll =
-                        ( 1, Dice.Reroll )
-
                     keepAll =
                         Dice.makeDice [ keep, keep, keep, keep, keep ]
 
@@ -76,6 +77,22 @@ updateSuite =
                     |> Tuple.first
                     |> diceOf
                     |> Expect.equalLists rerollFirst
+        , test "Incoming dice replace dice to be rerolled" <|
+            \_ ->
+                let
+                    startingDice =
+                        Dice.makeDice [ keep, reroll, keep, reroll, keep ]
+
+                    incomingDice =
+                        Dice.makeDice [ ( 2, Keep ), ( 3, Keep ) ]
+
+                    resultingDice =
+                        Dice.makeDice [ keep, ( 2, Keep ), keep, ( 3, Keep ), keep ]
+                in
+                update (GotDice incomingDice) (modelWithDice startingDice)
+                    |> Tuple.first
+                    |> diceOf
+                    |> Expect.equalLists resultingDice
         ]
 
 
