@@ -63,7 +63,14 @@ update msg model =
             ( model, Random.generate GotDice (Dice.diceRoller (rerollCount model)) )
 
         GotDice incomingDice ->
-            ( { model | dice = mergeDice incomingDice model.dice }, Cmd.none )
+            let
+                newModel =
+                    { model
+                        | dice = mergeDice incomingDice model.dice
+                        , remainingRolls = model.remainingRolls - 1
+                    }
+            in
+            ( newModel, Cmd.none )
 
         DieFlipped j ->
             let

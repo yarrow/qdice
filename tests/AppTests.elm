@@ -97,6 +97,12 @@ updateSuite =
                     |> Tuple.first
                     |> diceOf
                     |> Expect.equalLists resultingDice
+        , test "After the first roll, we have 2 rolls remaining" <|
+            \_ ->
+                update (GotDice randomDice) initialModel
+                    |> Tuple.first
+                    |> .remainingRolls
+                    |> Expect.equal 2
         ]
 
 
@@ -139,4 +145,10 @@ viewSuite =
                     |> Query.fromHtml
                     |> Query.find [ tag "caption" ]
                     |> Query.has [ text "3 rolls remaining" ]
+        , test "After the first roll, we show two rolls remaining" <|
+            \_ ->
+                view modelWithRandomDice
+                    |> Query.fromHtml
+                    |> Query.find [ tag "caption" ]
+                    |> Query.has [ text "2 rolls remaining" ]
         ]
