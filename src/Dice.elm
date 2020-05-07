@@ -1,4 +1,4 @@
-module Dice exposing (OnRoll(..), OneDie, diceRoller, fiveDice, onRoll, oneDie, pips, url)
+module Dice exposing (OnRoll(..), OneDie, diceRoller, fiveDice, flipOnRoll, onRoll, oneDie, pips, url)
 
 import Random exposing (Generator)
 
@@ -30,6 +30,20 @@ pips (OneDie die) =
 onRoll : OneDie -> OnRoll
 onRoll (OneDie die) =
     die.onRoll
+
+
+flipOnRoll : OneDie -> OneDie
+flipOnRoll (OneDie d) =
+    OneDie
+        { pips = d.pips
+        , onRoll =
+            case d.onRoll of
+                Keep ->
+                    Reroll
+
+                Reroll ->
+                    Keep
+        }
 
 
 type OneDie

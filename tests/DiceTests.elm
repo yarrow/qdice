@@ -9,7 +9,7 @@ import Test exposing (..)
 
 oneDieSuite : Test
 oneDieSuite =
-    describe "The Dice.OneDie type" <|
+    describe "The OneDie type" <|
         [ test "Input values less than 1 become 1" <|
             \_ ->
                 oneDie 0
@@ -71,4 +71,35 @@ diceRollerSuite =
                     |> Tuple.first
                     |> List.length
                     |> Expect.equal 5
+        ]
+
+
+randomDie : Int -> List Dice.OneDie
+randomDie seed =
+    Random.step (Dice.diceRoller 1) (Random.initialSeed seed)
+        |> Tuple.first
+
+
+onRollSuite : Test
+onRollSuite =
+    describe "the onRoll field" <|
+        [ fuzz (intRange Random.minInt Random.maxInt) "A new die's onRoll is Keep" <|
+            \seed ->
+                randomDie seed
+                    |> List.map Dice.onRoll
+                    |> Expect.equalLists [ Dice.Keep ]
+        , fuzz (intRange Random.minInt Random.maxInt) "flipOnRoll changes Keep to Reroll and vice-versa" <|
+            \seed ->
+                let
+                    hasKeep =
+                        randomDie seed
+
+                    hasReroll =
+                        List.map Dice.flipOnRoll hasKeep
+
+                    alsoKeep =
+                        List.map Dice.flipOnRoll hasReroll
+                in
+                List.map Dice.onRoll (hasKeep ++ hasReroll ++ alsoKeep)
+                    |> Expect.equalLists [ Dice.Keep, Dice.Reroll, Dice.Keep ]
         ]
