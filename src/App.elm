@@ -23,10 +23,33 @@ update msg model =
             ( { model | dice = Just dice }, Cmd.none )
 
 
+tdDie : Int -> Dice.OneDie -> Html msg
+tdDie _ d =
+    td [ class "dice" ] [ img [ src (Dice.url d) ] [] ]
+
+
+tdBlank : Html msg
+tdBlank =
+    td [ class "dice" ] []
+
+
+blankRow : Html msg
+blankRow =
+    tr [ class "dice-row" ] [ tdBlank, tdBlank ]
+
+
+dieRow : Int -> Dice.OneDie -> Html msg
+dieRow j d =
+    tr [ class "dice-row" ]
+        [ tdBlank
+        , tdDie j d
+        ]
+
+
 rowWith : List (Html msg) -> Html msg
 rowWith stuff =
     tr [ class "dice-row" ]
-        [ td [ class "dice", align "center" ] stuff
+        [ td [ class "dice" ] stuff
         , td [ class "dice" ] []
         ]
 
@@ -43,10 +66,10 @@ view model =
         , table [ class "dice", id "dice" ] <|
             case model.dice of
                 Nothing ->
-                    List.repeat 5 (rowWith [])
+                    List.repeat 5 blankRow
 
                 Just theDice ->
-                    List.indexedMap rowWithDie theDice
+                    List.indexedMap dieRow theDice
         , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
         ]
 
