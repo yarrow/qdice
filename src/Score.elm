@@ -1,4 +1,4 @@
-module Score exposing (DisplayBox, DisplayRow, ScoreDisplay, ScorePad, inert, initialScorePad, scoreOrder)
+module Score exposing (Display, DisplayBox, DisplayRow, Pad, inert, initialPad, rowOrder)
 
 import Array exposing (Array)
 import Dice
@@ -6,12 +6,12 @@ import Dict exposing (Dict)
 import ScoreTags exposing (..)
 
 
-scoreOrder : List String
-scoreOrder =
+rowOrder : List String
+rowOrder =
     [ ones, twos, threes, fours, fives, sixes, upperTotal, bonus, threeOfAKind, fourOfAKind, fullHouse, smallStraight, largeStraight, fiveOfAKind, chance, total, weighted, grandTotal ]
 
 
-type alias ScoreDisplay =
+type alias Display =
     List DisplayRow
 
 
@@ -31,15 +31,15 @@ type alias DisplayBox =
     }
 
 
-type ScorePad
-    = ScorePad
+type Pad
+    = Pad
 
 
-initialScorePad : ScorePad
-initialScorePad =
-    ScorePad
+initialPad : Pad
+initialPad =
+    Pad
 
 
-inert : ScorePad -> ScoreDisplay
-inert pad =
-    []
+inert : Pad -> Display
+inert _ =
+    List.map (\tag -> { tag = tag, boxes = List.repeat 3 { text = "", onClick = Nothing } }) rowOrder
