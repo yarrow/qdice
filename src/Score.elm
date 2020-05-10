@@ -1,4 +1,4 @@
-module Score exposing (Display, DisplayBox, DisplayRow, Pad, inert, initialPad, rowOrder)
+module Score exposing (BoxLocation, Display, DisplayBox, DisplayRow, Pad, active, inert, initialPad, rowOrder)
 
 import Array exposing (Array)
 import Dice
@@ -21,13 +21,13 @@ type alias DisplayRow =
     }
 
 
-type alias ScoreIndex =
+type alias BoxLocation =
     String
 
 
 type alias DisplayBox =
     { text : String
-    , onClick : Maybe ScoreIndex
+    , onClick : Maybe BoxLocation
     }
 
 
@@ -42,4 +42,9 @@ initialPad =
 
 inert : Pad -> Display
 inert _ =
+    List.map (\tag -> { tag = tag, boxes = List.repeat 3 { text = "", onClick = Nothing } }) rowOrder
+
+
+active : Pad -> Display
+active _ =
     List.map (\tag -> { tag = tag, boxes = List.repeat 3 { text = "", onClick = Nothing } }) rowOrder
