@@ -39,11 +39,20 @@ onClickSuite =
             \_ ->
                 List.all (\it -> it == Nothing) (clicks inertDisplay)
                     |> Expect.true "Found an onClick in inertDisplay"
-        , test "Initially, all the score (non-calculational) boxes have onClicks" <|
+        , test "No calculated boxes have onClicks" <|
             \_ ->
-                List.all (\it -> it == Nothing) (clicks inertDisplay)
-                    |> Expect.true "Found an onClick in inertDisplay"
+                List.all (\it -> it == Nothing) (clicks (rowsWith calculatedTags activeDisplay))
+                    |> Expect.true "Found an onClick in a calculated box"
+        , test "Initially, all the score boxes have onClicks" <|
+            \_ ->
+                List.all (\it -> it /= Nothing) (clicks (rowsWith activeTags activeDisplay))
+                    |> Expect.true "Found a score box without an onClick"
         ]
+
+
+rowsWith : Set String -> Score.Display -> Score.Display
+rowsWith tagSet display =
+    List.filter (\row -> Set.member row.tag tagSet) display
 
 
 allTags : List String
