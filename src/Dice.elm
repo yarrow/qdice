@@ -36,11 +36,12 @@ count : List OneDie -> Array Int
 count dice =
     let
         increment jth counter =
-            let
-                old =
-                    Maybe.withDefault 0 (Array.get jth counter)
-            in
-            Array.set jth (old + 1) counter
+            case Array.get jth counter of
+                Just old ->
+                    Array.set jth (old + 1) counter
+
+                Nothing ->
+                    counter
     in
     List.foldr increment (Array.repeat 7 0) (List.map pips dice)
 
