@@ -1,4 +1,6 @@
-module Combo exposing (Combo(..), toString)
+module Combo exposing (Combo(..), scoreFn, toString)
+
+import Array exposing (Array)
 
 
 type Combo
@@ -58,6 +60,59 @@ toString combo =
 
         Chance ->
             "Chance"
+
+
+meh : Array Int -> Int
+meh _ =
+    0
+
+
+valueTimesCount : Int -> Array Int -> Int
+valueTimesCount value counter =
+    value * Maybe.withDefault 0 (Array.get value counter)
+
+
+scoreFn : Combo -> (Array Int -> Int)
+scoreFn combo =
+    case combo of
+        Ones ->
+            valueTimesCount 1
+
+        Twos ->
+            valueTimesCount 2
+
+        Threes ->
+            valueTimesCount 3
+
+        Fours ->
+            valueTimesCount 4
+
+        Fives ->
+            valueTimesCount 5
+
+        Sixes ->
+            valueTimesCount 6
+
+        ThreeOfAKind ->
+            meh
+
+        FourOfAKind ->
+            meh
+
+        FullHouse ->
+            meh
+
+        SmallStraight ->
+            meh
+
+        LargeStraight ->
+            meh
+
+        FiveOfAKind ->
+            meh
+
+        Chance ->
+            meh
 
 
 toInt : Combo -> Int
