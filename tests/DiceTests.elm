@@ -47,15 +47,19 @@ oneDieSuite =
 
 countSuite : Test
 countSuite =
-    only <|
-        describe "(Dice.count dice) returns an array where slot j holds the number of dies in dice with j pips" <|
-            [ test "12345" <|
-                -- dice never have zero pips, and this set has no 6
-                \_ ->
-                    Dice.count (List.map oneDie [ 1, 2, 3, 4, 5 ])
-                        |> Array.toList
-                        |> Expect.equalLists [ 0, 1, 1, 1, 1, 1, 0 ]
-            ]
+    describe "(Dice.count dice) returns an array where slot j holds the number of dies in dice with j pips" <|
+        [ test "12345" <|
+            \_ ->
+                -- dice never have zero pips, and this set has no 6s
+                Dice.count (List.map oneDie [ 1, 2, 3, 4, 5 ])
+                    |> Array.toList
+                    |> Expect.equalLists [ 0, 1, 1, 1, 1, 1, 0 ]
+        , test "More of a kind" <|
+            \_ ->
+                Dice.count (List.map oneDie [ 3, 6, 5, 6, 3 ])
+                    |> Array.toList
+                    |> Expect.equalLists [ 0, 0, 0, 2, 0, 1, 2 ]
+        ]
 
 
 diceRollerSuite : Test
