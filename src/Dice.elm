@@ -1,6 +1,6 @@
-module Dice exposing (NextRoll(..), OneDie, diceRoller, fiveDice, flipNextRoll, flipNth, makeDice, makeDie, nextRoll, oneDie, pips, url)
+module Dice exposing (NextRoll(..), OneDie, count, diceRoller, fiveDice, flipNextRoll, flipNth, makeDice, makeDie, nextRoll, oneDie, pips, url)
 
-import Array
+import Array exposing (Array)
 import Random exposing (Generator)
 
 
@@ -30,6 +30,19 @@ oneDie n =
 pips : OneDie -> Int
 pips (OneDie die) =
     die.pips
+
+
+count : List OneDie -> Array Int
+count dice =
+    let
+        increment jth counter =
+            let
+                old =
+                    Maybe.withDefault 0 (Array.get jth counter)
+            in
+            Array.set jth (old + 1) counter
+    in
+    List.foldr increment (Array.repeat 7 0) (List.map pips dice)
 
 
 nextRoll : OneDie -> NextRoll

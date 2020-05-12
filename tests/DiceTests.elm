@@ -1,5 +1,6 @@
 module DiceTests exposing (..)
 
+import Array exposing (Array)
 import Dice exposing (NextRoll(..), OneDie, diceRoller, fiveDice, flipNextRoll, flipNth, makeDice, makeDie, nextRoll, oneDie, pips)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, intRange, list, string)
@@ -42,6 +43,19 @@ oneDieSuite =
                     |> String.contains fragment
                     |> Expect.true ("Expected to see " ++ fragment)
         ]
+
+
+countSuite : Test
+countSuite =
+    only <|
+        describe "(Dice.count dice) returns an array where slot j holds the number of dies in dice with j pips" <|
+            [ test "12345" <|
+                -- dice never have zero pips, and this set has no 6
+                \_ ->
+                    Dice.count (List.map oneDie [ 1, 2, 3, 4, 5 ])
+                        |> Array.toList
+                        |> Expect.equalLists [ 0, 1, 1, 1, 1, 1, 0 ]
+            ]
 
 
 diceRollerSuite : Test
