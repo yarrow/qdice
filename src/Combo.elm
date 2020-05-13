@@ -68,8 +68,8 @@ meh _ =
 
 
 valueTimesCount : Int -> Array Int -> Int
-valueTimesCount value counter =
-    value * Maybe.withDefault 0 (Array.get value counter)
+valueTimesCount value counted =
+    value * Maybe.withDefault 0 (Array.get value counted)
 
 
 sumDice : Array Int -> Int
@@ -119,7 +119,16 @@ scoreFn combo =
             ifAtLeast 4
 
         FullHouse ->
-            meh
+            \counted ->
+                let
+                    max =
+                        ofAKind counted
+                in
+                if max == 5 || (max == 3 && List.any (\count -> count == 2) (Array.toList counted)) then
+                    25
+
+                else
+                    0
 
         SmallStraight ->
             meh
@@ -128,8 +137,8 @@ scoreFn combo =
             meh
 
         FiveOfAKind ->
-            \counter ->
-                case List.any (\n -> n == 5) (Array.toList counter) of
+            \counted ->
+                case List.any (\n -> n == 5) (Array.toList counted) of
                     True ->
                         50
 

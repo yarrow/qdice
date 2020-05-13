@@ -130,4 +130,18 @@ comboSuite =
                     in
                     scoreFn FourOfAKind counted
                         |> Expect.equal expectedScore
+            , skip <|
+                test "Full House scores 25 for 3 of a kind with a pair, and for 5 of a kind" <|
+                    \_ ->
+                        let
+                            score plain =
+                                scoreFn FullHouse (diceCount plain)
+
+                            scores =
+                                List.map score [ [ 6, 6, 6, 6, 6 ], [ 4, 5, 4, 5, 4 ], [ 1, 1, 2, 2, 3 ] ]
+
+                            expectedScores =
+                                [ 25, 25, 0 ]
+                        in
+                        scores |> Expect.equalLists expectedScores
             ]
