@@ -82,6 +82,15 @@ atLeast min counted =
     List.any (\n -> n >= min) (Array.toList counted)
 
 
+ifAtLeast : Int -> Array Int -> Int
+ifAtLeast min counted =
+    if atLeast min counted then
+        sumDice counted
+
+    else
+        0
+
+
 scoreFn : Combo -> (Array Int -> Int)
 scoreFn combo =
     case combo of
@@ -104,15 +113,10 @@ scoreFn combo =
             valueTimesCount 6
 
         ThreeOfAKind ->
-            meh
+            ifAtLeast 3
 
         FourOfAKind ->
-            \counted ->
-                if atLeast 4 counted then
-                    sumDice counted
-
-                else
-                    0
+            ifAtLeast 4
 
         FullHouse ->
             meh

@@ -111,6 +111,10 @@ comboSuite =
                 \_ ->
                     scoreFn FourOfAKind (diceCount [ 4, 4, 4, 1, 4 ])
                         |> Expect.equal 17
+            , test "3 of a kind score of [4,4,4,1,4] is also 17" <|
+                \_ ->
+                    scoreFn ThreeOfAKind (diceCount [ 4, 4, 4, 1, 4 ])
+                        |> Expect.equal 17
             , fuzz (intRange Random.minInt Random.maxInt) "4 of a kind is the sum of the dice, if there are at least 4 the same" <|
                 \seed ->
                     let
