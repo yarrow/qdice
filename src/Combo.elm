@@ -77,14 +77,14 @@ sumDice count =
     Array.foldl (+) 0 (Array.indexedMap (*) count)
 
 
-atLeast : Int -> Array Int -> Bool
-atLeast min counted =
-    List.any (\n -> n >= min) (Array.toList counted)
+ofAKind : Array Int -> Int
+ofAKind counted =
+    Maybe.withDefault 0 (List.maximum (Array.toList counted))
 
 
 ifAtLeast : Int -> Array Int -> Int
 ifAtLeast min counted =
-    if atLeast min counted then
+    if min <= ofAKind counted then
         sumDice counted
 
     else
