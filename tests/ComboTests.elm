@@ -36,6 +36,11 @@ sumDice dice =
     List.sum (List.map Dice.pips dice)
 
 
+ofAKind : List Dice.OneDie -> Int
+ofAKind dice =
+    Maybe.withDefault 0 (List.maximum (Array.toList (Dice.count dice)))
+
+
 comboSuite : Test
 comboSuite =
     only <|
@@ -86,14 +91,39 @@ comboSuite =
                     in
                     List.map (\combo -> scoreFn combo counted) [ Ones, Twos, Threes, Fours, Fives, Sixes ]
                         |> Expect.equal expected
+            , fuzz (intRange Random.minInt Random.maxInt) "Chance score is always the sum of the dice" <|
+                \seed ->
+                    let
+                        ( dice, counted ) =
+                            diceFromSeed seed
+                    in
+                    scoreFn Chance counted
+                        |> Expect.equal (sumDice dice)
+            , test "5 of a kind is 50, if all dice are the same" <|
+                \_ ->
+                    let
+                        yatz =
+                            List.map (\n -> diceCount (List.repeat 5 n)) [ 1, 2, 3, 4, 5, 6 ]
+                    in
+                    List.map (scoreFn FiveOfAKind) yatz
+                        |> Expect.equalLists (List.repeat 6 50)
+            , test "4 of a kind score of [4,4,4,1,4] is 17" <|
+                \_ ->
+                    scoreFn FourOfAKind (diceCount [ 4, 4, 4, 1, 4 ])
+                        |> Expect.equal 17
+            , fuzz (intRange Random.minInt Random.maxInt) "4 of a kind is the sum of the dice, if there are at least 4 the same" <|
+                \seed ->
+                    let
+                        ( dice, counted ) =
+                            diceFromSeed seed
+
+                        expectedScore =
+                            if ofAKind dice >= 4 then
+                                sumDice dice
+
+                            else
+                                0
+                    in
+                    scoreFn FourOfAKind counted
+                        |> Expect.equal expectedScore
             ]
-
-
-
-{-
-   getUppers rowArray == List.map getRow combo [Ones, Twos, Threes, Fours, Fives, Sixes]
-
-   getLowers rowArray == List.map getRow combo [ThreeOfAKind, fourOfAKind, FullHouse, SmallStraight, LargeStraight, FiveOfAKind, Chance]
-
-   needed? toList rowArray == (getUppers rowArray) ++ (getLowers rowArray)
--}

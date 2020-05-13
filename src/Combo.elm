@@ -72,6 +72,16 @@ valueTimesCount value counter =
     value * Maybe.withDefault 0 (Array.get value counter)
 
 
+sumDice : Array Int -> Int
+sumDice count =
+    Array.foldl (+) 0 (Array.indexedMap (*) count)
+
+
+atLeast : Int -> Array Int -> Bool
+atLeast min counted =
+    List.any (\n -> n >= min) (Array.toList counted)
+
+
 scoreFn : Combo -> (Array Int -> Int)
 scoreFn combo =
     case combo of
@@ -97,7 +107,12 @@ scoreFn combo =
             meh
 
         FourOfAKind ->
-            meh
+            \counted ->
+                if atLeast 4 counted then
+                    sumDice counted
+
+                else
+                    0
 
         FullHouse ->
             meh
@@ -109,10 +124,16 @@ scoreFn combo =
             meh
 
         FiveOfAKind ->
-            meh
+            \counter ->
+                case List.any (\n -> n == 5) (Array.toList counter) of
+                    True ->
+                        50
+
+                    False ->
+                        0
 
         Chance ->
-            meh
+            sumDice
 
 
 toInt : Combo -> Int
