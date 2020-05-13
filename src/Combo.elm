@@ -82,8 +82,8 @@ ofAKind counted =
     Maybe.withDefault 0 (List.maximum (Array.toList counted))
 
 
-ifAtLeast : Int -> Array Int -> Int
-ifAtLeast min counted =
+sumDiceIfAtLeast : Int -> Array Int -> Int
+sumDiceIfAtLeast min counted =
     if min <= ofAKind counted then
         sumDice counted
 
@@ -113,10 +113,10 @@ scoreFn combo =
             valueTimesCount 6
 
         ThreeOfAKind ->
-            ifAtLeast 3
+            sumDiceIfAtLeast 3
 
         FourOfAKind ->
-            ifAtLeast 4
+            sumDiceIfAtLeast 4
 
         FullHouse ->
             \counted ->
