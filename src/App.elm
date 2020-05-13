@@ -2,6 +2,7 @@ module App exposing (Model, Msg(..), initialModel, main, update, view)
 
 import Browser
 import Dice
+import Die
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
@@ -10,12 +11,12 @@ import Random
 
 type Msg
     = RollDice
-    | GotDice (List Dice.OneDie)
+    | GotDice (List Die.OneDie)
     | DieFlipped Int
 
 
 type alias DiceList =
-    List Dice.OneDie
+    List Die.OneDie
 
 
 rerollCount : Model -> Int
@@ -25,7 +26,7 @@ rerollCount model =
             5
 
         Just dice ->
-            List.length (List.filter (\die -> Dice.nextRoll die == Dice.Reroll) dice)
+            List.length (List.filter (\die -> Die.nextRoll die == Die.Reroll) dice)
 
 
 mergeDice : DiceList -> Maybe DiceList -> Maybe DiceList
@@ -48,11 +49,11 @@ refreshDice incoming current =
             []
 
         ( new :: tailIncoming, old :: tailCurrent ) ->
-            case Dice.nextRoll old of
-                Dice.Keep ->
+            case Die.nextRoll old of
+                Die.Keep ->
                     old :: refreshDice incoming tailCurrent
 
-                Dice.Reroll ->
+                Die.Reroll ->
                     new :: refreshDice tailIncoming tailCurrent
 
 
@@ -99,19 +100,19 @@ update msg model =
             ( { model | dice = newDice }, Cmd.none )
 
 
-tdDie : Dice.OneDie -> Html msg
+tdDie : Die.OneDie -> Html msg
 tdDie d =
-    td [ class "dice" ] [ img [ src (Dice.url d) ] [] ]
+    td [ class "dice" ] [ img [ src (Die.url d) ] [] ]
 
 
-dieRow : Int -> Dice.OneDie -> Html Msg
+dieRow : Int -> Die.OneDie -> Html Msg
 dieRow j d =
     tr [ class "dice-row", onClick (DieFlipped j) ] <|
-        case Dice.nextRoll d of
-            Dice.Keep ->
+        case Die.nextRoll d of
+            Die.Keep ->
                 [ tdBlank, tdDie d ]
 
-            Dice.Reroll ->
+            Die.Reroll ->
                 [ tdDie d, tdBlank ]
 
 
@@ -145,7 +146,7 @@ view model =
 
 
 type alias Model =
-    { dice : Maybe (List Dice.OneDie)
+    { dice : Maybe (List Die.OneDie)
     , remainingRolls : Int
     }
 

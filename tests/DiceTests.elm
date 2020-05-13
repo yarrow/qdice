@@ -1,63 +1,28 @@
 module DiceTests exposing (..)
 
 import Array exposing (Array)
-import Dice exposing (NextRoll(..), OneDie, diceRoller, fiveDice, flipNextRoll, flipNth, makeDice, makeDie, nextRoll, oneDie, pips)
+import CountedDice exposing (CountedDice(..))
+import Dice exposing (diceRoller, fiveDice, flipNth, makeDice)
+import Die exposing (NextRoll(..), OneDie, flipNextRoll, makeDie, nextRoll, oneDie, pips)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, intRange, list, string)
 import Random
 import Test exposing (..)
 
 
-oneDieSuite : Test
-oneDieSuite =
-    describe "The OneDie type" <|
-        [ test "Input values less than 1 become 1" <|
-            \_ ->
-                oneDie 0
-                    |> pips
-                    |> Expect.equal 1
-        , test "Input values greater than 6 become 6" <|
-            \_ ->
-                oneDie 7
-                    |> pips
-                    |> Expect.equal 6
-        , test "Die values 1 through 6 survive unchanged" <|
-            \_ ->
-                let
-                    oneToSix =
-                        List.range 1 6
-                in
-                List.map oneDie oneToSix
-                    |> List.map pips
-                    |> Expect.equal oneToSix
-        , fuzz (intRange 0 7) "The url for a die with `n` pips contains '/die-`n`.`" <|
-            \n ->
-                let
-                    d =
-                        oneDie n
-
-                    fragment =
-                        "/die-" ++ String.fromInt (pips d) ++ "."
-                in
-                Dice.url d
-                    |> String.contains fragment
-                    |> Expect.true ("Expected to see " ++ fragment)
-        ]
-
-
 countSuite : Test
 countSuite =
-    describe "(Dice.count dice) returns an array where slot j holds the number of dies in dice with j pips" <|
+    describe "(CountedDice.fromDice dice) returns an array where slot j holds the number of dies in dice with j pips" <|
         [ test "12345" <|
             \_ ->
                 -- dice never have zero pips, and this set has no 6s
-                Dice.count (List.map oneDie [ 1, 2, 3, 4, 5 ])
-                    |> Array.toList
+                CountedDice.fromDice (List.map oneDie [ 1, 2, 3, 4, 5 ])
+                    |> CountedDice.toList
                     |> Expect.equalLists [ 0, 1, 1, 1, 1, 1, 0 ]
         , test "More of a kind" <|
             \_ ->
-                Dice.count (List.map oneDie [ 3, 6, 5, 6, 3 ])
-                    |> Array.toList
+                CountedDice.fromDice (List.map oneDie [ 3, 6, 5, 6, 3 ])
+                    |> CountedDice.toList
                     |> Expect.equalLists [ 0, 0, 0, 2, 0, 1, 2 ]
         ]
 
@@ -96,31 +61,6 @@ randomDie : Int -> List OneDie
 randomDie seed =
     Random.step (diceRoller 1) (Random.initialSeed seed)
         |> Tuple.first
-
-
-nextRollSuite : Test
-nextRollSuite =
-    describe "the nextRoll field" <|
-        [ fuzz (intRange Random.minInt Random.maxInt) "A new die's nextRoll is Keep" <|
-            \seed ->
-                randomDie seed
-                    |> List.map nextRoll
-                    |> Expect.equalLists [ Keep ]
-        , fuzz (intRange Random.minInt Random.maxInt) "flipNextRoll changes Keep to Reroll and vice-versa" <|
-            \seed ->
-                let
-                    hasKeep =
-                        randomDie seed
-
-                    hasReroll =
-                        List.map flipNextRoll hasKeep
-
-                    alsoKeep =
-                        List.map flipNextRoll hasReroll
-                in
-                List.map nextRoll (hasKeep ++ hasReroll ++ alsoKeep)
-                    |> Expect.equalLists [ Keep, Reroll, Keep ]
-        ]
 
 
 flipNthSuite : Test

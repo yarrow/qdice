@@ -1,7 +1,8 @@
 module AppTests exposing (..)
 
 import App exposing (Model, Msg(..), initialModel, main, update, view)
-import Dice exposing (NextRoll(..))
+import Dice
+import Die exposing (NextRoll(..))
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Html.Attributes as Attr
@@ -25,12 +26,12 @@ initialModelSuite =
         ]
 
 
-randomDice : List Dice.OneDie
+randomDice : List Die.OneDie
 randomDice =
     Random.step Dice.fiveDice (Random.initialSeed 0) |> Tuple.first
 
 
-modelWithDice : List Dice.OneDie -> Model
+modelWithDice : List Die.OneDie -> Model
 modelWithDice dice =
     update (GotDice dice) initialModel |> Tuple.first
 
@@ -40,7 +41,7 @@ modelWithRandomDice =
     modelWithDice randomDice
 
 
-diceOf : Model -> List Dice.OneDie
+diceOf : Model -> List Die.OneDie
 diceOf model =
     Maybe.withDefault [] model.dice
 
@@ -79,7 +80,7 @@ updateSuite =
                     |> Expect.equal randomDice
         , test "Initially, all dice have nextRoll == Keep" <|
             \_ ->
-                List.all (\d -> Dice.nextRoll d == Keep) randomDice
+                List.all (\d -> Die.nextRoll d == Keep) randomDice
                     |> Expect.true "Initially, all dice have an NextRoll of Keep"
         , test "`DieFlipped 0` causes the 0th die to flip its NextRoll status" <|
             \_ ->

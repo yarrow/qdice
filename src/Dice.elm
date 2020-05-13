@@ -1,93 +1,13 @@
-module Dice exposing (NextRoll(..), OneDie, count, diceRoller, fiveDice, flipNextRoll, flipNth, makeDice, makeDie, nextRoll, oneDie, pips, url)
+module Dice exposing (diceRoller, fiveDice, flipNth, makeDice)
 
 import Array exposing (Array)
+import Die exposing (NextRoll(..), OneDie, flipNextRoll, makeDie, nextRoll, oneDie, pips, url)
 import Random exposing (Generator)
-
-
-type NextRoll
-    = Keep
-    | Reroll
-
-
-type alias Fields =
-    { pips : Int
-    , nextRoll : NextRoll
-    }
-
-
-type OneDie
-    = OneDie Fields
-
-
-oneDie : Int -> OneDie
-oneDie n =
-    OneDie
-        { pips = clamp minDie maxDie n
-        , nextRoll = Keep
-        }
-
-
-pips : OneDie -> Int
-pips (OneDie die) =
-    die.pips
-
-
-count : List OneDie -> Array Int
-count dice =
-    let
-        increment jth counter =
-            case Array.get jth counter of
-                Just old ->
-                    Array.set jth (old + 1) counter
-
-                Nothing ->
-                    counter
-    in
-    List.foldr increment (Array.repeat 7 0) (List.map pips dice)
-
-
-nextRoll : OneDie -> NextRoll
-nextRoll (OneDie die) =
-    die.nextRoll
-
-
-makeDie : ( Int, NextRoll ) -> OneDie
-makeDie ( n, nextStatus ) =
-    OneDie { pips = n, nextRoll = nextStatus }
 
 
 makeDice : List ( Int, NextRoll ) -> List OneDie
 makeDice raw =
     List.map makeDie raw
-
-
-flipNextRoll : OneDie -> OneDie
-flipNextRoll (OneDie d) =
-    OneDie
-        { pips = d.pips
-        , nextRoll =
-            case d.nextRoll of
-                Keep ->
-                    Reroll
-
-                Reroll ->
-                    Keep
-        }
-
-
-minDie : Int
-minDie =
-    1
-
-
-maxDie : Int
-maxDie =
-    6
-
-
-url : OneDie -> String
-url d =
-    "assets/die-" ++ String.fromInt (pips d) ++ ".png"
 
 
 flipNth : Int -> List OneDie -> List OneDie
@@ -114,7 +34,7 @@ type alias DiceGenerator =
 
 diceRoller : Int -> DiceGenerator
 diceRoller n =
-    Random.list n (Random.map oneDie (Random.int minDie maxDie))
+    Random.list n (Random.map oneDie (Random.int Die.minDie Die.maxDie))
 
 
 fiveDice : DiceGenerator

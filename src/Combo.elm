@@ -1,6 +1,7 @@
 module Combo exposing (Combo(..), scoreFn, toString)
 
 import Array exposing (Array)
+import CountedDice exposing (CountedDice(..))
 
 
 type Combo
@@ -62,27 +63,22 @@ toString combo =
             "Chance"
 
 
-meh : Array Int -> Int
-meh _ =
-    0
-
-
-valueTimesCount : Int -> Array Int -> Int
-valueTimesCount value counted =
+valueTimesCount : Int -> CountedDice -> Int
+valueTimesCount value (CountedDice counted) =
     value * Maybe.withDefault 0 (Array.get value counted)
 
 
-sumDice : Array Int -> Int
-sumDice count =
+sumDice : CountedDice -> Int
+sumDice (CountedDice count) =
     Array.foldl (+) 0 (Array.indexedMap (*) count)
 
 
-ofAKind : Array Int -> Int
+ofAKind : CountedDice -> Int
 ofAKind counted =
-    Maybe.withDefault 0 (List.maximum (Array.toList counted))
+    Maybe.withDefault 0 (List.maximum (CountedDice.toList counted))
 
 
-sumDiceIfAtLeast : Int -> Array Int -> Int
+sumDiceIfAtLeast : Int -> CountedDice -> Int
 sumDiceIfAtLeast min counted =
     if min <= ofAKind counted then
         sumDice counted
@@ -114,12 +110,12 @@ runCount n list =
             runCount (n + 1) tail
 
 
-longestStraight : Array Int -> Int
-longestStraight counted =
+longestStraight : CountedDice -> Int
+longestStraight (CountedDice counted) =
     Array.toList counted |> leftTrimZeros |> runCount 0
 
 
-scoreFn : Combo -> (Array Int -> Int)
+scoreFn : Combo -> (CountedDice -> Int)
 scoreFn combo =
     case combo of
         Ones ->
@@ -152,7 +148,7 @@ scoreFn combo =
                     max =
                         ofAKind counted
                 in
-                if max == 5 || (max == 3 && List.any (\count -> count == 2) (Array.toList counted)) then
+                if max == 5 || (max == 3 && List.any (\count -> count == 2) (CountedDice.toList counted)) then
                     25
 
                 else
@@ -176,7 +172,7 @@ scoreFn combo =
 
         FiveOfAKind ->
             \counted ->
-                case List.any (\n -> n == 5) (Array.toList counted) of
+                case List.any (\n -> n == 5) (CountedDice.toList counted) of
                     True ->
                         50
 
