@@ -91,6 +91,34 @@ sumDiceIfAtLeast min counted =
         0
 
 
+leftTrimZeros : List Int -> List Int
+leftTrimZeros list =
+    case list of
+        0 :: tail ->
+            leftTrimZeros tail
+
+        _ ->
+            list
+
+
+runCount : Int -> List Int -> Int
+runCount n list =
+    case list of
+        [] ->
+            n
+
+        0 :: tail ->
+            n
+
+        _ :: tail ->
+            runCount (n + 1) tail
+
+
+longestStraight : Array Int -> Int
+longestStraight counted =
+    Array.toList counted |> leftTrimZeros |> runCount 0
+
+
 scoreFn : Combo -> (Array Int -> Int)
 scoreFn combo =
     case combo of
@@ -131,10 +159,20 @@ scoreFn combo =
                     0
 
         SmallStraight ->
-            meh
+            \counted ->
+                if longestStraight counted >= 4 then
+                    30
+
+                else
+                    0
 
         LargeStraight ->
-            meh
+            \counted ->
+                if longestStraight counted == 5 then
+                    40
+
+                else
+                    0
 
         FiveOfAKind ->
             \counted ->

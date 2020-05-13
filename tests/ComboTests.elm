@@ -136,11 +136,57 @@ comboSuite =
                         score plain =
                             scoreFn FullHouse (diceCount plain)
 
-                        scores =
+                        scoresFound =
                             List.map score [ [ 6, 6, 6, 6, 6 ], [ 4, 5, 4, 5, 4 ], [ 1, 1, 2, 2, 3 ] ]
 
                         expectedScores =
                             [ 25, 25, 0 ]
                     in
-                    scores |> Expect.equalLists expectedScores
+                    scoresFound |> Expect.equalLists expectedScores
+            , test "LargeStraight is permutations of [1,2,3,4,5] or [2,3,4,5,6]" <|
+                \_ ->
+                    let
+                        good =
+                            [ [ 1, 2, 3, 4, 5 ], [ 2, 3, 4, 5, 6 ], [ 1, 3, 5, 2, 4 ], [ 6, 4, 2, 3, 5 ] ]
+
+                        bad =
+                            [ [ 2, 2, 3, 4, 5 ], [ 2, 4, 4, 5, 6 ], [ 1, 4, 5, 2, 4 ], [ 6, 4, 6, 3, 5 ] ]
+
+                        expectedScores =
+                            List.repeat 4 40 ++ List.repeat 4 0
+
+                        score plain =
+                            scoreFn LargeStraight (diceCount plain)
+
+                        scoresFound =
+                            List.map score (good ++ bad)
+                    in
+                    scoresFound |> Expect.equalLists expectedScores
+            , test "SmallStraight is a large straight or permutations of [1,2,3,4, x] or [2,3,4,5,x] or [3,4,5,6,x]" <|
+                \_ ->
+                    let
+                        good =
+                            [ [ 1, 2, 3, 4, 5 ]
+                            , [ 2, 3, 4, 5, 6 ]
+                            , [ 1, 3, 5, 2, 4 ]
+                            , [ 6, 4, 2, 3, 5 ]
+                            , [ 1, 2, 3, 4, 4 ]
+                            , [ 2, 3, 4, 5, 2 ]
+                            , [ 3, 4, 5, 6, 3 ]
+                            , [ 6, 4, 6, 3, 5 ]
+                            ]
+
+                        bad =
+                            [ [ 1, 2, 4, 5, 6 ], [ 2, 4, 4, 5, 6 ], [ 1, 4, 5, 2, 4 ], [ 6, 4, 2, 3, 6 ] ]
+
+                        expectedScores =
+                            List.repeat 8 30 ++ List.repeat 4 0
+
+                        score plain =
+                            scoreFn SmallStraight (diceCount plain)
+
+                        scoresFound =
+                            List.map score (good ++ bad)
+                    in
+                    scoresFound |> Expect.equalLists expectedScores
             ]
