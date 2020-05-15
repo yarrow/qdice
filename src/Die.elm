@@ -1,4 +1,4 @@
-module Die exposing (Die, NextRoll(..), flipNextRoll, makeDie, maxDie, minDie, nextRoll, oneDie, pips, url)
+module Die exposing (Die, NextRoll(..), flipNextRoll, fromInt, makeDie, maxDie, minDie, nextRoll, pips, url)
 
 
 type NextRoll
@@ -24,8 +24,8 @@ makeDie ( n, nextStatus ) =
         }
 
 
-oneDie : Int -> Die
-oneDie n =
+fromInt : Int -> Die
+fromInt n =
     makeDie ( n, Keep )
 
 

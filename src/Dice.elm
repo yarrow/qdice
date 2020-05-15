@@ -1,7 +1,7 @@
 module Dice exposing (DiceList, diceRoller, fiveDice, flipNth, makeDice)
 
 import Array exposing (Array)
-import Die exposing (Die, NextRoll, flipNextRoll, makeDie, oneDie)
+import Die exposing (Die, NextRoll, flipNextRoll, makeDie)
 import Random exposing (Generator)
 
 
@@ -38,7 +38,7 @@ type alias DiceGenerator =
 
 diceRoller : Int -> DiceGenerator
 diceRoller n =
-    Random.list n (Random.map oneDie (Random.int Die.minDie Die.maxDie))
+    Random.list n (Random.map Die.fromInt (Random.int Die.minDie Die.maxDie))
 
 
 fiveDice : DiceGenerator

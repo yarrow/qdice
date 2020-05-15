@@ -4,7 +4,7 @@ import Array exposing (Array)
 import Combo exposing (..)
 import CountedDice exposing (CountedDice(..))
 import Dice exposing (DiceList, fiveDice)
-import Die exposing (oneDie)
+import Die
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, intRange, list, string)
 import Random
@@ -13,7 +13,7 @@ import Test exposing (..)
 
 diceCount : List Int -> CountedDice
 diceCount dice =
-    CountedDice.fromDice (List.map oneDie dice)
+    CountedDice.fromDice (List.map Die.fromInt dice)
 
 
 diceFromSeed : Int -> ( DiceList, CountedDice )
