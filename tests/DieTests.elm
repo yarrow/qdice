@@ -30,6 +30,10 @@ dieSuite =
                 List.map oneDie oneToSix
                     |> List.map pips
                     |> Expect.equal oneToSix
+        , test "makeDie clamps values like oneDie does" <|
+            \_ ->
+                makeDie ( 42, Die.Keep )
+                    |> Expect.equal (oneDie 42)
         , fuzz (intRange 0 7) "The url for a die with `n` pips contains '/die-`n`.`" <|
             \n ->
                 let

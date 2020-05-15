@@ -16,12 +16,17 @@ type Die
     = Die Fields
 
 
-oneDie : Int -> Die
-oneDie n =
+makeDie : ( Int, NextRoll ) -> Die
+makeDie ( n, nextStatus ) =
     Die
         { pips = clamp minDie maxDie n
-        , nextRoll = Keep
+        , nextRoll = nextStatus
         }
+
+
+oneDie : Int -> Die
+oneDie n =
+    makeDie ( n, Keep )
 
 
 pips : Die -> Int
@@ -32,11 +37,6 @@ pips (Die die) =
 nextRoll : Die -> NextRoll
 nextRoll (Die die) =
     die.nextRoll
-
-
-makeDie : ( Int, NextRoll ) -> Die
-makeDie ( n, nextStatus ) =
-    Die { pips = n, nextRoll = nextStatus }
 
 
 flipNextRoll : Die -> Die
