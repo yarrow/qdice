@@ -1,4 +1,4 @@
-module Die exposing (NextRoll(..), OneDie, flipNextRoll, makeDie, maxDie, minDie, nextRoll, oneDie, pips, url)
+module Die exposing (Die, NextRoll(..), flipNextRoll, makeDie, maxDie, minDie, nextRoll, oneDie, pips, url)
 
 
 type NextRoll
@@ -12,36 +12,36 @@ type alias Fields =
     }
 
 
-type OneDie
-    = OneDie Fields
+type Die
+    = Die Fields
 
 
-oneDie : Int -> OneDie
+oneDie : Int -> Die
 oneDie n =
-    OneDie
+    Die
         { pips = clamp minDie maxDie n
         , nextRoll = Keep
         }
 
 
-pips : OneDie -> Int
-pips (OneDie die) =
+pips : Die -> Int
+pips (Die die) =
     die.pips
 
 
-nextRoll : OneDie -> NextRoll
-nextRoll (OneDie die) =
+nextRoll : Die -> NextRoll
+nextRoll (Die die) =
     die.nextRoll
 
 
-makeDie : ( Int, NextRoll ) -> OneDie
+makeDie : ( Int, NextRoll ) -> Die
 makeDie ( n, nextStatus ) =
-    OneDie { pips = n, nextRoll = nextStatus }
+    Die { pips = n, nextRoll = nextStatus }
 
 
-flipNextRoll : OneDie -> OneDie
-flipNextRoll (OneDie d) =
-    OneDie
+flipNextRoll : Die -> Die
+flipNextRoll (Die d) =
+    Die
         { pips = d.pips
         , nextRoll =
             case d.nextRoll of
@@ -63,6 +63,6 @@ maxDie =
     6
 
 
-url : OneDie -> String
+url : Die -> String
 url d =
     "assets/die-" ++ String.fromInt (pips d) ++ ".png"

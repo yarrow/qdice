@@ -1,16 +1,16 @@
 module DieTests exposing (..)
 
 import Dice exposing (DiceList, diceRoller)
-import Die exposing (NextRoll(..), OneDie, flipNextRoll, makeDie, nextRoll, oneDie, pips)
+import Die exposing (Die, NextRoll(..), flipNextRoll, makeDie, nextRoll, oneDie, pips)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, intRange, list, string)
 import Random
 import Test exposing (..)
 
 
-oneDieSuite : Test
-oneDieSuite =
-    describe "The OneDie type" <|
+dieSuite : Test
+dieSuite =
+    describe "The Die type" <|
         [ test "Input values less than 1 become 1" <|
             \_ ->
                 oneDie 0

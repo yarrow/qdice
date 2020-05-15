@@ -1,7 +1,7 @@
 module Dice exposing (DiceList, diceRoller, fiveDice, flipNth, makeDice)
 
 import Array exposing (Array)
-import Die exposing (NextRoll, OneDie, flipNextRoll, makeDie, oneDie)
+import Die exposing (Die, NextRoll, flipNextRoll, makeDie, oneDie)
 import Random exposing (Generator)
 
 
@@ -29,7 +29,7 @@ flipNth n dice =
 
 
 type alias DiceList =
-    List OneDie
+    List Die
 
 
 type alias DiceGenerator =

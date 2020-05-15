@@ -3,7 +3,7 @@ module DiceTests exposing (..)
 import Array exposing (Array)
 import CountedDice exposing (CountedDice(..))
 import Dice exposing (DiceList, diceRoller, fiveDice, flipNth, makeDice)
-import Die exposing (NextRoll(..), OneDie, flipNextRoll, makeDie, nextRoll, oneDie, pips)
+import Die exposing (Die, NextRoll(..), flipNextRoll, makeDie, nextRoll, oneDie, pips)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, intRange, list, string)
 import Random
