@@ -38,7 +38,7 @@ type alias DiceGenerator =
 
 diceRoller : Int -> DiceGenerator
 diceRoller n =
-    Random.list n (Random.map Die.fromInt (Random.int Die.minDie Die.maxDie))
+    Random.list n Die.roller
 
 
 fiveDice : DiceGenerator

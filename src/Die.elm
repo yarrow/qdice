@@ -1,4 +1,6 @@
-module Die exposing (Die, NextRoll(..), flipNextRoll, fromInt, makeDie, maxDie, minDie, nextRoll, pips, url)
+module Die exposing (Die, NextRoll(..), flipNextRoll, fromInt, makeDie, nextRoll, pips, roller, url)
+
+import Random
 
 
 type NextRoll
@@ -66,3 +68,8 @@ maxDie =
 url : Die -> String
 url d =
     "assets/die-" ++ String.fromInt (pips d) ++ ".png"
+
+
+roller : Random.Generator Die
+roller =
+    Random.map fromInt (Random.int minDie maxDie)

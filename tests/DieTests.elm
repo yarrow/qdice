@@ -55,8 +55,8 @@ nextRollSuite =
         [ fuzz (intRange Random.minInt Random.maxInt) "A new die's nextRoll is Keep" <|
             \seed ->
                 randomDie seed
-                    |> List.map nextRoll
-                    |> Expect.equalLists [ Keep ]
+                    |> nextRoll
+                    |> Expect.equal Keep
         , fuzz (intRange Random.minInt Random.maxInt) "flipNextRoll changes Keep to Reroll and vice-versa" <|
             \seed ->
                 let
@@ -64,17 +64,17 @@ nextRollSuite =
                         randomDie seed
 
                     hasReroll =
-                        List.map flipNextRoll hasKeep
+                        flipNextRoll hasKeep
 
                     alsoKeep =
-                        List.map flipNextRoll hasReroll
+                        flipNextRoll hasReroll
                 in
-                List.map nextRoll (hasKeep ++ hasReroll ++ alsoKeep)
+                List.map nextRoll [ hasKeep, hasReroll, alsoKeep ]
                     |> Expect.equalLists [ Keep, Reroll, Keep ]
         ]
 
 
-randomDie : Int -> DiceList
+randomDie : Int -> Die
 randomDie seed =
-    Random.step (diceRoller 1) (Random.initialSeed seed)
+    Random.step Die.roller (Random.initialSeed seed)
         |> Tuple.first
