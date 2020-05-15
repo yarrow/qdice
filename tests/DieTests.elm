@@ -1,6 +1,6 @@
 module DieTests exposing (..)
 
-import Dice exposing (diceRoller)
+import Dice exposing (DiceList, diceRoller)
 import Die exposing (NextRoll(..), OneDie, flipNextRoll, makeDie, nextRoll, oneDie, pips)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, intRange, list, string)
@@ -70,7 +70,7 @@ nextRollSuite =
         ]
 
 
-randomDie : Int -> List OneDie
+randomDie : Int -> DiceList
 randomDie seed =
     Random.step (diceRoller 1) (Random.initialSeed seed)
         |> Tuple.first

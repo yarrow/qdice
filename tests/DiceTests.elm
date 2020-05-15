@@ -2,7 +2,7 @@ module DiceTests exposing (..)
 
 import Array exposing (Array)
 import CountedDice exposing (CountedDice(..))
-import Dice exposing (diceRoller, fiveDice, flipNth, makeDice)
+import Dice exposing (DiceList, diceRoller, fiveDice, flipNth, makeDice)
 import Die exposing (NextRoll(..), OneDie, flipNextRoll, makeDie, nextRoll, oneDie, pips)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, intRange, list, string)
@@ -57,7 +57,7 @@ diceRollerSuite =
         ]
 
 
-randomDie : Int -> List OneDie
+randomDie : Int -> DiceList
 randomDie seed =
     Random.step (diceRoller 1) (Random.initialSeed seed)
         |> Tuple.first

@@ -3,7 +3,7 @@ module ComboTests exposing (..)
 import Array exposing (Array)
 import Combo exposing (..)
 import CountedDice exposing (CountedDice(..))
-import Dice exposing (fiveDice)
+import Dice exposing (DiceList, fiveDice)
 import Die exposing (oneDie)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, intRange, list, string)
@@ -16,7 +16,7 @@ diceCount dice =
     CountedDice.fromDice (List.map oneDie dice)
 
 
-diceFromSeed : Int -> ( List Die.OneDie, CountedDice )
+diceFromSeed : Int -> ( DiceList, CountedDice )
 diceFromSeed seed =
     let
         dice =
@@ -28,17 +28,17 @@ diceFromSeed seed =
     ( dice, counted )
 
 
-countTimesVal : List Die.OneDie -> Int -> Int
+countTimesVal : DiceList -> Int -> Int
 countTimesVal dice val =
     val * List.length (List.filter (\n -> n == val) (List.map Die.pips dice))
 
 
-sumDice : List Die.OneDie -> Int
+sumDice : DiceList -> Int
 sumDice dice =
     List.sum (List.map Die.pips dice)
 
 
-ofAKind : List Die.OneDie -> Int
+ofAKind : DiceList -> Int
 ofAKind dice =
     Maybe.withDefault 0 (List.maximum (CountedDice.toList (CountedDice.fromDice dice)))
 

@@ -1,7 +1,7 @@
 module App exposing (Model, Msg(..), initialModel, main, update, view)
 
 import Browser
-import Dice
+import Dice exposing (DiceList)
 import Die
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -11,12 +11,8 @@ import Random
 
 type Msg
     = RollDice
-    | GotDice (List Die.OneDie)
+    | GotDice DiceList
     | DieFlipped Int
-
-
-type alias DiceList =
-    List Die.OneDie
 
 
 rerollCount : Model -> Int
@@ -146,7 +142,7 @@ view model =
 
 
 type alias Model =
-    { dice : Maybe (List Die.OneDie)
+    { dice : Maybe DiceList
     , remainingRolls : Int
     }
 

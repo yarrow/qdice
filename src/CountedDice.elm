@@ -1,7 +1,7 @@
 module CountedDice exposing (CountedDice(..), fromDice, toList)
 
 import Array exposing (Array)
-import Dice
+import Dice exposing (DiceList)
 import Die
 
 
@@ -9,7 +9,7 @@ type CountedDice
     = CountedDice (Array Int)
 
 
-fromDice : List Die.OneDie -> CountedDice
+fromDice : DiceList -> CountedDice
 fromDice dice =
     let
         increment jth counter =

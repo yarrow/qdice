@@ -1,7 +1,7 @@
 module AppTests exposing (..)
 
 import App exposing (Model, Msg(..), initialModel, main, update, view)
-import Dice
+import Dice exposing (DiceList)
 import Die exposing (NextRoll(..))
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
@@ -26,12 +26,12 @@ initialModelSuite =
         ]
 
 
-randomDice : List Die.OneDie
+randomDice : DiceList
 randomDice =
     Random.step Dice.fiveDice (Random.initialSeed 0) |> Tuple.first
 
 
-modelWithDice : List Die.OneDie -> Model
+modelWithDice : DiceList -> Model
 modelWithDice dice =
     update (GotDice dice) initialModel |> Tuple.first
 
@@ -41,7 +41,7 @@ modelWithRandomDice =
     modelWithDice randomDice
 
 
-diceOf : Model -> List Die.OneDie
+diceOf : Model -> DiceList
 diceOf model =
     Maybe.withDefault [] model.dice
 
