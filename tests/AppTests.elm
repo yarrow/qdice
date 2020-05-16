@@ -1,7 +1,7 @@
 module AppTests exposing (..)
 
 import App exposing (Model, Msg(..), initialModel, main, update, view)
-import Dice exposing (DiceList)
+import Dice exposing (DiceBoard(..), DiceList)
 import Die exposing (NextRoll(..))
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
@@ -43,7 +43,12 @@ modelWithRandomDice =
 
 diceOf : Model -> DiceList
 diceOf model =
-    Maybe.withDefault [] model.dice
+    case model.dice of
+        Nothing ->
+            []
+
+        Just (DiceBoard db) ->
+            db
 
 
 updateSuite : Test

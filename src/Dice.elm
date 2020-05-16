@@ -1,8 +1,16 @@
-module Dice exposing (DiceList, diceRoller, fiveDice, flipNth, makeDice)
+module Dice exposing (DiceBoard(..), DiceList, diceRoller, fiveDice, flipNth, makeDice)
 
 import Array exposing (Array)
 import Die exposing (Die, NextRoll, flipNextRoll, makeDie)
 import Random exposing (Generator)
+
+
+type alias DiceList =
+    List Die
+
+
+type DiceBoard
+    = DiceBoard (List Die)
 
 
 makeDice : List ( Int, NextRoll ) -> DiceList
@@ -10,8 +18,8 @@ makeDice raw =
     List.map makeDie raw
 
 
-flipNth : Int -> DiceList -> DiceList
-flipNth n dice =
+flipNth : Int -> DiceBoard -> DiceBoard
+flipNth n (DiceBoard dice) =
     let
         diceArray =
             Array.fromList dice
@@ -21,15 +29,12 @@ flipNth n dice =
     in
     case oldDie of
         Nothing ->
-            dice
+            DiceBoard dice
 
         Just aDie ->
             Array.set n (flipNextRoll aDie) diceArray
                 |> Array.toList
-
-
-type alias DiceList =
-    List Die
+                |> DiceBoard
 
 
 type alias DiceGenerator =

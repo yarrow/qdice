@@ -2,7 +2,7 @@ module DiceTests exposing (..)
 
 import Array exposing (Array)
 import CountedDice exposing (CountedDice(..))
-import Dice exposing (DiceList, diceRoller, fiveDice, flipNth, makeDice)
+import Dice exposing (DiceBoard(..), DiceList, diceRoller, fiveDice, flipNth, makeDice)
 import Die exposing (Die, NextRoll(..), flipNextRoll, makeDie, nextRoll, pips)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, intRange, list, string)
@@ -68,6 +68,6 @@ flipNthSuite =
     describe "flipNth n dice performs flipNextRoll on the nth element of dice" <|
         [ test "flipNth 0" <|
             \_ ->
-                flipNth 0 (makeDice [ ( 1, Keep ), ( 2, Reroll ) ])
-                    |> Expect.equalLists (makeDice [ ( 1, Reroll ), ( 2, Reroll ) ])
+                flipNth 0 (DiceBoard (makeDice [ ( 1, Keep ), ( 2, Reroll ) ]))
+                    |> Expect.equal (DiceBoard (makeDice [ ( 1, Reroll ), ( 2, Reroll ) ]))
         ]

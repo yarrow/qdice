@@ -1,7 +1,7 @@
 module App exposing (Model, Msg(..), initialModel, main, update, view)
 
 import Browser
-import Dice exposing (DiceList)
+import Dice exposing (DiceBoard(..), DiceList)
 import Die exposing (Die)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -21,18 +21,22 @@ rerollCount model =
         Nothing ->
             5
 
-        Just dice ->
+        Just (DiceBoard dice) ->
             List.length (List.filter (\die -> Die.nextRoll die == Die.Reroll) dice)
 
 
-mergeDice : DiceList -> Maybe DiceList -> Maybe DiceList
+mergeDice : DiceList -> Maybe DiceBoard -> Maybe DiceBoard
 mergeDice incoming current =
-    case current of
-        Nothing ->
-            Just incoming
+    let
+        diceList =
+            case current of
+                Nothing ->
+                    incoming
 
-        Just oldDice ->
-            Just (refreshDice incoming oldDice)
+                Just (DiceBoard oldDice) ->
+                    refreshDice incoming oldDice
+    in
+    Just (DiceBoard diceList)
 
 
 refreshDice : DiceList -> DiceList -> DiceList
@@ -134,7 +138,7 @@ view model =
                         Nothing ->
                             List.repeat 5 blankRow
 
-                        Just theDice ->
+                        Just (DiceBoard theDice) ->
                             List.indexedMap dieRow theDice
                    )
         , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
@@ -142,7 +146,7 @@ view model =
 
 
 type alias Model =
-    { dice : Maybe DiceList
+    { dice : Maybe DiceBoard
     , remainingRolls : Int
     }
 
