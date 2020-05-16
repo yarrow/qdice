@@ -1,6 +1,6 @@
 module Combo exposing (Combo(..), scoreFn, toString)
 
-import Array exposing (Array)
+import Array
 import CountedDice exposing (CountedDice(..))
 
 
@@ -103,7 +103,7 @@ runCount n list =
         [] ->
             n
 
-        0 :: tail ->
+        0 :: _ ->
             n
 
         _ :: tail ->
@@ -172,12 +172,11 @@ scoreFn combo =
 
         FiveOfAKind ->
             \counted ->
-                case List.any (\n -> n == 5) (CountedDice.toList counted) of
-                    True ->
-                        50
+                if List.any (\n -> n == 5) (CountedDice.toList counted) then
+                    50
 
-                    False ->
-                        0
+                else
+                    0
 
         Chance ->
             sumDice

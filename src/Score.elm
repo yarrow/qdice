@@ -1,7 +1,6 @@
 module Score exposing (BoxLocation, Display, DisplayBox, DisplayRow, Pad, active, inert, initialPad, rowOrder)
 
 import Array exposing (Array)
-import Dice
 import Dict exposing (Dict)
 import ScoreTags exposing (..)
 
