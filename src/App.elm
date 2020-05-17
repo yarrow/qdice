@@ -21,67 +21,34 @@ rerollCount model =
         Nothing ->
             5
 
-        Just (DiceBoard dice) ->
-            List.length (List.filter (\die -> Die.nextRoll die == Die.Reroll) dice)
-
-
-mergeDice : DiceList -> Maybe DiceBoard -> Maybe DiceBoard
-mergeDice incoming current =
-    let
-        diceList =
-            case current of
-                Nothing ->
-                    incoming
-
-                Just (DiceBoard oldDice) ->
-                    refreshDice incoming oldDice
-    in
-    Just (DiceBoard diceList)
-
-
-refreshDice : DiceList -> DiceList -> DiceList
-refreshDice incoming current =
-    case ( incoming, current ) of
-        ( [], _ ) ->
-            current
-
-        ( _, [] ) ->
-            []
-
-        ( new :: tailIncoming, old :: tailCurrent ) ->
-            case Die.nextRoll old of
-                Die.Keep ->
-                    old :: refreshDice incoming tailCurrent
-
-                Die.Reroll ->
-                    new :: refreshDice tailIncoming tailCurrent
+        Just dice ->
+            Dice.rerollCount dice
 
 
 rollAllowed : Model -> Bool
 rollAllowed model =
-    model.remainingRolls > 0 && (rerollCount model > 0)
-
-
-gotDiceIfRollAllowed : Model -> Cmd Msg
-gotDiceIfRollAllowed model =
-    if rollAllowed model then
-        Random.generate GotDice (Dice.diceRoller (rerollCount model))
-
-    else
-        Cmd.none
+    model.remainingRolls > 0 && Maybe.withDefault False (Maybe.map Dice.hasRerolls model.dice)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         RollDice ->
-            ( model, gotDiceIfRollAllowed model )
+            let
+                cmd =
+                    if rollAllowed model then
+                        Random.generate GotDice (Dice.diceRoller (rerollCount model))
+
+                    else
+                        Cmd.none
+            in
+            ( model, cmd )
 
         GotDice incomingDice ->
             let
                 newModel =
                     { model
-                        | dice = mergeDice incomingDice model.dice
+                        | dice = Dice.mergeDice incomingDice model.dice
                         , remainingRolls = model.remainingRolls - 1
                     }
             in
