@@ -1,6 +1,6 @@
 module DiceTests exposing (..)
 
-import Dice exposing (DiceBoard(..), diceRoller, fiveDice, flipNth, makeDiceList)
+import Dice exposing (DiceBoard(..), diceRoller, fiveDice, flipNth)
 import Die exposing (NextRoll(..))
 import Expect
 import Fuzz exposing (intRange)
@@ -35,17 +35,11 @@ diceRollerSuite =
         ]
 
 
-randomDie : Int -> Dice.PipsList
-randomDie seed =
-    Random.step (diceRoller 1) (Random.initialSeed seed)
-        |> Tuple.first
-
-
 flipNthSuite : Test
 flipNthSuite =
     describe "flipNth n dice performs flipNextRoll on the nth element of dice" <|
         [ test "flipNth 0" <|
             \_ ->
-                flipNth 0 (DiceBoard (makeDiceList [ ( 1, Keep ), ( 2, Reroll ) ]))
-                    |> Expect.equal (DiceBoard (makeDiceList [ ( 1, Reroll ), ( 2, Reroll ) ]))
+                flipNth 0 (Dice.makeDiceBoard [ ( 1, Keep ), ( 2, Reroll ) ])
+                    |> Expect.equal (Dice.makeDiceBoard [ ( 1, Reroll ), ( 2, Reroll ) ])
         ]

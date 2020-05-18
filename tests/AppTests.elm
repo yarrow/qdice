@@ -1,7 +1,7 @@
 module AppTests exposing (..)
 
 import App exposing (Model, Msg(..), initialModel, update, view)
-import Dice exposing (DiceBoard(..), DiceList)
+import Dice exposing (DiceBoard(..))
 import Die exposing (NextRoll(..))
 import Expect
 import Html.Attributes as Attr
@@ -44,16 +44,6 @@ modelAfterFirstRoll =
     update (GotDice randomPipsList) initialModel |> Tuple.first
 
 
-diceOf : Model -> DiceList
-diceOf model =
-    case model.dice of
-        Nothing ->
-            []
-
-        Just (DiceBoard db) ->
-            db
-
-
 updateSuite : Test
 updateSuite =
     describe "Properties of update" <|
@@ -86,8 +76,8 @@ updateSuite =
         {-
               , test "In the initial model, (GotDice someDice) installs (Just someDice) as the model's .dice value" <|
                   \_ ->
-                      diceOf modelWithRandomDice
-                          |> Expect.equal randomPipsList
+                      modelWithRandomDice.dice
+                          |> Expect.equal (Just Dice.makeDiceBoard randomPipsList)
            , test "Initially, all dice have nextRoll == Keep" <|
                \_ ->
                    List.all (\d -> Die.nextRoll d == Keep) randomPipsList
@@ -97,12 +87,12 @@ updateSuite =
             \_ ->
                 let
                     rerollFirst =
-                        Dice.makeDiceList [ reroll, keep, keep, keep, keep ]
+                        Just (Dice.makeDiceBoard [ reroll, keep, keep, keep, keep ])
                 in
                 update (DieFlipped 0) (modelWithDice keepAll)
                     |> Tuple.first
-                    |> diceOf
-                    |> Expect.equalLists rerollFirst
+                    |> .dice
+                    |> Expect.equal rerollFirst
         , test "Incoming dice replace dice to be rerolled" <|
             \_ ->
                 let
@@ -113,12 +103,12 @@ updateSuite =
                         [ 2, 3 ]
 
                     resultingDice =
-                        Dice.makeDiceList [ keep, ( 2, Keep ), keep, ( 3, Keep ), keep ]
+                        Just (Dice.makeDiceBoard [ keep, ( 2, Keep ), keep, ( 3, Keep ), keep ])
                 in
                 update (GotDice incomingDice) (modelWithDice startingDice)
                     |> Tuple.first
-                    |> diceOf
-                    |> Expect.equalLists resultingDice
+                    |> .dice
+                    |> Expect.equal resultingDice
         , test "After the first roll, we have 2 rolls remaining" <|
             \_ ->
                 update (GotDice randomPipsList) initialModel

@@ -1,4 +1,4 @@
-module Dice exposing (DiceBoard(..), DiceList, PipsList, diceRoller, fiveDice, flipNth, hasRerolls, makeDiceBoard, makeDiceList, mergeDice, rerollCount)
+module Dice exposing (DiceBoard(..), PipsList, diceRoller, fiveDice, flipNth, hasRerolls, makeDiceBoard, mergeDice, rerollCount)
 
 import Array
 import Die exposing (Die, NextRoll, flipNextRoll, makeDie)
@@ -59,14 +59,9 @@ hasRerolls dice =
     rerollCount dice > 0
 
 
-makeDiceList : List ( Int, NextRoll ) -> DiceList
-makeDiceList raw =
-    List.map makeDie raw
-
-
 makeDiceBoard : List ( Int, NextRoll ) -> DiceBoard
 makeDiceBoard raw =
-    DiceBoard (makeDiceList raw)
+    DiceBoard (List.map makeDie raw)
 
 
 flipNth : Int -> DiceBoard -> DiceBoard
