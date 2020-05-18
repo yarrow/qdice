@@ -14,21 +14,21 @@ type alias PipsList =
 
 
 type DiceBoard
-    = DiceBoard (List Die)
+    = DiceBoard (Maybe DiceList)
 
 
-mergeDice : PipsList -> Maybe DiceBoard -> Maybe DiceBoard
-mergeDice incoming current =
+mergeDice : PipsList -> DiceBoard -> DiceBoard
+mergeDice incoming (DiceBoard current) =
     let
         diceList =
             case current of
                 Nothing ->
                     List.map Die.fromInt incoming
 
-                Just (DiceBoard oldDice) ->
+                Just oldDice ->
                     refreshDice incoming oldDice
     in
-    Just (DiceBoard diceList)
+    DiceBoard (Just diceList)
 
 
 refreshDice : PipsList -> DiceList -> DiceList
@@ -50,8 +50,13 @@ refreshDice incoming current =
 
 
 rerollCount : DiceBoard -> Int
-rerollCount (DiceBoard dice) =
-    List.length (List.filter (\die -> Die.nextRoll die == Die.Reroll) dice)
+rerollCount (DiceBoard diceBoard) =
+    case diceBoard of
+        Nothing ->
+            5
+
+        Just dice ->
+            List.length (List.filter (\die -> Die.nextRoll die == Die.Reroll) dice)
 
 
 hasRerolls : DiceBoard -> Bool
@@ -61,11 +66,21 @@ hasRerolls dice =
 
 makeDiceBoard : List ( Int, NextRoll ) -> DiceBoard
 makeDiceBoard raw =
-    DiceBoard (List.map makeDie raw)
+    DiceBoard (Just (List.map makeDie raw))
 
 
 flipNth : Int -> DiceBoard -> DiceBoard
-flipNth n (DiceBoard dice) =
+flipNth n (DiceBoard diceBoard) =
+    case diceBoard of
+        Nothing ->
+            DiceBoard Nothing
+
+        Just dice ->
+            DiceBoard (Just (do_flip n dice))
+
+
+do_flip : Int -> DiceList -> DiceList
+do_flip n dice =
     let
         diceArray =
             Array.fromList dice
@@ -75,12 +90,11 @@ flipNth n (DiceBoard dice) =
     in
     case oldDie of
         Nothing ->
-            DiceBoard dice
+            dice
 
         Just aDie ->
             Array.set n (flipNextRoll aDie) diceArray
                 |> Array.toList
-                |> DiceBoard
 
 
 type alias DiceGenerator =

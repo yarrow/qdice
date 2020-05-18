@@ -17,12 +17,7 @@ type Msg
 
 rerollCount : Model -> Int
 rerollCount model =
-    case model.dice of
-        Nothing ->
-            5
-
-        Just dice ->
-            Dice.rerollCount dice
+    Dice.rerollCount model.dice
 
 
 rollAllowed : Model -> Bool
@@ -31,12 +26,7 @@ rollAllowed model =
         False
 
     else
-        case model.dice of
-            Nothing ->
-                True
-
-            Just dice ->
-                Dice.hasRerolls dice
+        Dice.hasRerolls model.dice
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -64,16 +54,7 @@ update msg model =
             ( newModel, Cmd.none )
 
         DieFlipped j ->
-            let
-                newDice =
-                    case model.dice of
-                        Nothing ->
-                            Nothing
-
-                        Just dice ->
-                            Just (Dice.flipNth j dice)
-            in
-            ( { model | dice = newDice }, Cmd.none )
+            ( { model | dice = Dice.flipNth j model.dice }, Cmd.none )
 
 
 tdDie : Die -> Html msg
@@ -111,10 +92,10 @@ view model =
             , tr [] [ th [] [ text "Reroll" ], th [] [ text "Keep" ] ]
             ]
                 ++ (case model.dice of
-                        Nothing ->
+                        DiceBoard Nothing ->
                             List.repeat 5 blankRow
 
-                        Just (DiceBoard theDice) ->
+                        DiceBoard (Just theDice) ->
                             List.indexedMap dieRow theDice
                    )
         , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
@@ -122,14 +103,14 @@ view model =
 
 
 type alias Model =
-    { dice : Maybe DiceBoard
+    { dice : DiceBoard
     , remainingRolls : Int
     }
 
 
 initialModel : Model
 initialModel =
-    { dice = Nothing, remainingRolls = 3 }
+    { dice = DiceBoard Nothing, remainingRolls = 3 }
 
 
 main : Program () Model Msg

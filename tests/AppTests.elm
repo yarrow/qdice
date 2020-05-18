@@ -22,7 +22,7 @@ randomPipsList =
 
 modelWithDice : PreDice -> Model
 modelWithDice dice =
-    { initialModel | dice = Just (Dice.makeDiceBoard dice) }
+    { initialModel | dice = Dice.makeDiceBoard dice }
 
 
 modelAfterFirstRoll : Model
@@ -37,7 +37,7 @@ appTests =
             [ test "We start with no dice" <|
                 \_ ->
                     initialModel.dice
-                        |> Expect.equal Nothing
+                        |> Expect.equal (DiceBoard Nothing)
             , test "We start with three rolls available" <|
                 \_ ->
                     initialModel.remainingRolls
@@ -84,7 +84,7 @@ appTests =
                 \_ ->
                     let
                         rerollFirst =
-                            Just (Dice.makeDiceBoard [ reroll, keep, keep, keep, keep ])
+                            Dice.makeDiceBoard [ reroll, keep, keep, keep, keep ]
                     in
                     update (DieFlipped 0) (modelWithDice keepAll)
                         |> Tuple.first
@@ -100,7 +100,7 @@ appTests =
                             [ 2, 3 ]
 
                         resultingDice =
-                            Just (Dice.makeDiceBoard [ keep, ( 2, Keep ), keep, ( 3, Keep ), keep ])
+                            Dice.makeDiceBoard [ keep, ( 2, Keep ), keep, ( 3, Keep ), keep ]
                     in
                     update (GotDice incomingDice) (modelWithDice startingDice)
                         |> Tuple.first
