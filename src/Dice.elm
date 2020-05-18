@@ -1,4 +1,4 @@
-module Dice exposing (DiceBoard, PipsList, diceRoller, display, emptyBoard, fiveDice, flipNth, hasRerolls, makeDiceBoard, mergeDice, rerollCount)
+module Dice exposing (DiceBoard, PipsList, diceRoller, display, emptyBoard, fiveDice, flipNth, fromPips, hasRerolls, makeDiceBoard, mergeDice, rerollCount)
 
 import Array
 import Die exposing (Die, NextRoll, flipNextRoll, makeDie)
@@ -28,8 +28,8 @@ numberOfDice =
 
 
 display : a -> (Int -> Die -> a) -> DiceBoard -> List a
-display emptyRow makeRow (DiceBoard diceBoard) =
-    case diceBoard of
+display emptyRow makeRow (DiceBoard board) =
+    case board of
         Nothing ->
             List.repeat numberOfDice emptyRow
 
@@ -37,18 +37,24 @@ display emptyRow makeRow (DiceBoard diceBoard) =
             List.indexedMap makeRow theDice
 
 
+diceBoard : DiceList -> DiceBoard
+diceBoard dice =
+    DiceBoard (Just dice)
+
+
+fromPips : PipsList -> DiceBoard
+fromPips pips =
+    diceBoard (List.map Die.fromInt pips)
+
+
 mergeDice : PipsList -> DiceBoard -> DiceBoard
 mergeDice incoming (DiceBoard current) =
-    let
-        diceList =
-            case current of
-                Nothing ->
-                    List.map Die.fromInt incoming
+    case current of
+        Nothing ->
+            fromPips incoming
 
-                Just oldDice ->
-                    refreshDice incoming oldDice
-    in
-    DiceBoard (Just diceList)
+        Just oldDice ->
+            diceBoard (refreshDice incoming oldDice)
 
 
 refreshDice : PipsList -> DiceList -> DiceList
@@ -70,8 +76,8 @@ refreshDice incoming current =
 
 
 rerollCount : DiceBoard -> Int
-rerollCount (DiceBoard diceBoard) =
-    case diceBoard of
+rerollCount (DiceBoard board) =
+    case board of
         Nothing ->
             numberOfDice
 
@@ -90,8 +96,8 @@ makeDiceBoard raw =
 
 
 flipNth : Int -> DiceBoard -> DiceBoard
-flipNth n (DiceBoard diceBoard) =
-    case diceBoard of
+flipNth n (DiceBoard board) =
+    case board of
         Nothing ->
             DiceBoard Nothing
 
