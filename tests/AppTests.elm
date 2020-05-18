@@ -1,10 +1,9 @@
 module AppTests exposing (..)
 
-import App exposing (Model, Msg(..), initialModel, main, update, view)
+import App exposing (Model, Msg(..), initialModel, update, view)
 import Dice exposing (DiceBoard(..), DiceList)
 import Die exposing (NextRoll(..))
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, list, string)
+import Expect
 import Html.Attributes as Attr
 import Random
 import Test exposing (..)

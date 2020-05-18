@@ -1,6 +1,6 @@
 module Dice exposing (DiceBoard(..), DiceList, PipsList, diceRoller, fiveDice, flipNth, hasRerolls, makeDiceBoard, makeDiceList, mergeDice, rerollCount)
 
-import Array exposing (Array)
+import Array
 import Die exposing (Die, NextRoll, flipNextRoll, makeDie)
 import Random exposing (Generator)
 

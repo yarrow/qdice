@@ -1,7 +1,7 @@
 module App exposing (Model, Msg(..), initialModel, main, update, view)
 
 import Browser
-import Dice exposing (DiceBoard(..), DiceList)
+import Dice exposing (DiceBoard(..))
 import Die exposing (Die)
 import Html exposing (..)
 import Html.Attributes exposing (..)

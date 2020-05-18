@@ -1,9 +1,8 @@
 module DieTests exposing (..)
 
-import Dice exposing (DiceList, diceRoller)
-import Die exposing (Die, NextRoll(..), flipNextRoll, makeDie, nextRoll, pips)
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, intRange, list, string)
+import Die exposing (NextRoll(..), flipNextRoll, makeDie, nextRoll, pips)
+import Expect
+import Fuzz exposing (intRange)
 import Random
 import Test exposing (..)
 

@@ -1,11 +1,11 @@
 {
     "checks": {
-        "SingleFieldRecord": false,
+        "SingleFieldRecord": true,
         "ExposeAll": false,
         "ImportAll": false,
-        "UnusedTopLevel": false,
-        "UnusedImportAlias": false,
-        "UnusedImportedVariable": false,
+        "UnusedTopLevel": true,
+        "UnusedImportAlias": true,
+        "UnusedImportedVariable": true,
         "MultiLineRecordFormatting": false
     }
 }
