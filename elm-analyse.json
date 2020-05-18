@@ -1,7 +1,7 @@
 {
     "checks": {
         "SingleFieldRecord": true,
-        "ExposeAll": false,
+        "ExposeAll": true,
         "ImportAll": false,
         "UnusedTopLevel": true,
         "UnusedImportAlias": true,
