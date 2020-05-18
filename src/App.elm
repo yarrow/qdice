@@ -11,7 +11,7 @@ import Random
 
 type Msg
     = RollDice
-    | GotDice DiceList
+    | GotDice Dice.PipsList
     | DieFlipped Int
 
 
@@ -27,7 +27,16 @@ rerollCount model =
 
 rollAllowed : Model -> Bool
 rollAllowed model =
-    model.remainingRolls > 0 && Maybe.withDefault False (Maybe.map Dice.hasRerolls model.dice)
+    if model.remainingRolls == 0 then
+        False
+
+    else
+        case model.dice of
+            Nothing ->
+                True
+
+            Just dice ->
+                Dice.hasRerolls dice
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

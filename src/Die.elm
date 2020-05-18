@@ -70,6 +70,6 @@ url d =
     "assets/die-" ++ String.fromInt (pips d) ++ ".png"
 
 
-roller : Random.Generator Die
+roller : Random.Generator Int
 roller =
-    Random.map fromInt (Random.int minDie maxDie)
+    Random.int minDie maxDie

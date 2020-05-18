@@ -1,7 +1,7 @@
 module DiceTests exposing (..)
 
 import Array exposing (Array)
-import Dice exposing (DiceBoard(..), DiceList, diceRoller, fiveDice, flipNth, makeDice)
+import Dice exposing (DiceBoard(..), DiceList, diceRoller, fiveDice, flipNth, makeDiceList)
 import Die exposing (Die, NextRoll(..), flipNextRoll, makeDie, nextRoll, pips)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, intRange, list, string)
@@ -16,19 +16,16 @@ diceRollerSuite =
             \_ ->
                 Random.step (diceRoller 0) (Random.initialSeed 42)
                     |> Tuple.first
-                    |> List.map pips
                     |> Expect.equalLists []
         , test "diceRoller 1 returns a list with one random die" <|
             \_ ->
                 Random.step (diceRoller 1) (Random.initialSeed 42)
                     |> Tuple.first
-                    |> List.map pips
                     |> Expect.equalLists [ 6 ]
         , test "diceRoller 5 returns a list with five random dice" <|
             \_ ->
                 Random.step (diceRoller 5) (Random.initialSeed 42)
                     |> Tuple.first
-                    |> List.map pips
                     |> Expect.equalLists [ 1, 3, 1, 1, 6 ]
         , fuzz (intRange Random.minInt Random.maxInt) "fiveDice always returns five dice" <|
             \seed ->
@@ -39,7 +36,7 @@ diceRollerSuite =
         ]
 
 
-randomDie : Int -> DiceList
+randomDie : Int -> Dice.PipsList
 randomDie seed =
     Random.step (diceRoller 1) (Random.initialSeed seed)
         |> Tuple.first
@@ -50,6 +47,6 @@ flipNthSuite =
     describe "flipNth n dice performs flipNextRoll on the nth element of dice" <|
         [ test "flipNth 0" <|
             \_ ->
-                flipNth 0 (DiceBoard (makeDice [ ( 1, Keep ), ( 2, Reroll ) ]))
-                    |> Expect.equal (DiceBoard (makeDice [ ( 1, Reroll ), ( 2, Reroll ) ]))
+                flipNth 0 (DiceBoard (makeDiceList [ ( 1, Keep ), ( 2, Reroll ) ]))
+                    |> Expect.equal (DiceBoard (makeDiceList [ ( 1, Reroll ), ( 2, Reroll ) ]))
         ]

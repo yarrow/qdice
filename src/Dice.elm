@@ -1,4 +1,4 @@
-module Dice exposing (DiceBoard(..), DiceList, diceRoller, fiveDice, flipNth, hasRerolls, makeDice, mergeDice, rerollCount)
+module Dice exposing (DiceBoard(..), DiceList, PipsList, diceRoller, fiveDice, flipNth, hasRerolls, makeDiceBoard, makeDiceList, mergeDice, rerollCount)
 
 import Array exposing (Array)
 import Die exposing (Die, NextRoll, flipNextRoll, makeDie)
@@ -9,17 +9,21 @@ type alias DiceList =
     List Die
 
 
+type alias PipsList =
+    List Int
+
+
 type DiceBoard
     = DiceBoard (List Die)
 
 
-mergeDice : DiceList -> Maybe DiceBoard -> Maybe DiceBoard
+mergeDice : PipsList -> Maybe DiceBoard -> Maybe DiceBoard
 mergeDice incoming current =
     let
         diceList =
             case current of
                 Nothing ->
-                    incoming
+                    List.map Die.fromInt incoming
 
                 Just (DiceBoard oldDice) ->
                     refreshDice incoming oldDice
@@ -27,7 +31,7 @@ mergeDice incoming current =
     Just (DiceBoard diceList)
 
 
-refreshDice : DiceList -> DiceList -> DiceList
+refreshDice : PipsList -> DiceList -> DiceList
 refreshDice incoming current =
     case ( incoming, current ) of
         ( [], _ ) ->
@@ -42,7 +46,7 @@ refreshDice incoming current =
                     old :: refreshDice incoming tailCurrent
 
                 Die.Reroll ->
-                    new :: refreshDice tailIncoming tailCurrent
+                    Die.fromInt new :: refreshDice tailIncoming tailCurrent
 
 
 rerollCount : DiceBoard -> Int
@@ -55,9 +59,14 @@ hasRerolls dice =
     rerollCount dice > 0
 
 
-makeDice : List ( Int, NextRoll ) -> DiceList
-makeDice raw =
+makeDiceList : List ( Int, NextRoll ) -> DiceList
+makeDiceList raw =
     List.map makeDie raw
+
+
+makeDiceBoard : List ( Int, NextRoll ) -> DiceBoard
+makeDiceBoard raw =
+    DiceBoard (makeDiceList raw)
 
 
 flipNth : Int -> DiceBoard -> DiceBoard
@@ -80,7 +89,7 @@ flipNth n (DiceBoard dice) =
 
 
 type alias DiceGenerator =
-    Generator DiceList
+    Generator PipsList
 
 
 diceRoller : Int -> DiceGenerator

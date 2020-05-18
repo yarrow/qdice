@@ -54,14 +54,14 @@ nextRollSuite =
     describe "the nextRoll field" <|
         [ fuzz (intRange Random.minInt Random.maxInt) "A new die's nextRoll is Keep" <|
             \seed ->
-                randomDie seed
+                Die.fromInt (randomDie seed)
                     |> nextRoll
                     |> Expect.equal Keep
         , fuzz (intRange Random.minInt Random.maxInt) "flipNextRoll changes Keep to Reroll and vice-versa" <|
             \seed ->
                 let
                     hasKeep =
-                        randomDie seed
+                        Die.fromInt (randomDie seed)
 
                     hasReroll =
                         flipNextRoll hasKeep
@@ -74,7 +74,7 @@ nextRollSuite =
         ]
 
 
-randomDie : Int -> Die
+randomDie : Int -> Int
 randomDie seed =
     Random.step Die.roller (Random.initialSeed seed)
         |> Tuple.first
