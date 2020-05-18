@@ -1,7 +1,7 @@
 module App exposing (Model, Msg(..), initialModel, main, update, view)
 
 import Browser
-import Dice exposing (DiceBoard(..))
+import Dice
 import Die exposing (Die)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -91,26 +91,20 @@ view model =
             [ caption [] [ text (String.fromInt model.remainingRolls ++ " rolls remaining") ]
             , tr [] [ th [] [ text "Reroll" ], th [] [ text "Keep" ] ]
             ]
-                ++ (case model.dice of
-                        DiceBoard Nothing ->
-                            List.repeat 5 blankRow
-
-                        DiceBoard (Just theDice) ->
-                            List.indexedMap dieRow theDice
-                   )
+                ++ Dice.display blankRow dieRow model.dice
         , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
         ]
 
 
 type alias Model =
-    { dice : DiceBoard
+    { dice : Dice.DiceBoard
     , remainingRolls : Int
     }
 
 
 initialModel : Model
 initialModel =
-    { dice = DiceBoard Nothing, remainingRolls = 3 }
+    { dice = Dice.emptyBoard, remainingRolls = 3 }
 
 
 main : Program () Model Msg

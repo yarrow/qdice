@@ -1,7 +1,7 @@
 module AppTests exposing (appTests)
 
 import App exposing (Model, Msg(..), initialModel, update, view)
-import Dice exposing (DiceBoard(..))
+import Dice
 import Die exposing (NextRoll(..))
 import Expect
 import Html.Attributes as Attr
@@ -37,7 +37,7 @@ appTests =
             [ test "We start with no dice" <|
                 \_ ->
                     initialModel.dice
-                        |> Expect.equal (DiceBoard Nothing)
+                        |> Expect.equal Dice.emptyBoard
             , test "We start with three rolls available" <|
                 \_ ->
                     initialModel.remainingRolls

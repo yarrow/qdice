@@ -1,4 +1,4 @@
-module Dice exposing (DiceBoard(..), PipsList, diceRoller, fiveDice, flipNth, hasRerolls, makeDiceBoard, mergeDice, rerollCount)
+module Dice exposing (DiceBoard, PipsList, diceRoller, display, emptyBoard, fiveDice, flipNth, hasRerolls, makeDiceBoard, mergeDice, rerollCount)
 
 import Array
 import Die exposing (Die, NextRoll, flipNextRoll, makeDie)
@@ -15,6 +15,26 @@ type alias PipsList =
 
 type DiceBoard
     = DiceBoard (Maybe DiceList)
+
+
+emptyBoard : DiceBoard
+emptyBoard =
+    DiceBoard Nothing
+
+
+numberOfDice : Int
+numberOfDice =
+    5
+
+
+display : a -> (Int -> Die -> a) -> DiceBoard -> List a
+display emptyRow makeRow (DiceBoard diceBoard) =
+    case diceBoard of
+        Nothing ->
+            List.repeat numberOfDice emptyRow
+
+        Just theDice ->
+            List.indexedMap makeRow theDice
 
 
 mergeDice : PipsList -> DiceBoard -> DiceBoard
@@ -53,7 +73,7 @@ rerollCount : DiceBoard -> Int
 rerollCount (DiceBoard diceBoard) =
     case diceBoard of
         Nothing ->
-            5
+            numberOfDice
 
         Just dice ->
             List.length (List.filter (\die -> Die.nextRoll die == Die.Reroll) dice)
@@ -108,4 +128,4 @@ diceRoller n =
 
 fiveDice : DiceGenerator
 fiveDice =
-    diceRoller 5
+    diceRoller numberOfDice
