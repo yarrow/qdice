@@ -1,7 +1,6 @@
 module DiceTests exposing (diceTests)
 
-import Dice exposing (DiceBoard(..), diceRoller, fiveDice, flipNth)
-import Die exposing (NextRoll(..))
+import Dice exposing (DiceBoard(..), NextRoll(..), diceRoller, fiveDice, flipNth)
 import Expect
 import Fuzz exposing (intRange)
 import Random
@@ -29,7 +28,7 @@ diceTests =
 
                     -- FIXME
                     getNextRoll _ die =
-                        Die.nextRoll die
+                        Dice.nextRoll die
 
                     rolls =
                         Dice.display Reroll getNextRoll diceBoard
@@ -43,9 +42,9 @@ diceTests =
                         Dice.fromInt n
 
                     fragment =
-                        "/die-" ++ String.fromInt (Die.pips d) ++ "."
+                        "/die-" ++ String.fromInt (Dice.pips d) ++ "."
                 in
-                Die.url d
+                Dice.url d
                     |> String.contains fragment
                     |> Expect.true ("Expected to see " ++ fragment)
         , describe "The value of `diceRoller n` is a random generator returning a list of `n` random dice" <|

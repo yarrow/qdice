@@ -2,7 +2,6 @@ module App exposing (Model, Msg(..), initialModel, main, update, view)
 
 import Browser
 import Dice
-import Die exposing (Die)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
@@ -57,19 +56,19 @@ update msg model =
             ( { model | dice = Dice.flipNth j model.dice }, Cmd.none )
 
 
-tdDie : Die -> Html msg
+tdDie : Dice.Die -> Html msg
 tdDie d =
-    td [ class "dice" ] [ img [ src (Die.url d) ] [] ]
+    td [ class "dice" ] [ img [ src (Dice.url d) ] [] ]
 
 
-dieRow : Int -> Die -> Html Msg
+dieRow : Int -> Dice.Die -> Html Msg
 dieRow j d =
     tr [ class "dice-row", onClick (DieFlipped j) ] <|
-        case Die.nextRoll d of
-            Die.Keep ->
+        case Dice.nextRoll d of
+            Dice.Keep ->
                 [ tdBlank, tdDie d ]
 
-            Die.Reroll ->
+            Dice.Reroll ->
                 [ tdDie d, tdBlank ]
 
 

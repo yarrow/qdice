@@ -1,8 +1,7 @@
 module AppTests exposing (appTests)
 
 import App exposing (Model, Msg(..), initialModel, update, view)
-import Dice
-import Die exposing (NextRoll(..))
+import Dice exposing (NextRoll(..))
 import Expect
 import Html.Attributes as Attr
 import Random
@@ -12,7 +11,7 @@ import Test.Html.Selector exposing (attribute, id, tag, text)
 
 
 type alias PreDice =
-    List ( Int, Die.NextRoll )
+    List ( Int, Dice.NextRoll )
 
 
 randomPipsList : Dice.PipsList
@@ -77,7 +76,7 @@ appTests =
                               |> Expect.equal (Just Dice.makeDiceBoard randomPipsList)
                , test "Initially, all dice have nextRoll == Keep" <|
                    \_ ->
-                       List.all (\d -> Die.nextRoll d == Keep) randomPipsList
+                       List.all (\d -> Dice.nextRoll d == Keep) randomPipsList
                            |> Expect.true "Initially, all dice have an NextRoll of Keep"
             -}
             , test "`DieFlipped 0` causes the 0th die to flip its NextRoll status" <|

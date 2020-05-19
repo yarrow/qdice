@@ -1,7 +1,28 @@
-module Dice exposing (DiceBoard, PipsList, diceRoller, display, emptyBoard, fiveDice, flipNth, fromInt, fromPips, hasRerolls, makeDiceBoard, mergeDice, rerollCount, toPips)
+module Dice exposing
+    ( DiceBoard
+    , Die(..)
+    , NextRoll(..)
+    , PipsList
+    , diceRoller
+    , display
+    , emptyBoard
+    , fiveDice
+    , flipNextRoll
+    , flipNth
+    , fromInt
+    , fromPips
+    , hasRerolls
+    , makeDiceBoard
+    , mergeDice
+    , nextRoll
+    , pips
+    , rerollCount
+    , roller
+    , toPips
+    , url
+    )
 
 import Array
-import Die exposing (Die(..), NextRoll, flipNextRoll)
 import Random exposing (Generator)
 
 
@@ -53,13 +74,13 @@ diceBoard dice =
 
 
 fromPips : PipsList -> DiceBoard
-fromPips pips =
-    diceBoard (List.map fromInt pips)
+fromPips pipsList =
+    diceBoard (List.map fromInt pipsList)
 
 
 toPips : DiceBoard -> Maybe PipsList
 toPips (DiceBoard board) =
-    Maybe.map (List.map Die.pips) board
+    Maybe.map (List.map pips) board
 
 
 mergeDice : PipsList -> DiceBoard -> DiceBoard
@@ -82,11 +103,11 @@ refreshDice incoming current =
             []
 
         ( new :: tailIncoming, old :: tailCurrent ) ->
-            case Die.nextRoll old of
-                Die.Keep ->
+            case nextRoll old of
+                Keep ->
                     old :: refreshDice incoming tailCurrent
 
-                Die.Reroll ->
+                Reroll ->
                     fromInt new :: refreshDice tailIncoming tailCurrent
 
 
@@ -97,7 +118,7 @@ rerollCount (DiceBoard board) =
             numberOfDice
 
         Just dice ->
-            List.length (List.filter (\die -> Die.nextRoll die == Die.Reroll) dice)
+            List.length (List.filter (\die -> nextRoll die == Reroll) dice)
 
 
 hasRerolls : DiceBoard -> Bool
@@ -115,7 +136,7 @@ makeDie ( n, nextStatus ) =
 
 fromInt : Int -> Die
 fromInt n =
-    makeDie ( n, Die.Keep )
+    makeDie ( n, Keep )
 
 
 makeDiceBoard : List ( Int, NextRoll ) -> DiceBoard
@@ -157,9 +178,59 @@ type alias DiceGenerator =
 
 diceRoller : Int -> DiceGenerator
 diceRoller n =
-    Random.list n Die.roller
+    Random.list n roller
 
 
 fiveDice : DiceGenerator
 fiveDice =
     diceRoller numberOfDice
+
+
+
+--------------------------------------------------------------- Die stuff
+
+
+type NextRoll
+    = Keep
+    | Reroll
+
+
+type Die
+    = Die
+        { pips : Int
+        , nextRoll : NextRoll
+        }
+
+
+pips : Die -> Int
+pips (Die die) =
+    die.pips
+
+
+nextRoll : Die -> NextRoll
+nextRoll (Die die) =
+    die.nextRoll
+
+
+flipNextRoll : Die -> Die
+flipNextRoll (Die d) =
+    Die
+        { pips = d.pips
+        , nextRoll =
+            case d.nextRoll of
+                Keep ->
+                    Reroll
+
+                Reroll ->
+                    Keep
+        }
+
+
+url : Die -> String
+url d =
+    "assets/die-" ++ String.fromInt (pips d) ++ ".png"
+
+
+roller : Random.Generator Int
+roller =
+    Random.int minDie maxDie
