@@ -3,7 +3,6 @@ module Dice exposing
     , Die(..)
     , NextRoll(..)
     , PipsList
-    , diceRoller
     , display
     , emptyBoard
     , flipNextRoll
@@ -175,9 +174,9 @@ type alias DiceGenerator =
     Generator PipsList
 
 
-diceRoller : Int -> DiceGenerator
-diceRoller n =
-    Random.list n roller
+roller : Int -> DiceGenerator
+roller n =
+    Random.list n (Random.int minDie maxDie)
 
 
 
@@ -223,8 +222,3 @@ flipNextRoll (Die d) =
 url : Die -> String
 url d =
     "assets/die-" ++ String.fromInt (pips d) ++ ".png"
-
-
-roller : Random.Generator Int
-roller =
-    Random.int minDie maxDie

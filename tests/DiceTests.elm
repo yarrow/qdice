@@ -1,6 +1,6 @@
 module DiceTests exposing (diceTests)
 
-import Dice exposing (DiceBoard(..), NextRoll(..), diceRoller, flipNth)
+import Dice exposing (DiceBoard(..), NextRoll(..), flipNth)
 import Expect
 import Fuzz exposing (intRange)
 import Random
@@ -47,20 +47,20 @@ diceTests =
                 Dice.url d
                     |> String.contains fragment
                     |> Expect.true ("Expected to see " ++ fragment)
-        , describe "The value of `diceRoller n` is a random generator returning a list of `n` random dice" <|
-            [ test "diceRoller 0 is a generator that always returns an empty list" <|
+        , describe "The value of `Dice.roller n` is a random generator returning a list of `n` random dice" <|
+            [ test "Dice.roller 0 is a generator that always returns an empty list" <|
                 \_ ->
-                    Random.step (diceRoller 0) (Random.initialSeed 42)
+                    Random.step (Dice.roller 0) (Random.initialSeed 42)
                         |> Tuple.first
                         |> Expect.equalLists []
-            , test "diceRoller 1 returns a list with one random die" <|
+            , test "Dice.roller 1 returns a list with one random die" <|
                 \_ ->
-                    Random.step (diceRoller 1) (Random.initialSeed 42)
+                    Random.step (Dice.roller 1) (Random.initialSeed 42)
                         |> Tuple.first
                         |> Expect.equalLists [ 6 ]
-            , test "diceRoller 5 returns a list with five random dice" <|
+            , test "Dice.roller 5 returns a list with five random dice" <|
                 \_ ->
-                    Random.step (diceRoller 5) (Random.initialSeed 42)
+                    Random.step (Dice.roller 5) (Random.initialSeed 42)
                         |> Tuple.first
                         |> Expect.equalLists [ 1, 3, 1, 1, 6 ]
             ]

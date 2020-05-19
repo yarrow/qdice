@@ -35,7 +35,7 @@ update msg model =
             let
                 cmd =
                     if rollAllowed model then
-                        Random.generate GotDice (Dice.diceRoller (rerollCount model))
+                        Random.generate GotDice (Dice.roller (rerollCount model))
 
                     else
                         Cmd.none
