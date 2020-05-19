@@ -53,7 +53,7 @@ update msg model =
             ( newModel, Cmd.none )
 
         DieFlipped j ->
-            ( { model | dice = Dice.flipNth j model.dice }, Cmd.none )
+            ( { model | dice = Dice.flipNextRoll j model.dice }, Cmd.none )
 
 
 tdDie : Dice.Die -> Html msg

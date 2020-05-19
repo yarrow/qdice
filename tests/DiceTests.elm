@@ -1,6 +1,6 @@
 module DiceTests exposing (diceTests)
 
-import Dice exposing (DiceBoard(..), NextRoll(..), flipNth)
+import Dice exposing (DiceBoard(..), NextRoll(..), flipNextRoll)
 import Expect
 import Fuzz exposing (intRange)
 import Random
@@ -64,10 +64,10 @@ diceTests =
                         |> Tuple.first
                         |> Expect.equalLists [ 1, 3, 1, 1, 6 ]
             ]
-        , describe "flipNth n dice performs flipNextRoll on the nth element of dice" <|
-            [ test "flipNth 0" <|
+        , describe "`flipNextRoll n dice` flips the NextRoll on the nth element of dice" <|
+            [ test "`flipNextRoll 0` flips Keep/Reroll status of first element" <|
                 \_ ->
-                    flipNth 0 (Dice.makeDiceBoard [ ( 1, Keep ), ( 2, Reroll ) ])
+                    flipNextRoll 0 (Dice.makeDiceBoard [ ( 1, Keep ), ( 2, Reroll ) ])
                         |> Expect.equal (Dice.makeDiceBoard [ ( 1, Reroll ), ( 2, Reroll ) ])
             ]
         ]

@@ -6,7 +6,6 @@ module Dice exposing
     , display
     , emptyBoard
     , flipNextRoll
-    , flipNth
     , fromInt
     , fromPips
     , hasRerolls
@@ -142,8 +141,8 @@ makeDiceBoard raw =
     DiceBoard (Just (List.map makeDie raw))
 
 
-flipNth : Int -> DiceBoard -> DiceBoard
-flipNth n (DiceBoard board) =
+flipNextRoll : Int -> DiceBoard -> DiceBoard
+flipNextRoll n (DiceBoard board) =
     case board of
         Nothing ->
             DiceBoard Nothing
@@ -165,8 +164,17 @@ do_flip n dice =
         Nothing ->
             dice
 
-        Just aDie ->
-            Array.set n (flipNextRoll aDie) diceArray
+        Just (Die aDie) ->
+            let
+                flipped =
+                    case aDie.nextRoll of
+                        Keep ->
+                            Reroll
+
+                        Reroll ->
+                            Keep
+            in
+            Array.set n (Die { aDie | nextRoll = flipped }) diceArray
                 |> Array.toList
 
 
@@ -203,20 +211,6 @@ pips (Die die) =
 nextRoll : Die -> NextRoll
 nextRoll (Die die) =
     die.nextRoll
-
-
-flipNextRoll : Die -> Die
-flipNextRoll (Die d) =
-    Die
-        { pips = d.pips
-        , nextRoll =
-            case d.nextRoll of
-                Keep ->
-                    Reroll
-
-                Reroll ->
-                    Keep
-        }
 
 
 url : Die -> String
