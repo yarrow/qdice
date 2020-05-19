@@ -23,28 +23,39 @@ diceTests =
         , test "fromPips uses Keep for every die" <|
             \_ ->
                 let
-                    diceBoard =
-                        Dice.fromPips [ 1, 3, 2, 4, 7, 2, 4 ]
+                    pips =
+                        [ 1, 3, 2, 4, 7, 2, 4 ]
 
-                    -- FIXME
-                    getNextRoll _ die =
-                        Dice.nextRoll die
+                    diceBoard =
+                        Dice.fromPips pips
 
                     rolls =
-                        Dice.display Reroll getNextRoll diceBoard
+                        Dice.toDiceList diceBoard
+                            |> List.map (\die -> Dice.nextRoll die)
+
+                    ok =
+                        (List.length rolls == List.length pips)
+                            && List.all (\r -> r == Keep) rolls
                 in
-                List.all (\r -> r == Keep) rolls
-                    |> Expect.true "Found a nextRoll of Reroll"
-        , fuzz (intRange 0 7) "The url for a die with `n` pips contains '/die-`n`.`" <|
+                ok |> Expect.true "Wrong number of dice, or found one with Reroll"
+        , fuzz (intRange 1 6) "The url for a die with `n` pips contains '/die-`n`.`" <|
             \n ->
                 let
-                    d =
-                        Dice.fromInt n
+                    diceBoard =
+                        Dice.fromPips [ n ]
+
+                    theUrl =
+                        case Dice.toDiceList diceBoard of
+                            [] ->
+                                ""
+
+                            die :: _ ->
+                                Dice.url die
 
                     fragment =
-                        "/die-" ++ String.fromInt (Dice.pips d) ++ "."
+                        "/die-" ++ String.fromInt n ++ "."
                 in
-                Dice.url d
+                theUrl
                     |> String.contains fragment
                     |> Expect.true ("Expected to see " ++ fragment)
         , describe "The value of `Dice.roller n` is a random generator returning a list of `n` random dice" <|

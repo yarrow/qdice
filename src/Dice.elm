@@ -6,7 +6,6 @@ module Dice exposing
     , display
     , emptyBoard
     , flipNextRoll
-    , fromInt
     , fromPips
     , hasRerolls
     , makeDiceBoard
@@ -15,6 +14,7 @@ module Dice exposing
     , pips
     , rerollCount
     , roller
+    , toDiceList
     , toPips
     , url
     )
@@ -72,12 +72,22 @@ diceBoard dice =
 
 fromPips : PipsList -> DiceBoard
 fromPips pipsList =
-    diceBoard (List.map fromInt pipsList)
+    diceBoard (List.map dieFromInt pipsList)
 
 
 toPips : DiceBoard -> Maybe PipsList
 toPips (DiceBoard board) =
     Maybe.map (List.map pips) board
+
+
+toDiceList : DiceBoard -> DiceList
+toDiceList (DiceBoard board) =
+    case board of
+        Nothing ->
+            []
+
+        Just dice ->
+            dice
 
 
 mergeDice : PipsList -> DiceBoard -> DiceBoard
@@ -105,7 +115,7 @@ refreshDice incoming current =
                     old :: refreshDice incoming tailCurrent
 
                 Reroll ->
-                    fromInt new :: refreshDice tailIncoming tailCurrent
+                    dieFromInt new :: refreshDice tailIncoming tailCurrent
 
 
 rerollCount : DiceBoard -> Int
@@ -131,8 +141,8 @@ makeDie ( n, nextStatus ) =
         }
 
 
-fromInt : Int -> Die
-fromInt n =
+dieFromInt : Int -> Die
+dieFromInt n =
     makeDie ( n, Keep )
 
 
