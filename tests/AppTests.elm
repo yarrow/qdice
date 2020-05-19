@@ -16,7 +16,7 @@ type alias PreDice =
 
 randomPipsList : Dice.PipsList
 randomPipsList =
-    Random.step (Dice.roller 5) (Random.initialSeed 0) |> Tuple.first
+    Random.step (Dice.rollForNewDice Dice.emptyBoard) (Random.initialSeed 0) |> Tuple.first
 
 
 modelWithDice : PreDice -> Model

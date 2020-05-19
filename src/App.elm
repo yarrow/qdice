@@ -14,11 +14,6 @@ type Msg
     | DieFlipped Int
 
 
-rerollCount : Model -> Int
-rerollCount model =
-    Dice.rerollCount model.dice
-
-
 rollAllowed : Model -> Bool
 rollAllowed model =
     if model.remainingRolls == 0 then
@@ -35,7 +30,7 @@ update msg model =
             let
                 cmd =
                     if rollAllowed model then
-                        Random.generate GotDice (Dice.roller (rerollCount model))
+                        Random.generate GotDice (Dice.rollForNewDice model.dice)
 
                     else
                         Cmd.none

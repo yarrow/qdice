@@ -10,6 +10,11 @@ import Test exposing (..)
 diceTests : Test
 diceTests =
     describe "Tests for Dice.elm" <|
+        let
+            nextRolls diceBoard =
+                Dice.toDiceList diceBoard
+                    |> List.map (\die -> Dice.nextRoll die)
+        in
         [ test "fromPips clamps the pips value to 1-6" <|
             \_ ->
                 let
@@ -26,12 +31,8 @@ diceTests =
                     pips =
                         [ 1, 3, 2, 4, 7, 2, 4 ]
 
-                    diceBoard =
-                        Dice.fromPips pips
-
                     rolls =
-                        Dice.toDiceList diceBoard
-                            |> List.map (\die -> Dice.nextRoll die)
+                        nextRolls (Dice.fromPips pips)
 
                     ok =
                         (List.length rolls == List.length pips)
@@ -58,22 +59,31 @@ diceTests =
                 theUrl
                     |> String.contains fragment
                     |> Expect.true ("Expected to see " ++ fragment)
-        , describe "The value of `Dice.roller n` is a random generator returning a list of `n` random dice" <|
-            [ test "Dice.roller 0 is a generator that always returns an empty list" <|
-                \_ ->
-                    Random.step (Dice.roller 0) (Random.initialSeed 42)
+        , describe "`rollForNewDice diceBoard` returns a generator for the appropriate number of new dice for diceBoard" <|
+            let
+                numberRolled diceRoller =
+                    Random.step diceRoller (Random.initialSeed 42)
                         |> Tuple.first
-                        |> Expect.equalLists []
-            , test "Dice.roller 1 returns a list with one random die" <|
+                        |> List.length
+            in
+            [ test "`rollForNewDice emptyBoard` returns a 5-dice generator" <|
                 \_ ->
-                    Random.step (Dice.roller 1) (Random.initialSeed 42)
-                        |> Tuple.first
-                        |> Expect.equalLists [ 6 ]
-            , test "Dice.roller 5 returns a list with five random dice" <|
+                    numberRolled (Dice.rollForNewDice Dice.emptyBoard)
+                        |> Expect.equal 5
+            , test "When diceBoard is not empty, `rollForNewDice diceBoard` returns a generator for the number dice with nextRoll==Reroll" <|
                 \_ ->
-                    Random.step (Dice.roller 5) (Random.initialSeed 42)
-                        |> Tuple.first
-                        |> Expect.equalLists [ 1, 3, 1, 1, 6 ]
+                    let
+                        two =
+                            [ ( 1, Keep ), ( 1, Keep ), ( 3, Reroll ), ( 4, Keep ), ( 6, Reroll ) ]
+
+                        three =
+                            [ ( 1, Reroll ), ( 1, Keep ), ( 3, Reroll ), ( 4, Keep ), ( 6, Reroll ) ]
+
+                        none =
+                            [ ( 1, Keep ), ( 1, Keep ), ( 3, Keep ), ( 4, Keep ), ( 6, Keep ) ]
+                    in
+                    List.map (numberRolled << Dice.rollForNewDice << Dice.fromPairs) [ two, three, none ]
+                        |> Expect.equalLists [ 2, 3, 0 ]
             ]
         , describe "`flipNextRoll n dice` flips the NextRoll on the nth element of dice" <|
             [ test "`flipNextRoll 0` flips Keep/Reroll status of first element" <|

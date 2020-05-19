@@ -6,14 +6,14 @@ module Dice exposing
     , display
     , emptyBoard
     , flipNextRoll
+    , fromPairs
     , fromPips
     , hasRerolls
     , makeDiceBoard
     , mergeDice
     , nextRoll
     , pips
-    , rerollCount
-    , roller
+    , rollForNewDice
     , toDiceList
     , toPips
     , url
@@ -128,13 +128,23 @@ rerollCount (DiceBoard board) =
             List.length (List.filter (\die -> nextRoll die == Reroll) dice)
 
 
+rollForNewDice : DiceBoard -> DiceGenerator
+rollForNewDice diceBoard =
+    Random.list (rerollCount diceBoard) (Random.int minDie maxDie)
+
+
 hasRerolls : DiceBoard -> Bool
 hasRerolls dice =
     rerollCount dice > 0
 
 
-makeDie : ( Int, NextRoll ) -> Die
-makeDie ( n, nextStatus ) =
+fromPairs : List ( Int, NextRoll ) -> DiceBoard
+fromPairs pairs =
+    fromDiceList (List.map dieFromPair pairs)
+
+
+dieFromPair : ( Int, NextRoll ) -> Die
+dieFromPair ( n, nextStatus ) =
     Die
         { pips = clamp minDie maxDie n
         , nextRoll = nextStatus
@@ -143,12 +153,12 @@ makeDie ( n, nextStatus ) =
 
 dieFromInt : Int -> Die
 dieFromInt n =
-    makeDie ( n, Keep )
+    dieFromPair ( n, Keep )
 
 
 makeDiceBoard : List ( Int, NextRoll ) -> DiceBoard
 makeDiceBoard raw =
-    DiceBoard (Just (List.map makeDie raw))
+    DiceBoard (Just (List.map dieFromPair raw))
 
 
 flipNextRoll : Int -> DiceBoard -> DiceBoard
