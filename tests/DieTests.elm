@@ -1,5 +1,6 @@
 module DieTests exposing (dieTests)
 
+import Dice
 import Die exposing (NextRoll(..), flipNextRoll, nextRoll, pips)
 import Expect
 import Fuzz exposing (intRange)
@@ -14,7 +15,7 @@ dieTests =
             \n ->
                 let
                     d =
-                        Die.fromInt n
+                        Dice.fromInt n
 
                     fragment =
                         "/die-" ++ String.fromInt (pips d) ++ "."
@@ -25,14 +26,14 @@ dieTests =
         , describe "the nextRoll field" <|
             [ fuzz (intRange Random.minInt Random.maxInt) "A new die's nextRoll is Keep" <|
                 \seed ->
-                    Die.fromInt (randomDie seed)
+                    Dice.fromInt (randomDie seed)
                         |> nextRoll
                         |> Expect.equal Keep
             , fuzz (intRange Random.minInt Random.maxInt) "flipNextRoll changes Keep to Reroll and vice-versa" <|
                 \seed ->
                     let
                         hasKeep =
-                            Die.fromInt (randomDie seed)
+                            Dice.fromInt (randomDie seed)
 
                         hasReroll =
                             flipNextRoll hasKeep

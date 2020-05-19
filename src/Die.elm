@@ -1,4 +1,4 @@
-module Die exposing (Die, NextRoll(..), flipNextRoll, fromInt, makeDie, nextRoll, pips, roller, url)
+module Die exposing (Die(..), NextRoll(..), flipNextRoll, nextRoll, pips, roller, url)
 
 import Random
 
@@ -16,19 +16,6 @@ type alias Fields =
 
 type Die
     = Die Fields
-
-
-makeDie : ( Int, NextRoll ) -> Die
-makeDie ( n, nextStatus ) =
-    Die
-        { pips = clamp minDie maxDie n
-        , nextRoll = nextStatus
-        }
-
-
-fromInt : Int -> Die
-fromInt n =
-    makeDie ( n, Keep )
 
 
 pips : Die -> Int

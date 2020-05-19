@@ -1,7 +1,7 @@
-module Dice exposing (DiceBoard, PipsList, diceRoller, display, emptyBoard, fiveDice, flipNth, fromPips, hasRerolls, makeDiceBoard, mergeDice, rerollCount, toPips)
+module Dice exposing (DiceBoard, PipsList, diceRoller, display, emptyBoard, fiveDice, flipNth, fromInt, fromPips, hasRerolls, makeDiceBoard, mergeDice, rerollCount, toPips)
 
 import Array
-import Die exposing (Die, NextRoll, flipNextRoll, makeDie)
+import Die exposing (Die(..), NextRoll, flipNextRoll)
 import Random exposing (Generator)
 
 
@@ -27,6 +27,16 @@ numberOfDice =
     5
 
 
+minDie : Int
+minDie =
+    1
+
+
+maxDie : Int
+maxDie =
+    6
+
+
 display : a -> (Int -> Die -> a) -> DiceBoard -> List a
 display emptyRow makeRow (DiceBoard board) =
     case board of
@@ -44,7 +54,7 @@ diceBoard dice =
 
 fromPips : PipsList -> DiceBoard
 fromPips pips =
-    diceBoard (List.map Die.fromInt pips)
+    diceBoard (List.map fromInt pips)
 
 
 toPips : DiceBoard -> Maybe PipsList
@@ -77,7 +87,7 @@ refreshDice incoming current =
                     old :: refreshDice incoming tailCurrent
 
                 Die.Reroll ->
-                    Die.fromInt new :: refreshDice tailIncoming tailCurrent
+                    fromInt new :: refreshDice tailIncoming tailCurrent
 
 
 rerollCount : DiceBoard -> Int
@@ -93,6 +103,19 @@ rerollCount (DiceBoard board) =
 hasRerolls : DiceBoard -> Bool
 hasRerolls dice =
     rerollCount dice > 0
+
+
+makeDie : ( Int, NextRoll ) -> Die
+makeDie ( n, nextStatus ) =
+    Die
+        { pips = clamp minDie maxDie n
+        , nextRoll = nextStatus
+        }
+
+
+fromInt : Int -> Die
+fromInt n =
+    makeDie ( n, Die.Keep )
 
 
 makeDiceBoard : List ( Int, NextRoll ) -> DiceBoard
