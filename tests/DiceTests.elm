@@ -19,7 +19,7 @@ diceTests =
                     clamped =
                         [ 1, 1, 2, 3, 4, 5, 6, 6, 6, 1 ]
                 in
-                Dice.toPips result |> Expect.equal (Just clamped)
+                Dice.toPips result |> Expect.equal clamped
         , test "fromPips uses Keep for every die" <|
             \_ ->
                 let

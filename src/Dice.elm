@@ -65,19 +65,19 @@ display emptyRow makeRow (DiceBoard board) =
             List.indexedMap makeRow theDice
 
 
-diceBoard : DiceList -> DiceBoard
-diceBoard dice =
+fromDiceList : DiceList -> DiceBoard
+fromDiceList dice =
     DiceBoard (Just dice)
 
 
 fromPips : PipsList -> DiceBoard
 fromPips pipsList =
-    diceBoard (List.map dieFromInt pipsList)
+    fromDiceList (List.map dieFromInt pipsList)
 
 
-toPips : DiceBoard -> Maybe PipsList
-toPips (DiceBoard board) =
-    Maybe.map (List.map pips) board
+toPips : DiceBoard -> PipsList
+toPips diceBoard =
+    List.map pips (toDiceList diceBoard)
 
 
 toDiceList : DiceBoard -> DiceList
@@ -97,7 +97,7 @@ mergeDice incoming (DiceBoard current) =
             fromPips incoming
 
         Just oldDice ->
-            diceBoard (refreshDice incoming oldDice)
+            fromDiceList (refreshDice incoming oldDice)
 
 
 refreshDice : PipsList -> DiceList -> DiceList
