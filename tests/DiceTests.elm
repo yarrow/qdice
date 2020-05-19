@@ -36,6 +36,18 @@ diceTests =
                 in
                 List.all (\r -> r == Keep) rolls
                     |> Expect.true "Found a nextRoll of Reroll"
+        , fuzz (intRange 0 7) "The url for a die with `n` pips contains '/die-`n`.`" <|
+            \n ->
+                let
+                    d =
+                        Dice.fromInt n
+
+                    fragment =
+                        "/die-" ++ String.fromInt (Die.pips d) ++ "."
+                in
+                Die.url d
+                    |> String.contains fragment
+                    |> Expect.true ("Expected to see " ++ fragment)
         , describe "The value of `diceRoller n` is a random generator returning a list of `n` random dice" <|
             [ test "diceRoller 0 is a generator that always returns an empty list" <|
                 \_ ->
