@@ -6,7 +6,6 @@ module Dice exposing
     , diceRoller
     , display
     , emptyBoard
-    , fiveDice
     , flipNextRoll
     , flipNth
     , fromInt
@@ -179,11 +178,6 @@ type alias DiceGenerator =
 diceRoller : Int -> DiceGenerator
 diceRoller n =
     Random.list n roller
-
-
-fiveDice : DiceGenerator
-fiveDice =
-    diceRoller numberOfDice
 
 
 

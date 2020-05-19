@@ -1,6 +1,6 @@
 module DiceTests exposing (diceTests)
 
-import Dice exposing (DiceBoard(..), NextRoll(..), diceRoller, fiveDice, flipNth)
+import Dice exposing (DiceBoard(..), NextRoll(..), diceRoller, flipNth)
 import Expect
 import Fuzz exposing (intRange)
 import Random
@@ -63,12 +63,6 @@ diceTests =
                     Random.step (diceRoller 5) (Random.initialSeed 42)
                         |> Tuple.first
                         |> Expect.equalLists [ 1, 3, 1, 1, 6 ]
-            , fuzz (intRange Random.minInt Random.maxInt) "fiveDice always returns five dice" <|
-                \seed ->
-                    Random.step fiveDice (Random.initialSeed seed)
-                        |> Tuple.first
-                        |> List.length
-                        |> Expect.equal 5
             ]
         , describe "flipNth n dice performs flipNextRoll on the nth element of dice" <|
             [ test "flipNth 0" <|
