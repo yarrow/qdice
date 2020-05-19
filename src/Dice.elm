@@ -1,4 +1,4 @@
-module Dice exposing (DiceBoard, PipsList, diceRoller, display, emptyBoard, fiveDice, flipNth, fromPips, hasRerolls, makeDiceBoard, mergeDice, rerollCount)
+module Dice exposing (DiceBoard, PipsList, diceRoller, display, emptyBoard, fiveDice, flipNth, fromPips, hasRerolls, makeDiceBoard, mergeDice, rerollCount, toPips)
 
 import Array
 import Die exposing (Die, NextRoll, flipNextRoll, makeDie)
@@ -45,6 +45,11 @@ diceBoard dice =
 fromPips : PipsList -> DiceBoard
 fromPips pips =
     diceBoard (List.map Die.fromInt pips)
+
+
+toPips : DiceBoard -> Maybe PipsList
+toPips (DiceBoard board) =
+    Maybe.map (List.map Die.pips) board
 
 
 mergeDice : PipsList -> DiceBoard -> DiceBoard

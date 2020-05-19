@@ -11,7 +11,32 @@ import Test exposing (..)
 diceTests : Test
 diceTests =
     describe "Tests for Dice.elm" <|
-        [ describe "The value of `diceRoller n` is a random generator returning a list of `n` random dice" <|
+        [ test "fromPips clamps the pips value to 1-6" <|
+            \_ ->
+                let
+                    result =
+                        Dice.fromPips [ 0, 1, 2, 3, 4, 5, 6, 7, 49, -82 ]
+
+                    clamped =
+                        [ 1, 1, 2, 3, 4, 5, 6, 6, 6, 1 ]
+                in
+                Dice.toPips result |> Expect.equal (Just clamped)
+        , test "fromPips uses Keep for every die" <|
+            \_ ->
+                let
+                    diceBoard =
+                        Dice.fromPips [ 1, 3, 2, 4, 7, 2, 4 ]
+
+                    -- FIXME
+                    getNextRoll _ die =
+                        Die.nextRoll die
+
+                    rolls =
+                        Dice.display Reroll getNextRoll diceBoard
+                in
+                List.all (\r -> r == Keep) rolls
+                    |> Expect.true "Found a nextRoll of Reroll"
+        , describe "The value of `diceRoller n` is a random generator returning a list of `n` random dice" <|
             [ test "diceRoller 0 is a generator that always returns an empty list" <|
                 \_ ->
                     Random.step (diceRoller 0) (Random.initialSeed 42)
