@@ -16,7 +16,7 @@ type alias PreDice =
 
 randomPipsList : Dice.PipsList
 randomPipsList =
-    Random.step (Dice.rollForNewDice Dice.emptyBoard) (Random.initialSeed 0) |> Tuple.first
+    Random.step (Dice.rollForNewDice Nothing) (Random.initialSeed 0) |> Tuple.first
 
 
 modelWithDice : PreDice -> Model
@@ -36,7 +36,7 @@ appTests =
             [ test "We start with no dice" <|
                 \_ ->
                     initialModel.dice
-                        |> Expect.equal Dice.emptyBoard
+                        |> Expect.equal Nothing
             , test "We start with three rolls available" <|
                 \_ ->
                     initialModel.remainingRolls

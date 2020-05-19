@@ -1,6 +1,6 @@
 module DiceTests exposing (diceTests)
 
-import Dice exposing (DiceBoard(..), NextRoll(..), flipNextRoll)
+import Dice exposing (NextRoll(..), flipNextRoll)
 import Expect
 import Fuzz exposing (intRange)
 import Random
@@ -12,8 +12,7 @@ diceTests =
     describe "Tests for Dice.elm" <|
         let
             nextRolls diceBoard =
-                Dice.toDiceList diceBoard
-                    |> List.map (\die -> Dice.nextRoll die)
+                List.map (\die -> Dice.nextRoll die) (Dice.toDiceList diceBoard)
         in
         [ test "fromPips clamps the pips value to 1-6" <|
             \_ ->
@@ -68,7 +67,7 @@ diceTests =
             in
             [ test "`rollForNewDice emptyBoard` returns a 5-dice generator" <|
                 \_ ->
-                    numberRolled (Dice.rollForNewDice Dice.emptyBoard)
+                    numberRolled (Dice.rollForNewDice Nothing)
                         |> Expect.equal 5
             , test "When diceBoard is not empty, `rollForNewDice diceBoard` returns a generator for the number dice with nextRoll==Reroll" <|
                 \_ ->
@@ -81,8 +80,11 @@ diceTests =
 
                         none =
                             [ ( 1, Keep ), ( 1, Keep ), ( 3, Keep ), ( 4, Keep ), ( 6, Keep ) ]
+
+                        diceBoards =
+                            List.map Dice.fromPairs [ two, three, none ]
                     in
-                    List.map (numberRolled << Dice.rollForNewDice << Dice.fromPairs) [ two, three, none ]
+                    List.map (numberRolled << Dice.rollForNewDice << Just) diceBoards
                         |> Expect.equalLists [ 2, 3, 0 ]
             ]
         , describe "`flipNextRoll n dice` flips the NextRoll on the nth element of dice" <|

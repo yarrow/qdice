@@ -41,7 +41,7 @@ update msg model =
             let
                 newModel =
                     { model
-                        | dice = Dice.mergeDice incomingDice model.dice
+                        | dice = Just (Dice.mergeDice incomingDice model.dice)
                         , remainingRolls = model.remainingRolls - 1
                     }
             in
@@ -91,14 +91,14 @@ view model =
 
 
 type alias Model =
-    { dice : Dice.DiceBoard
+    { dice : Maybe Dice.DiceBoard
     , remainingRolls : Int
     }
 
 
 initialModel : Model
 initialModel =
-    { dice = Dice.emptyBoard, remainingRolls = 3 }
+    { dice = Nothing, remainingRolls = 3 }
 
 
 main : Program () Model Msg
