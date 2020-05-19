@@ -23,12 +23,69 @@ import Array
 import Random exposing (Generator)
 
 
+
+--- The Die type (singular of Dice, not opposite of Live ^_^)
+
+
+type Die
+    = Die
+        { pips : Int
+        , nextRoll : NextRoll
+        }
+
+
+type
+    NextRoll
+    -- On the next roll, do we Keep this die on the board, or do we put it back in the dice
+    -- cup to Reroll it?
+    = Keep
+    | Reroll
+
+
+pips : Die -> Int
+pips (Die die) =
+    die.pips
+
+
+nextRoll : Die -> NextRoll
+nextRoll (Die die) =
+    die.nextRoll
+
+
+url : Die -> String
+url d =
+    "assets/die-" ++ String.fromInt (pips d) ++ ".png"
+
+
+minDie : Int
+minDie =
+    1
+
+
+maxDie : Int
+maxDie =
+    6
+
+
+dieFromPair : ( Int, NextRoll ) -> Die
+dieFromPair ( n, nextStatus ) =
+    Die
+        { pips = clamp minDie maxDie n
+        , nextRoll = nextStatus
+        }
+
+
+dieFromInt : Int -> Die
+dieFromInt n =
+    dieFromPair ( n, Keep )
+
+
+
+--- The DiceBoard type ----------------------------------
+
+
 type alias DiceList =
     List Die
-
-
-type alias PipsList =
-    List Int
 
 
 type DiceBoard
@@ -45,16 +102,6 @@ numberOfDice =
     5
 
 
-minDie : Int
-minDie =
-    1
-
-
-maxDie : Int
-maxDie =
-    6
-
-
 display : a -> (Int -> Die -> a) -> DiceBoard -> List a
 display emptyRow makeRow (DiceBoard board) =
     case board of
@@ -68,6 +115,10 @@ display emptyRow makeRow (DiceBoard board) =
 fromDiceList : DiceList -> DiceBoard
 fromDiceList dice =
     DiceBoard (Just dice)
+
+
+type alias PipsList =
+    List Int
 
 
 fromPips : PipsList -> DiceBoard
@@ -128,7 +179,7 @@ rerollCount (DiceBoard board) =
             List.length (List.filter (\die -> nextRoll die == Reroll) dice)
 
 
-rollForNewDice : DiceBoard -> DiceGenerator
+rollForNewDice : DiceBoard -> Generator PipsList
 rollForNewDice diceBoard =
     Random.list (rerollCount diceBoard) (Random.int minDie maxDie)
 
@@ -143,19 +194,6 @@ fromPairs pairs =
     fromDiceList (List.map dieFromPair pairs)
 
 
-dieFromPair : ( Int, NextRoll ) -> Die
-dieFromPair ( n, nextStatus ) =
-    Die
-        { pips = clamp minDie maxDie n
-        , nextRoll = nextStatus
-        }
-
-
-dieFromInt : Int -> Die
-dieFromInt n =
-    dieFromPair ( n, Keep )
-
-
 makeDiceBoard : List ( Int, NextRoll ) -> DiceBoard
 makeDiceBoard raw =
     DiceBoard (Just (List.map dieFromPair raw))
@@ -168,71 +206,28 @@ flipNextRoll n (DiceBoard board) =
             DiceBoard Nothing
 
         Just dice ->
-            DiceBoard (Just (do_flip n dice))
+            DiceBoard <|
+                Just <|
+                    let
+                        diceArray =
+                            Array.fromList dice
 
+                        oldDie =
+                            diceArray |> Array.get n
+                    in
+                    case oldDie of
+                        Nothing ->
+                            dice
 
-do_flip : Int -> DiceList -> DiceList
-do_flip n dice =
-    let
-        diceArray =
-            Array.fromList dice
+                        Just (Die aDie) ->
+                            let
+                                flipped =
+                                    case aDie.nextRoll of
+                                        Keep ->
+                                            Reroll
 
-        oldDie =
-            diceArray |> Array.get n
-    in
-    case oldDie of
-        Nothing ->
-            dice
-
-        Just (Die aDie) ->
-            let
-                flipped =
-                    case aDie.nextRoll of
-                        Keep ->
-                            Reroll
-
-                        Reroll ->
-                            Keep
-            in
-            Array.set n (Die { aDie | nextRoll = flipped }) diceArray
-                |> Array.toList
-
-
-type alias DiceGenerator =
-    Generator PipsList
-
-
-roller : Int -> DiceGenerator
-roller n =
-    Random.list n (Random.int minDie maxDie)
-
-
-
---------------------------------------------------------------- Die stuff
-
-
-type NextRoll
-    = Keep
-    | Reroll
-
-
-type Die
-    = Die
-        { pips : Int
-        , nextRoll : NextRoll
-        }
-
-
-pips : Die -> Int
-pips (Die die) =
-    die.pips
-
-
-nextRoll : Die -> NextRoll
-nextRoll (Die die) =
-    die.nextRoll
-
-
-url : Die -> String
-url d =
-    "assets/die-" ++ String.fromInt (pips d) ++ ".png"
+                                        Reroll ->
+                                            Keep
+                            in
+                            Array.set n (Die { aDie | nextRoll = flipped }) diceArray
+                                |> Array.toList
