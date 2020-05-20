@@ -7,6 +7,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Random
+import ScorePad exposing (ScorePad)
 
 
 type Msg
@@ -94,12 +95,13 @@ view model =
 type alias Model =
     { dice : DiceBoard
     , remainingRolls : Int
+    , scorePad : ScorePad
     }
 
 
 initialModel : Model
 initialModel =
-    { dice = Nothing, remainingRolls = 3 }
+    { dice = Nothing, remainingRolls = 3, scorePad = ScorePad.blank }
 
 
 main : Program () Model Msg

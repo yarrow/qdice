@@ -6,6 +6,7 @@ import DiceBoard
 import Expect
 import Html.Attributes as Attr
 import Random
+import ScorePad
 import Test exposing (..)
 import Test.Html.Query as Query
 import Test.Html.Selector exposing (attribute, id, tag, text)
@@ -42,6 +43,10 @@ appTests =
                 \_ ->
                     initialModel.remainingRolls
                         |> Expect.equal 3
+            , test "We start with a blank scorePad" <|
+                \_ ->
+                    initialModel.scorePad
+                        |> Expect.equal ScorePad.blank
             ]
         , describe "Properties of update" <|
             let
