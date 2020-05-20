@@ -1,6 +1,7 @@
 module DiceTests exposing (diceTests)
 
 import Dice exposing (NextRoll(..), flipNextRoll)
+import DiceBoard
 import Expect
 import Fuzz exposing (intRange)
 import Random
@@ -9,10 +10,10 @@ import Test exposing (..)
 
 diceTests : Test
 diceTests =
-    describe "Tests for Dice.elm" <|
+    describe "Tests for Dice.elm and DiceBoard.elm" <|
         let
-            nextRolls diceBoard =
-                List.map (\die -> Dice.nextRoll die) (Dice.toDiceList diceBoard)
+            nextRolls dice =
+                List.map (\die -> Dice.nextRoll die) dice
         in
         [ test "fromPips clamps the pips value to 1-6" <|
             \_ ->
@@ -23,7 +24,7 @@ diceTests =
                     clamped =
                         [ 1, 1, 2, 3, 4, 5, 6, 6, 6, 1 ]
                 in
-                Dice.toPips result |> Expect.equal clamped
+                List.map Dice.pips result |> Expect.equal clamped
         , test "fromPips uses Keep for every die" <|
             \_ ->
                 let
@@ -41,11 +42,11 @@ diceTests =
         , fuzz (intRange 1 6) "The url for a die with `n` pips contains '/die-`n`.`" <|
             \n ->
                 let
-                    diceBoard =
+                    dice =
                         Dice.fromPips [ n ]
 
                     theUrl =
-                        case Dice.toDiceList diceBoard of
+                        case dice of
                             [] ->
                                 ""
 
@@ -67,7 +68,7 @@ diceTests =
             in
             [ test "`rollForNewDice emptyBoard` returns a 5-dice generator" <|
                 \_ ->
-                    numberRolled (Dice.rollForNewDice Nothing)
+                    numberRolled (DiceBoard.rollForNewDice Nothing)
                         |> Expect.equal 5
             , test "When diceBoard is not empty, `rollForNewDice diceBoard` returns a generator for the number dice with nextRoll==Reroll" <|
                 \_ ->
@@ -82,15 +83,15 @@ diceTests =
                             [ ( 1, Keep ), ( 1, Keep ), ( 3, Keep ), ( 4, Keep ), ( 6, Keep ) ]
 
                         diceBoards =
-                            List.map Dice.fromPairs [ two, three, none ]
+                            List.map DiceBoard.makeDiceBoard [ two, three, none ]
                     in
-                    List.map (numberRolled << Dice.rollForNewDice << Just) diceBoards
+                    List.map (numberRolled << DiceBoard.rollForNewDice) diceBoards
                         |> Expect.equalLists [ 2, 3, 0 ]
             ]
         , describe "`flipNextRoll n dice` flips the NextRoll on the nth element of dice" <|
             [ test "`flipNextRoll 0` flips Keep/Reroll status of first element" <|
                 \_ ->
-                    flipNextRoll 0 (Dice.makeDiceBoard [ ( 1, Keep ), ( 2, Reroll ) ])
-                        |> Expect.equal (Dice.makeDiceBoard [ ( 1, Reroll ), ( 2, Reroll ) ])
+                    flipNextRoll 0 (Dice.fromPairs [ ( 1, Keep ), ( 2, Reroll ) ])
+                        |> Expect.equal (Dice.fromPairs [ ( 1, Reroll ), ( 2, Reroll ) ])
             ]
         ]

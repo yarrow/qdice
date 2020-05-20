@@ -2,6 +2,7 @@ module AppTests exposing (appTests)
 
 import App exposing (Model, Msg(..), initialModel, update, view)
 import Dice exposing (NextRoll(..))
+import DiceBoard
 import Expect
 import Html.Attributes as Attr
 import Random
@@ -16,12 +17,12 @@ type alias PreDice =
 
 randomPipsList : Dice.PipsList
 randomPipsList =
-    Random.step (Dice.rollForNewDice Nothing) (Random.initialSeed 0) |> Tuple.first
+    Random.step (DiceBoard.rollForNewDice Nothing) (Random.initialSeed 0) |> Tuple.first
 
 
 modelWithDice : PreDice -> Model
 modelWithDice dice =
-    { initialModel | dice = Dice.makeDiceBoard dice }
+    { initialModel | dice = DiceBoard.makeDiceBoard dice }
 
 
 modelAfterFirstRoll : Model
@@ -83,7 +84,7 @@ appTests =
                 \_ ->
                     let
                         rerollFirst =
-                            Dice.makeDiceBoard [ reroll, keep, keep, keep, keep ]
+                            DiceBoard.makeDiceBoard [ reroll, keep, keep, keep, keep ]
                     in
                     update (DieFlipped 0) (modelWithDice keepAll)
                         |> Tuple.first
@@ -99,7 +100,7 @@ appTests =
                             [ 2, 3 ]
 
                         resultingDice =
-                            Dice.makeDiceBoard [ keep, ( 2, Keep ), keep, ( 3, Keep ), keep ]
+                            DiceBoard.makeDiceBoard [ keep, ( 2, Keep ), keep, ( 3, Keep ), keep ]
                     in
                     update (GotDice incomingDice) (modelWithDice startingDice)
                         |> Tuple.first

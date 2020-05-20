@@ -2,6 +2,7 @@ module App exposing (Model, Msg(..), initialModel, main, update, view)
 
 import Browser
 import Dice
+import DiceBoard exposing (DiceBoard)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
@@ -20,7 +21,7 @@ rollAllowed model =
         False
 
     else
-        Dice.hasRerolls model.dice
+        DiceBoard.hasRerolls model.dice
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -30,7 +31,7 @@ update msg model =
             let
                 cmd =
                     if rollAllowed model then
-                        Random.generate GotDice (Dice.rollForNewDice model.dice)
+                        Random.generate GotDice (DiceBoard.rollForNewDice model.dice)
 
                     else
                         Cmd.none
@@ -41,14 +42,14 @@ update msg model =
             let
                 newModel =
                     { model
-                        | dice = Just (Dice.mergeDice incomingDice model.dice)
+                        | dice = Just (DiceBoard.mergeDice incomingDice model.dice)
                         , remainingRolls = model.remainingRolls - 1
                     }
             in
             ( newModel, Cmd.none )
 
         DieFlipped j ->
-            ( { model | dice = Dice.flipNextRoll j model.dice }, Cmd.none )
+            ( { model | dice = DiceBoard.flipNextRoll j model.dice }, Cmd.none )
 
 
 tdDie : Dice.Die -> Html msg
@@ -85,13 +86,13 @@ view model =
             [ caption [] [ text (String.fromInt model.remainingRolls ++ " rolls remaining") ]
             , tr [] [ th [] [ text "Reroll" ], th [] [ text "Keep" ] ]
             ]
-                ++ Dice.display blankRow dieRow model.dice
+                ++ DiceBoard.display blankRow dieRow model.dice
         , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
         ]
 
 
 type alias Model =
-    { dice : Maybe Dice.DiceBoard
+    { dice : DiceBoard
     , remainingRolls : Int
     }
 
