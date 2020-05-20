@@ -9,7 +9,7 @@ import Random
 import ScorePad
 import Test exposing (..)
 import Test.Html.Query as Query
-import Test.Html.Selector exposing (attribute, id, tag, text)
+import Test.Html.Selector exposing (attribute, class, id, tag, text)
 
 
 type alias PreDice =
@@ -125,6 +125,12 @@ appTests =
                         |> Query.fromHtml
                         |> Query.find [ tag "button", id "roll-dice" ]
                         |> Query.has [ text "Roll Dice" ]
+            , test "There is a dice table" <|
+                \_ ->
+                    view initialModel
+                        |> Query.fromHtml
+                        |> Query.find [ class "dice" ]
+                        |> Query.has [ id "dice" ]
             , test "We start with no dice" <|
                 \_ ->
                     view initialModel

@@ -55,7 +55,7 @@ update msg model =
 
 tdDie : Dice.Die -> Html msg
 tdDie d =
-    td [ class "dice" ] [ img [ src (Dice.url d) ] [] ]
+    td [ class "die" ] [ img [ src (Dice.url d) ] [] ]
 
 
 dieRow : Int -> Dice.Die -> Html Msg
@@ -71,7 +71,7 @@ dieRow j d =
 
 tdBlank : Html msg
 tdBlank =
-    td [ class "dice" ] []
+    td [ class "die" ] []
 
 
 blankRow : Html msg
