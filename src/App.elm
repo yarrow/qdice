@@ -57,9 +57,11 @@ view : Model -> Html Msg
 view model =
     div []
         [ h1 [] [ text "Quarantine Dice" ]
-        , viewDice model
+        , div []
+            [ viewDice model
+            , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
+            ]
         , viewScores model
-        , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
         ]
 
 
@@ -100,7 +102,14 @@ blankRow =
 
 viewScores : Model -> Html Msg
 viewScores _ =
-    table [ class "scorepad", id "scorepad" ] []
+    let
+        topBox label =
+            td [ class "score-box" ] [ text label ]
+    in
+    table [ class "scorepad", id "scorepad" ]
+        [ tr [ class "scorepad-row" ]
+            [ topBox "", topBox "x1", topBox "x2", topBox "x3" ]
+        ]
 
 
 type alias Model =

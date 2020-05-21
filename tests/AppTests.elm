@@ -4,6 +4,7 @@ import App exposing (Model, Msg(..), initialModel, update, view)
 import Dice exposing (NextRoll(..))
 import DiceBoard
 import Expect
+import Html exposing (td)
 import Html.Attributes as Attr
 import Random
 import ScorePad
@@ -175,5 +176,17 @@ appTests =
                         |> Query.fromHtml
                         |> Query.find [ class "scorepad" ]
                         |> Query.has [ id "scorepad" ]
+            , test "The top scorepad row has text of [blank, x1, x2, x3]" <|
+                \_ ->
+                    view initialModel
+                        |> Query.fromHtml
+                        |> Query.findAll [ class "scorepad-row" ]
+                        |> Query.first
+                        |> Query.contains
+                            [ td [ Attr.class "score-box" ] [ Html.text "" ]
+                            , td [ Attr.class "score-box" ] [ Html.text "x1" ]
+                            , td [ Attr.class "score-box" ] [ Html.text "x2" ]
+                            , td [ Attr.class "score-box" ] [ Html.text "x3" ]
+                            ]
             ]
         ]
