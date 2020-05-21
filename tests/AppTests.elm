@@ -4,7 +4,6 @@ import App exposing (Model, Msg(..), initialModel, update, view)
 import Dice exposing (NextRoll(..))
 import DiceBoard
 import Expect
-import Html exposing (td)
 import Html.Attributes as Attr
 import Random
 import ScorePad
@@ -32,6 +31,16 @@ modelAfterFirstRoll =
     update (GotDice randomPipsList) initialModel |> Tuple.first
 
 
+find : Model -> List Test.Html.Selector.Selector -> Query.Single Msg
+find model attributes =
+    view model |> Query.fromHtml |> Query.find attributes
+
+
+findAll : Model -> List Test.Html.Selector.Selector -> Query.Multiple Msg
+findAll model attributes =
+    view model |> Query.fromHtml |> Query.findAll attributes
+
+
 appTests : Test
 appTests =
     describe "Tests for App.elm" <|
@@ -44,9 +53,9 @@ appTests =
                 \_ ->
                     initialModel.remainingRolls
                         |> Expect.equal 3
-            , test "We start with a blank scorePad" <|
+            , test "We start with blank scores" <|
                 \_ ->
-                    initialModel.scorePad
+                    initialModel.scores
                         |> Expect.equal ScorePad.blank
             ]
         , describe "Properties of update" <|
@@ -126,71 +135,52 @@ appTests =
         , describe "Properties of viewing dice" <|
             [ test "The app has a 'Roll Dice' button" <|
                 \_ ->
-                    view initialModel
-                        |> Query.fromHtml
-                        |> Query.find [ tag "button", id "roll-dice" ]
+                    find initialModel [ tag "button", id "roll-dice" ]
                         |> Query.has [ text "Roll Dice" ]
             , test "There is a dice table" <|
                 \_ ->
-                    view initialModel
-                        |> Query.fromHtml
-                        |> Query.find [ class "dice" ]
+                    find initialModel [ class "dice" ]
                         |> Query.has [ id "dice" ]
             , test "We start with no dice" <|
                 \_ ->
-                    view initialModel
-                        |> Query.fromHtml
-                        |> Query.findAll [ tag "img" ]
+                    findAll initialModel [ tag "img" ]
                         |> Query.count (Expect.equal 0)
             , test "When there are dice, there are five dice" <|
                 \_ ->
-                    view modelAfterFirstRoll
-                        |> Query.fromHtml
-                        |> Query.findAll [ tag "img" ]
+                    findAll modelAfterFirstRoll [ tag "img" ]
                         |> Query.count (Expect.equal 5)
             , test "There are five dice rows" <|
                 \_ ->
-                    view modelAfterFirstRoll
-                        |> Query.fromHtml
-                        |> Query.findAll [ tag "tr", attribute <| Attr.class "dice-row" ]
+                    findAll modelAfterFirstRoll [ tag "tr", attribute <| Attr.class "dice-row" ]
                         |> Query.count (Expect.equal 5)
             , test "There are five dice rows in the initial Model too" <|
                 \_ ->
-                    view initialModel
-                        |> Query.fromHtml
-                        |> Query.findAll [ tag "tr", attribute <| Attr.class "dice-row" ]
+                    findAll initialModel [ tag "tr", attribute <| Attr.class "dice-row" ]
                         |> Query.count (Expect.equal 5)
             , test "The inital model shows 3 remainingRolls" <|
                 \_ ->
-                    view initialModel
-                        |> Query.fromHtml
-                        |> Query.find [ tag "caption" ]
+                    find initialModel [ tag "caption" ]
                         |> Query.has [ text "3 rolls remaining" ]
             , test "After the first roll, we show two rolls remaining" <|
                 \_ ->
-                    view modelAfterFirstRoll
-                        |> Query.fromHtml
-                        |> Query.find [ tag "caption" ]
+                    find modelAfterFirstRoll [ tag "caption" ]
                         |> Query.has [ text "2 rolls remaining" ]
             ]
         , describe "Properties of viewing scores" <|
             [ test "There is a scorepad table" <|
                 \_ ->
-                    view initialModel
-                        |> Query.fromHtml
-                        |> Query.find [ class "scorepad" ]
+                    find initialModel [ class "scorepad" ]
                         |> Query.has [ id "scorepad" ]
-            , test "The top scorepad row has text of [blank, x1, x2, x3]" <|
+            , test "There are 13 rows with scores" <|
                 \_ ->
-                    view initialModel
-                        |> Query.fromHtml
-                        |> Query.findAll [ class "scorepad-row" ]
-                        |> Query.first
-                        |> Query.contains
-                            [ td [ Attr.class "score-box" ] [ Html.text "" ]
-                            , td [ Attr.class "score-box" ] [ Html.text "x1" ]
-                            , td [ Attr.class "score-box" ] [ Html.text "x2" ]
-                            , td [ Attr.class "score-box" ] [ Html.text "x3" ]
-                            ]
+                    findAll initialModel [ class "score-row" ]
+                        |> Query.count (Expect.equal 13)
+
+            {-
+               , test "There are 5 rows with (sub-)totals" <|
+                   \_ ->
+                       findAll initialModel [ class "score-total-row" ]
+                           |> Query.count (Expect.equal 5)
+            -}
             ]
         ]

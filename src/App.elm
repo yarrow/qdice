@@ -7,7 +7,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Random
-import ScorePad exposing (ScorePad)
+import ScorePad exposing (Scores)
 
 
 type Msg
@@ -101,27 +101,34 @@ blankRow =
 
 
 viewScores : Model -> Html Msg
-viewScores _ =
+viewScores model =
     let
         topBox label =
-            td [ class "score-box" ] [ text label ]
+            td [ class "score-top" ] [ text label ]
+
+        scoreRow _ =
+            tr [ class "score-row" ] [ td [] [ text "13" ] ]
+
+        scoreRows =
+            List.map scoreRow (ScorePad.display model.scores)
+
+        topRow =
+            tr [ class "score-top-row" ]
+                [ topBox "", topBox "x1", topBox "x2", topBox "x3" ]
     in
-    table [ class "scorepad", id "scorepad" ]
-        [ tr [ class "scorepad-row" ]
-            [ topBox "", topBox "x1", topBox "x2", topBox "x3" ]
-        ]
+    table [ class "scorepad", id "scorepad" ] (topRow :: scoreRows)
 
 
 type alias Model =
     { dice : DiceBoard
     , remainingRolls : Int
-    , scorePad : ScorePad
+    , scores : Scores
     }
 
 
 initialModel : Model
 initialModel =
-    { dice = Nothing, remainingRolls = 3, scorePad = ScorePad.blank }
+    { dice = Nothing, remainingRolls = 3, scores = ScorePad.blank }
 
 
 main : Program () Model Msg
