@@ -75,17 +75,21 @@ appTests =
                     update RollDice (modelWithDice keepAll)
                         |> Tuple.second
                         |> Expect.equal Cmd.none
+            , test "After the first roll, all dice have nextRoll == Keep" <|
+                \_ ->
+                    let
+                        allKeep diceList =
+                            List.all (\d -> Dice.nextRoll d == Keep) diceList
 
-            {-
-                  , test "In the initial model, (GotDice someDice) installs (Just someDice) as the model's .dice value" <|
-                      \_ ->
-                          modelWithRandomDice.dice
-                              |> Expect.equal (Just Dice.makeDiceBoard randomPipsList)
-               , test "Initially, all dice have nextRoll == Keep" <|
-                   \_ ->
-                       List.all (\d -> Dice.nextRoll d == Keep) randomPipsList
-                           |> Expect.true "Initially, all dice have an NextRoll of Keep"
-            -}
+                        passed =
+                            case modelAfterFirstRoll.dice of
+                                Nothing ->
+                                    False
+
+                                Just dice ->
+                                    allKeep (DiceBoard.toDiceList dice)
+                    in
+                    passed |> Expect.true "Initially, all dice have an NextRoll of Keep"
             , test "`DieFlipped 0` causes the 0th die to flip its NextRoll status" <|
                 \_ ->
                     let
