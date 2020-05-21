@@ -118,7 +118,7 @@ appTests =
                         |> .remainingRolls
                         |> Expect.equal 2
             ]
-        , describe "Properties of view" <|
+        , describe "Properties of viewing dice" <|
             [ test "The app has a 'Roll Dice' button" <|
                 \_ ->
                     view initialModel
@@ -167,5 +167,13 @@ appTests =
                         |> Query.fromHtml
                         |> Query.find [ tag "caption" ]
                         |> Query.has [ text "2 rolls remaining" ]
+            ]
+        , describe "Properties of viewing scores" <|
+            [ test "There is a scorepad table" <|
+                \_ ->
+                    view initialModel
+                        |> Query.fromHtml
+                        |> Query.find [ class "scorepad" ]
+                        |> Query.has [ id "scorepad" ]
             ]
         ]

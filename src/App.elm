@@ -53,13 +53,32 @@ update msg model =
             ( { model | dice = DiceBoard.flipNextRoll j model.dice }, Cmd.none )
 
 
+view : Model -> Html Msg
+view model =
+    div []
+        [ h1 [] [ text "Quarantine Dice" ]
+        , viewDice model
+        , viewScores model
+        , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
+        ]
+
+
+viewDice : Model -> Html Msg
+viewDice model =
+    table [ class "dice", id "dice" ] <|
+        [ caption [] [ text (String.fromInt model.remainingRolls ++ " rolls remaining") ]
+        , tr [] [ th [] [ text "Reroll" ], th [] [ text "Keep" ] ]
+        ]
+            ++ DiceBoard.display blankRow diceRow model.dice
+
+
 tdDie : Dice.Die -> Html msg
 tdDie d =
     td [ class "die" ] [ img [ src (Dice.url d) ] [] ]
 
 
-dieRow : Int -> Dice.Die -> Html Msg
-dieRow j d =
+diceRow : Int -> Dice.Die -> Html Msg
+diceRow j d =
     tr [ class "dice-row", onClick (DieFlipped j) ] <|
         case Dice.nextRoll d of
             Dice.Keep ->
@@ -79,17 +98,9 @@ blankRow =
     tr [ class "dice-row" ] [ tdBlank, tdBlank ]
 
 
-view : Model -> Html Msg
-view model =
-    div []
-        [ h1 [] [ text "Quarantine Dice" ]
-        , table [ class "dice", id "dice" ] <|
-            [ caption [] [ text (String.fromInt model.remainingRolls ++ " rolls remaining") ]
-            , tr [] [ th [] [ text "Reroll" ], th [] [ text "Keep" ] ]
-            ]
-                ++ DiceBoard.display blankRow dieRow model.dice
-        , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
-        ]
+viewScores : Model -> Html Msg
+viewScores _ =
+    table [ class "scorepad", id "scorepad" ] []
 
 
 type alias Model =

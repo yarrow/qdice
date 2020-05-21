@@ -9,14 +9,14 @@ button:hover {
   background-color: #80d5ec;
 }
 
-table {
+.dice {
     table-layout: fixed;
     border-collapse: collapse;
     border-spacing: 0;
     text-align: center;
     caption-side: bottom;
 }
-td {
+.die {
     width: 81px;
     height: 81px;
     border: 2px solid #60b5cc;
