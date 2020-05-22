@@ -37,11 +37,6 @@ type CanUse
     | InUse
 
 
-activeScorePad : Scores -> PipsList -> List ScorePadRow
-activeScorePad scores pips =
-    staticScorePad scores
-
-
 staticScorePad : Scores -> List ScorePadRow
 staticScorePad scores =
     let
@@ -54,16 +49,22 @@ staticScorePad scores =
     List.map staticRow allRanks
 
 
+activeScorePad : Scores -> PipsList -> List ScorePadRow
+activeScorePad scores pips =
+    let
+        vacant rank column box =
+            ( Vacant ( rank, column ), boxToString box )
+
+        activeRow rank =
+            { caption = caption rank
+            , boxes = List.indexedMap (vacant rank) (getRow rank scores)
+            }
+    in
+    List.map activeRow allRanks
+
+
 
 ----- private
-
-
-activeRow : Rank -> Scores -> scorePadRow
-activeRow rank scores =
-    Debug.todo "activeRow"
-
-
-
 -- activeBox is a box that's part of an active ScorePad,
 -- not necessarily itself available for input
 

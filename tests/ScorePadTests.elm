@@ -1,5 +1,6 @@
 module ScorePadTests exposing (scorePadTests)
 
+import Dice exposing (PipsList)
 import Expect
 import ScorePad
     exposing
@@ -32,8 +33,34 @@ theCaptions =
     ]
 
 
+aPipsList : PipsList
 aPipsList =
     [ 1, 3, 2, 5, 6 ]
+
+
+allBoxes : ScorePad -> List ScorePadBox
+allBoxes scores =
+    List.concatMap .boxes scores
+
+
+emptyStatic : ScorePad
+emptyStatic =
+    staticScorePad emptyScores
+
+
+emptyActive : ScorePad
+emptyActive =
+    activeScorePad emptyScores aPipsList
+
+
+isVacant : CanUse -> Bool
+isVacant canUse =
+    case canUse of
+        InUse ->
+            False
+
+        Vacant _ ->
+            True
 
 
 scorePadTests : Test
@@ -41,18 +68,18 @@ scorePadTests =
     describe "ScorePad tests" <|
         [ test "Every box in staticScorePad emptyScores is (InUse, '')" <|
             \_ ->
-                let
-                    boxes =
-                        List.concatMap .boxes (staticScorePad emptyScores)
-                in
-                List.all (\box -> box == ( InUse, "" )) boxes
+                List.all (\box -> box == ( InUse, "" )) (allBoxes emptyStatic)
                     |> Expect.true "Every box should be (InUse, '')"
         , test "Each staticScorePad box has the correct caption" <|
             \_ ->
-                List.map .caption (staticScorePad emptyScores)
+                List.map .caption emptyStatic
                     |> Expect.equalLists theCaptions
         , test "Each activeScorePad box has the correct caption" <|
             \_ ->
-                List.map .caption (activeScorePad emptyScores aPipsList)
+                List.map .caption emptyActive
                     |> Expect.equalLists theCaptions
+        , test "Every box in ScorePad emptyScores is Vacant" <|
+            \_ ->
+                List.all (\box -> isVacant (Tuple.first box)) (allBoxes emptyActive)
+                    |> Expect.true "Every box should be Vacant"
         ]
