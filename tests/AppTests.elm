@@ -57,7 +57,7 @@ appTests =
             , test "We start with blank scores" <|
                 \_ ->
                     initialModel.scores
-                        |> Expect.equal ScorePad.initialScores
+                        |> Expect.equal ScorePad.emptyScores
             ]
         , describe "Properties of update" <|
             let
