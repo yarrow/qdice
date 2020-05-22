@@ -112,7 +112,7 @@ viewScores model =
 
         scoreBoxes : ScorePad.ScorePadRow -> List (Html msg)
         scoreBoxes row =
-            List.map (\box -> td [ class "score-box" ] [ text (String.fromInt box.score) ]) row.boxes
+            List.map (\box -> td [ class "score-box" ] [ text box.text ]) row.boxes
 
         scoreRow : ScorePad.ScorePadRow -> Html msg
         scoreRow row =
@@ -141,7 +141,7 @@ type alias Model =
 
 initialModel : Model
 initialModel =
-    { dice = Nothing, remainingRolls = 3, scores = ScorePad.blank }
+    { dice = Nothing, remainingRolls = 3, scores = ScorePad.initialScores }
 
 
 main : Program () Model Msg

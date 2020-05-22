@@ -4,6 +4,7 @@ import App exposing (Model, Msg(..), initialModel, update, view)
 import Dice exposing (NextRoll(..))
 import DiceBoard
 import Expect
+import Html exposing (Html)
 import Html.Attributes as Attr
 import Random
 import ScorePad
@@ -56,7 +57,7 @@ appTests =
             , test "We start with blank scores" <|
                 \_ ->
                     initialModel.scores
-                        |> Expect.equal ScorePad.blank
+                        |> Expect.equal ScorePad.initialScores
             ]
         , describe "Properties of update" <|
             let
@@ -180,6 +181,12 @@ appTests =
                     findAll initialModel [ class "score-box" ]
                         |> Query.count (Expect.equal 39)
 
+            {-
+               , test "... and those unclickable score boxes are blank" <|
+                   \_ ->
+                       findAll initialModel [ class "score-box" ]
+                           |> Query.each (Query.contains [ Html.text "" ])
+            -}
             {-
                , test "There are 5 rows with (sub-)totals" <|
                    \_ ->

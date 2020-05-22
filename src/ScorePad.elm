@@ -1,14 +1,30 @@
 module ScorePad exposing
-    ( ScorePadRow
+    ( Score(..)
+    , ScorePadRow
     , Scores
-    , blank
     , display
+    , initialScores
+    , toText
     )
+
+
+type Score
+    = Available
+    | Is Int
+
+
+toText : Score -> String
+toText score =
+    ""
 
 
 display : Scores -> List ScorePadRow
 display _ =
-    List.repeat 13 { caption = "Ones", boxes = List.repeat 3 { score = 0 } }
+    let
+        available =
+            { text = toText Available }
+    in
+    List.repeat 13 { caption = "Ones", boxes = List.repeat 3 available }
 
 
 type alias ScorePadRow =
@@ -18,13 +34,14 @@ type alias ScorePadRow =
 
 
 type alias ScorePadBox =
-    { score : Int }
+    { text : String
+    }
 
 
 type alias Scores =
     Int
 
 
-blank : Scores
-blank =
+initialScores : Scores
+initialScores =
     0
