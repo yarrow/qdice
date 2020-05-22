@@ -6,6 +6,7 @@
         "UnusedTopLevel": true,
         "UnusedImportAlias": true,
         "UnusedImportedVariable": true,
-        "MultiLineRecordFormatting": false
+        "MultiLineRecordFormatting": false,
+        "DebugTodo": false
     }
 }
