@@ -39,7 +39,7 @@ type CanUse
 
 activeScorePad : Scores -> PipsList -> List ScorePadRow
 activeScorePad scores pips =
-    Debug.todo "activeScorePad"
+    staticScorePad scores
 
 
 staticScorePad : Scores -> List ScorePadRow

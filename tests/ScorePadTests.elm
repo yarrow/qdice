@@ -32,6 +32,10 @@ theCaptions =
     ]
 
 
+aPipsList =
+    [ 1, 3, 2, 5, 6 ]
+
+
 scorePadTests : Test
 scorePadTests =
     describe "ScorePad tests" <|
@@ -46,5 +50,9 @@ scorePadTests =
         , test "Each staticScorePad box has the correct caption" <|
             \_ ->
                 List.map .caption (staticScorePad emptyScores)
+                    |> Expect.equalLists theCaptions
+        , test "Each activeScorePad box has the correct caption" <|
+            \_ ->
+                List.map .caption (activeScorePad emptyScores aPipsList)
                     |> Expect.equalLists theCaptions
         ]
