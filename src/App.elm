@@ -122,7 +122,7 @@ viewScores model =
         scoreRow row =
             let
                 capt =
-                    td [ class "caption" ] [ text "Sm Straight" ]
+                    td [ class "caption" ] [ text row.caption ]
             in
             tr [ class "score-row" ] <| capt :: scoreBoxes row
 
