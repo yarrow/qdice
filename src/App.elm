@@ -56,12 +56,16 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ h1 [] [ text "Quarantine Dice" ]
-        , div []
-            [ viewDice model
-            , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
+        [ header []
+            [ h1 [] [ text "Quarantine Dice" ]
+            , section []
+                [ div []
+                    [ viewDice model
+                    , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
+                    ]
+                , viewScores model
+                ]
             ]
-        , viewScores model
         ]
 
 
@@ -106,8 +110,17 @@ viewScores model =
         topBox label =
             td [ class "score-top" ] [ text label ]
 
-        scoreRow _ =
-            tr [ class "score-row" ] [ td [] [ text "13" ] ]
+        scoreBoxes : ScorePad.ScorePadRow -> List (Html msg)
+        scoreBoxes row =
+            List.map (\box -> td [ class "score-box" ] [ text (String.fromInt box.score) ]) row.boxes
+
+        scoreRow : ScorePad.ScorePadRow -> Html msg
+        scoreRow row =
+            let
+                capt =
+                    td [ class "caption" ] [ text "Sm Straight" ]
+            in
+            tr [ class "score-row" ] <| capt :: scoreBoxes row
 
         scoreRows =
             List.map scoreRow (ScorePad.display model.scores)

@@ -1,8 +1,18 @@
+html {
+    font-family: 'Barlow Semi Condensed', sans-serif;
+    font-size: 14px;
+}
+section {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
 button {
   float: left; background-color: #60b5cc; border: 0; color: rgb(44, 44, 44);
   font-size: 24px;
   cursor: pointer;
   padding: 10px 30px;
+  font-family: 'Barlow Semi Condensed', sans-serif;
 }
 
 button:hover {
@@ -10,6 +20,8 @@ button:hover {
 }
 
 .dice {
+    font-family: 'Barlow Semi Condensed', sans-serif;
+    font-size: 16px;
     table-layout: fixed;
     border-collapse: collapse;
     border-spacing: 0;
@@ -20,6 +32,31 @@ button:hover {
     width: 81px;
     height: 81px;
     border: 2px solid #60b5cc;
+}
+td {
     background-color: #80d5ec;
+}
+
+.scorepad {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border-spacing: 0;
+    text-align: center;
+    caption-side: bottom;
+
+}
+.score-row {
+}
+.score-box {
+    border: 2px solid #60b5cc;
+    height: 30px;
+    width: 30px;
+}
+.caption {
+    border: 2px solid #60b5cc;
+    height: 30px;
+    padding: 0px 10px;
 }
 

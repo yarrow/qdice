@@ -175,6 +175,10 @@ appTests =
                 \_ ->
                     findAll initialModel [ class "score-row" ]
                         |> Query.count (Expect.equal 13)
+            , test "The initial model has 39 unclickable score boxes" <|
+                \_ ->
+                    findAll initialModel [ class "score-box" ]
+                        |> Query.count (Expect.equal 39)
 
             {-
                , test "There are 5 rows with (sub-)totals" <|

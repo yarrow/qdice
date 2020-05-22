@@ -8,11 +8,17 @@ module ScorePad exposing
 
 display : Scores -> List ScorePadRow
 display _ =
-    List.repeat 13 0
+    List.repeat 13 { caption = "Ones", boxes = List.repeat 3 { score = 0 } }
 
 
 type alias ScorePadRow =
-    Int
+    { caption : String
+    , boxes : List ScorePadBox
+    }
+
+
+type alias ScorePadBox =
+    { score : Int }
 
 
 type alias Scores =
