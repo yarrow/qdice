@@ -112,7 +112,7 @@ viewScores model =
 
         scoreBoxes : ScorePad.ScorePadRow -> List (Html msg)
         scoreBoxes row =
-            List.map (\box -> td [ class "score-box" ] [ text box.text ]) row.boxes
+            List.map (\box -> td [ class "score-box" ] [ text box ]) row.boxes
 
         scoreRow : ScorePad.ScorePadRow -> Html msg
         scoreRow row =
@@ -123,7 +123,7 @@ viewScores model =
             tr [ class "score-row" ] <| capt :: scoreBoxes row
 
         scoreRows =
-            List.map scoreRow (ScorePad.display model.scores)
+            List.map scoreRow (ScorePad.staticScorePad model.scores)
 
         topRow =
             tr [ class "score-top-row" ]
