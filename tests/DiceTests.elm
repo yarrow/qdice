@@ -1,6 +1,6 @@
 module DiceTests exposing (diceTests)
 
-import Dice exposing (NextRoll(..), flipNextRoll)
+import Dice exposing (NextRoll(..), PipsList(..), flipNextRoll, unPip)
 import DiceBoard
 import Expect
 import Fuzz exposing (intRange)
@@ -19,7 +19,7 @@ diceTests =
             \_ ->
                 let
                     result =
-                        Dice.fromPips [ 0, 1, 2, 3, 4, 5, 6, 7, 49, -82 ]
+                        Dice.fromPips (PipsList [ 0, 1, 2, 3, 4, 5, 6, 7, 49, -82 ])
 
                     clamped =
                         [ 1, 1, 2, 3, 4, 5, 6, 6, 6, 1 ]
@@ -32,7 +32,7 @@ diceTests =
                         [ 1, 3, 2, 4, 7, 2, 4 ]
 
                     rolls =
-                        nextRolls (Dice.fromPips pips)
+                        nextRolls (Dice.fromPips (PipsList pips))
 
                     ok =
                         (List.length rolls == List.length pips)
@@ -43,7 +43,7 @@ diceTests =
             \n ->
                 let
                     dice =
-                        Dice.fromPips [ n ]
+                        Dice.fromPips (PipsList [ n ])
 
                     theUrl =
                         case dice of
@@ -64,6 +64,7 @@ diceTests =
                 numberRolled diceRoller =
                     Random.step diceRoller (Random.initialSeed 42)
                         |> Tuple.first
+                        |> unPip
                         |> List.length
             in
             [ test "`rollForNewDice emptyBoard` returns a 5-dice generator" <|

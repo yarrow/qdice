@@ -2,7 +2,7 @@ module Dice exposing
     ( DiceList
     , Die
     , NextRoll(..)
-    , PipsList
+    , PipsList(..)
     , flipNextRoll
     , fromPairs
     , fromPips
@@ -11,6 +11,7 @@ module Dice exposing
     , pips
     , randomPip
     , rerollCount
+    , unPip
     , url
     )
 
@@ -102,17 +103,22 @@ type alias DiceList =
     List Die
 
 
-type alias PipsList =
-    List Int
+type PipsList
+    = PipsList (List Int)
+
+
+unPip : PipsList -> List Int
+unPip (PipsList list) =
+    list
 
 
 fromPips : PipsList -> DiceList
-fromPips pipsList =
+fromPips (PipsList pipsList) =
     List.map dieFromInt pipsList
 
 
 mergeDice : PipsList -> DiceList -> DiceList
-mergeDice incoming current =
+mergeDice (PipsList incoming) current =
     case ( incoming, current ) of
         ( [], _ ) ->
             current
@@ -123,10 +129,10 @@ mergeDice incoming current =
         ( new :: tailIncoming, old :: tailCurrent ) ->
             case nextRoll old of
                 Keep ->
-                    old :: mergeDice incoming tailCurrent
+                    old :: mergeDice (PipsList incoming) tailCurrent
 
                 Reroll ->
-                    dieFromInt new :: mergeDice tailIncoming tailCurrent
+                    dieFromInt new :: mergeDice (PipsList tailIncoming) tailCurrent
 
 
 rerollCount : DiceList -> Int

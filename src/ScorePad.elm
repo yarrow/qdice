@@ -11,7 +11,7 @@ module ScorePad exposing
 
 import Array exposing (Array)
 import Debug
-import Dice exposing (PipsList)
+import Dice exposing (PipsList(..))
 import Rank exposing (Rank(..), allRanks, caption, numberOfRanks, tally, toInt)
 
 
@@ -51,7 +51,7 @@ staticScorePad scores =
 
 
 activeScorePad : Scores -> PipsList -> List ScorePadRow
-activeScorePad scores pips =
+activeScorePad scores (PipsList pips) =
     let
         vacant rank column box =
             ( Vacant ( rank, column ), boxToString box )

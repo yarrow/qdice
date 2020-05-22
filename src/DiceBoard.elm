@@ -9,7 +9,7 @@ module DiceBoard exposing
     , toDiceList
     )
 
-import Dice exposing (DiceList, Die, NextRoll(..))
+import Dice exposing (DiceList, Die, NextRoll(..), PipsList(..))
 import Random exposing (Generator)
 
 
@@ -40,10 +40,6 @@ display emptyRow makeRow board =
 
         Just (FiveDice theDice) ->
             List.indexedMap makeRow theDice
-
-
-type alias PipsList =
-    List Int
 
 
 toDiceList : FiveDice -> DiceList
@@ -80,7 +76,7 @@ mergeDice incoming current =
 
 rollForNewDice : DiceBoard -> Generator PipsList
 rollForNewDice diceBoard =
-    Random.list (rerollCount diceBoard) Dice.randomPip
+    Random.map PipsList (Random.list (rerollCount diceBoard) Dice.randomPip)
 
 
 hasRerolls : DiceBoard -> Bool

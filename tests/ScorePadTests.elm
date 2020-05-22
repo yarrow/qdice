@@ -1,6 +1,6 @@
 module ScorePadTests exposing (scorePadTests)
 
-import Dice exposing (PipsList)
+import Dice exposing (PipsList(..))
 import Expect
 import ScorePad
     exposing
@@ -35,7 +35,7 @@ theCaptions =
 
 aPipsList : PipsList
 aPipsList =
-    [ 1, 3, 2, 5, 6 ]
+    PipsList [ 1, 3, 2, 5, 6 ]
 
 
 allBoxes : ScorePad -> List ScorePadBox

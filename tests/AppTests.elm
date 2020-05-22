@@ -122,7 +122,7 @@ appTests =
                         resultingDice =
                             DiceBoard.makeDiceBoard [ keep, ( 2, Keep ), keep, ( 3, Keep ), keep ]
                     in
-                    update (GotDice incomingDice) (modelWithDice startingDice)
+                    update (GotDice (Dice.PipsList incomingDice)) (modelWithDice startingDice)
                         |> Tuple.first
                         |> .dice
                         |> Expect.equal resultingDice
