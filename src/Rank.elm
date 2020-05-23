@@ -1,6 +1,156 @@
-module Rank exposing (Rank(..), allRanks, caption, numberOfRanks, tally, toInt)
+module Rank exposing
+    ( PipsCounted(..)
+    , Rank(..)
+    , allRanks
+    , caption
+    , countPips
+    , numberOfRanks
+    , tally
+    , toInt
+    )
 
-import Dice exposing (PipsList)
+import Array exposing (Array)
+import Dice exposing (PipsList(..))
+
+
+type PipsCounted
+    = PipsCounted (Array Int)
+
+
+countPips : PipsList -> PipsCounted
+countPips (PipsList dice) =
+    let
+        increment jth counter =
+            case Array.get jth counter of
+                Just old ->
+                    Array.set jth (old + 1) counter
+
+                Nothing ->
+                    counter
+    in
+    PipsCounted (List.foldr increment (Array.repeat 7 0) dice)
+
+
+valueTimesCount : Int -> PipsCounted -> Int
+valueTimesCount value (PipsCounted counted) =
+    value * Maybe.withDefault 0 (Array.get value counted)
+
+
+sumDice : PipsCounted -> Int
+sumDice (PipsCounted count) =
+    Array.foldl (+) 0 (Array.indexedMap (*) count)
+
+
+ofAKind : PipsCounted -> Int
+ofAKind (PipsCounted counted) =
+    Maybe.withDefault 0 (List.maximum (Array.toList counted))
+
+
+sumDiceIfAtLeast : Int -> PipsCounted -> Int
+sumDiceIfAtLeast min counted =
+    if min <= ofAKind counted then
+        sumDice counted
+
+    else
+        0
+
+
+leftTrimZeros : List Int -> List Int
+leftTrimZeros list =
+    case list of
+        0 :: tail ->
+            leftTrimZeros tail
+
+        _ ->
+            list
+
+
+runCount : Int -> List Int -> Int
+runCount n list =
+    case list of
+        [] ->
+            n
+
+        0 :: _ ->
+            n
+
+        _ :: tail ->
+            runCount (n + 1) tail
+
+
+longestStraight : PipsCounted -> Int
+longestStraight (PipsCounted counted) =
+    Array.toList counted |> leftTrimZeros |> runCount 0
+
+
+tally : Rank -> PipsCounted -> Int
+tally rank =
+    case rank of
+        Ones ->
+            valueTimesCount 1
+
+        Twos ->
+            valueTimesCount 2
+
+        Threes ->
+            valueTimesCount 3
+
+        Fours ->
+            valueTimesCount 4
+
+        Fives ->
+            valueTimesCount 5
+
+        Sixes ->
+            valueTimesCount 6
+
+        ThreeOfAKind ->
+            sumDiceIfAtLeast 3
+
+        FourOfAKind ->
+            sumDiceIfAtLeast 4
+
+        FullHouse ->
+            \counted ->
+                let
+                    max =
+                        ofAKind counted
+
+                    hasPair (PipsCounted kounted) =
+                        List.any (\count -> count == 2) (Array.toList kounted)
+                in
+                if max == 5 || (max == 3 && hasPair counted) then
+                    25
+
+                else
+                    0
+
+        SmallStraight ->
+            \counted ->
+                if longestStraight counted >= 4 then
+                    30
+
+                else
+                    0
+
+        LargeStraight ->
+            \counted ->
+                if longestStraight counted == 5 then
+                    40
+
+                else
+                    0
+
+        FiveOfAKind ->
+            \(PipsCounted counted) ->
+                if List.any (\n -> n == 5) (Array.toList counted) then
+                    50
+
+                else
+                    0
+
+        Chance ->
+            sumDice
 
 
 type Rank
@@ -35,11 +185,6 @@ allRanks =
     , FiveOfAKind
     , Chance
     ]
-
-
-tally : Rank -> PipsList -> Int
-tally =
-    Debug.todo "tally"
 
 
 

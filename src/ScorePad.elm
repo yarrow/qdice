@@ -51,40 +51,32 @@ staticScorePad scores =
 
 
 activeScorePad : Scores -> PipsList -> List ScorePadRow
-activeScorePad scores (PipsList pips) =
+activeScorePad scores pipsList =
     let
-        vacant rank column box =
-            ( Vacant ( rank, column ), boxToString box )
+        counted =
+            Rank.countPips pipsList
 
         activeRow rank =
+            let
+                current =
+                    getRow rank scores
+
+                pointsForThisRoll =
+                    tally rank counted
+
+                makeBox column box =
+                    case box of
+                        Nothing ->
+                            ( Vacant ( rank, column ), String.fromInt pointsForThisRoll )
+
+                        Just points ->
+                            ( InUse, String.fromInt points )
+            in
             { caption = caption rank
-            , boxes = List.indexedMap (vacant rank) (getRow rank scores)
+            , boxes = List.indexedMap makeBox current
             }
     in
     List.map activeRow allRanks
-
-
-
------ private
--- activeBox is a box that's part of an active ScorePad,
--- not necessarily itself available for input
-
-
-activeBox : Rank -> Int -> Scores -> PipsList -> ScorePadBox
-activeBox rank column scores pipsList =
-    let
-        current =
-            getBox rank column scores
-
-        ( status, points ) =
-            case current of
-                Nothing ->
-                    ( Vacant ( rank, column ), tally rank pipsList )
-
-                Just pts ->
-                    ( InUse, pts )
-    in
-    ( status, String.fromInt points )
 
 
 
