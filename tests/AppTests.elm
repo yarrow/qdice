@@ -180,13 +180,11 @@ appTests =
                 \_ ->
                     findAll initialModel [ class "score-box" ]
                         |> Query.count (Expect.equal 39)
+            , test "... and those unclickable score boxes are blank" <|
+                \_ ->
+                    findAll initialModel [ class "score-box" ]
+                        |> Query.each (Query.contains [ Html.text "" ])
 
-            {-
-               , test "... and those unclickable score boxes are blank" <|
-                   \_ ->
-                       findAll initialModel [ class "score-box" ]
-                           |> Query.each (Query.contains [ Html.text "" ])
-            -}
             {-
                , test "There are 5 rows with (sub-)totals" <|
                    \_ ->
