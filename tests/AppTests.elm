@@ -138,6 +138,11 @@ appTests =
                     updateModel RecordScore modelAfterFirstRoll
                         |> .remainingRolls
                         |> Expect.equal 3
+            , test "RecordScore sets model.dice to Nothing" <|
+                \_ ->
+                    updateModel RecordScore modelAfterFirstRoll
+                        |> .dice
+                        |> Expect.equal Nothing
             ]
         , describe "Properties of viewing dice" <|
             [ test "The app has a 'Roll Dice' button" <|

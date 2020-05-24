@@ -54,7 +54,7 @@ update msg model =
             ( { model | dice = DiceBoard.flipNextRoll j model.dice }, Cmd.none )
 
         RecordScore ->
-            ( { model | remainingRolls = 3 }, Cmd.none )
+            ( { model | dice = Nothing, remainingRolls = 3 }, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -112,20 +112,17 @@ viewScores model =
         topBox label =
             td [ class "score-top" ] [ text label ]
 
-        displayBox : ScorePadBox -> Html msg
+        displayBox : ScorePadBox -> Html Msg
         displayBox ( occupancy, score ) =
-            let
-                attrs =
-                    case occupancy of
-                        InUse ->
-                            [ class "in-use" ]
+            case occupancy of
+                InUse ->
+                    td [ class "in-use" ] [ text score ]
 
-                        Available pair ->
-                            [ class "available" ]
-            in
-            td attrs [ text score ]
+                Available pair ->
+                    td [ class "available" ]
+                        [ a [ onClick RecordScore, href "#0" ] [ text score ] ]
 
-        scoreRow : ScorePadRow -> Html msg
+        scoreRow : ScorePadRow -> Html Msg
         scoreRow row =
             let
                 capt =

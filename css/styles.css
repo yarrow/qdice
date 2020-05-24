@@ -36,7 +36,10 @@ button:hover {
 table {
     background-color: #80d5ec;
 }
-
+td a {
+    display:block;
+    width:100%;
+}
 .scorepad {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 16px;
