@@ -29,11 +29,11 @@ button:hover {
     caption-side: bottom;
 }
 .die {
-    width: 81px;
-    height: 81px;
+    width: 85px;
+    height: 85px;
     border: 2px solid #60b5cc;
 }
-td {
+table {
     background-color: #80d5ec;
 }
 
@@ -49,10 +49,16 @@ td {
 }
 .score-row {
 }
-.score-box {
+.in-use {
     border: 2px solid #60b5cc;
     height: 30px;
     width: 30px;
+}
+.available {
+    border: 2px solid #60b5cc;
+    height: 30px;
+    width: 30px;
+    background-color: #a7f542;
 }
 .caption {
     border: 2px solid #60b5cc;

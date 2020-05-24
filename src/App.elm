@@ -114,10 +114,10 @@ viewScores model =
                 attrs =
                     case occupancy of
                         InUse ->
-                            [ class "score-box" ]
+                            [ class "in-use" ]
 
                         Available pair ->
-                            [ class "score-box", class "available" ]
+                            [ class "available" ]
             in
             td attrs [ text score ]
 

@@ -177,17 +177,13 @@ appTests =
                     \_ ->
                         findAll initialModel [ class "score-row" ]
                             |> Query.count (Expect.equal 13)
-                , test "There are 39 score boxes" <|
+                , test "There are 39 in-use score boxes" <|
                     \_ ->
-                        findAll initialModel [ class "score-box" ]
+                        findAll initialModel [ class "in-use" ]
                             |> Query.count (Expect.equal 39)
-                , test "Those score boxes are unclickable" <|
+                , test "... and all in-use score boxes are blank" <|
                     \_ ->
-                        findAll initialModel [ class "score-box" ]
-                            |> Query.each (Query.hasNot [ class "available" ])
-                , test "... and those unclickable score boxes are blank" <|
-                    \_ ->
-                        findAll initialModel [ class "score-box" ]
+                        findAll initialModel [ class "in-use" ]
                             |> Query.each (Query.contains [ Html.text "" ])
                 ]
             , describe "The scorepad after the first roll" <|
@@ -197,12 +193,15 @@ appTests =
                             |> Query.has [ id "scorepad" ]
                 , test "There are 13 rows with scores" <|
                     \_ ->
-                        findAll initialModel [ class "score-row" ]
+                        findAll modelAfterFirstRoll [ class "score-row" ]
                             |> Query.count (Expect.equal 13)
-                , test "There are 39 clickable score boxes" <|
+                , test "There are 39 available score boxes" <|
                     \_ ->
                         findAll modelAfterFirstRoll [ class "available" ]
                             |> Query.count (Expect.equal 39)
+                , test "... and no available score box is blank" <|
+                    \_ ->
+                        True |> Expect.true "I don't know how to test for this"
                 ]
 
             {-
