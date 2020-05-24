@@ -168,22 +168,42 @@ appTests =
                         |> Query.has [ text "2 rolls remaining" ]
             ]
         , describe "Properties of viewing scores" <|
-            [ test "There is a scorepad table" <|
-                \_ ->
-                    find initialModel [ class "scorepad" ]
-                        |> Query.has [ id "scorepad" ]
-            , test "There are 13 rows with scores" <|
-                \_ ->
-                    findAll initialModel [ class "score-row" ]
-                        |> Query.count (Expect.equal 13)
-            , test "The initial model has 39 unclickable score boxes" <|
-                \_ ->
-                    findAll initialModel [ class "score-box" ]
-                        |> Query.count (Expect.equal 39)
-            , test "... and those unclickable score boxes are blank" <|
-                \_ ->
-                    findAll initialModel [ class "score-box" ]
-                        |> Query.each (Query.contains [ Html.text "" ])
+            [ describe "The scorepad with no dice" <|
+                [ test "There is a scorepad table" <|
+                    \_ ->
+                        find initialModel [ class "scorepad" ]
+                            |> Query.has [ id "scorepad" ]
+                , test "There are 13 rows with scores" <|
+                    \_ ->
+                        findAll initialModel [ class "score-row" ]
+                            |> Query.count (Expect.equal 13)
+                , test "There are 39 score boxes" <|
+                    \_ ->
+                        findAll initialModel [ class "score-box" ]
+                            |> Query.count (Expect.equal 39)
+                , test "Those score boxes are unclickable" <|
+                    \_ ->
+                        findAll initialModel [ class "score-box" ]
+                            |> Query.each (Query.hasNot [ class "vacant" ])
+                , test "... and those unclickable score boxes are blank" <|
+                    \_ ->
+                        findAll initialModel [ class "score-box" ]
+                            |> Query.each (Query.contains [ Html.text "" ])
+                ]
+            , describe "The scorepad after the first roll" <|
+                [ test "There is a scorepad table" <|
+                    \_ ->
+                        find modelAfterFirstRoll [ class "scorepad" ]
+                            |> Query.has [ id "scorepad" ]
+                , test "There are 13 rows with scores" <|
+                    \_ ->
+                        findAll initialModel [ class "score-row" ]
+                            |> Query.count (Expect.equal 13)
+                , test "There are 39 clickable score boxes" <|
+                    \_ ->
+                        findAll initialModel [ class "score-box" ]
+                            |> Query.count (Expect.equal 39)
+                ]
 
             {-
                , test "There are 5 rows with (sub-)totals" <|
