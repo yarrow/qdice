@@ -7,7 +7,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Random
-import ScorePad exposing (ScorePadBox, ScorePadRow, Scores, activeScorePad, emptyScores, staticScorePad)
+import ScorePad exposing (CanUse(..), ScorePadBox, ScorePadRow, Scores, activeScorePad, emptyScores, staticScorePad)
 
 
 type Msg
@@ -110,12 +110,21 @@ viewScores model =
         topBox label =
             td [ class "score-top" ] [ text label ]
 
-        staticBox : ScorePadBox -> Html msg
-        staticBox box =
-            td [ class "score-box" ] [ text (Tuple.second box) ]
+        displayBox : ScorePadBox -> Html msg
+        displayBox ( canUse, score ) =
+            let
+                attrs =
+                    case canUse of
+                        InUse ->
+                            []
 
-        scoreRow : (ScorePadBox -> Html msg) -> ScorePadRow -> Html msg
-        scoreRow displayBox row =
+                        Vacant pair ->
+                            [ class "vacant" ]
+            in
+            td (class "score-box" :: attrs) [ text score ]
+
+        scoreRow : ScorePadRow -> Html msg
+        scoreRow row =
             let
                 capt =
                     td [ class "caption" ] [ text row.caption ]
@@ -123,7 +132,16 @@ viewScores model =
             tr [ class "score-row" ] <| capt :: List.map displayBox row.boxes
 
         scoreRows =
-            List.map (scoreRow staticBox) (staticScorePad model.scores)
+            let
+                getScorePad =
+                    case model.dice of
+                        Nothing ->
+                            staticScorePad
+
+                        Just dice ->
+                            activeScorePad (DiceBoard.toPipsList dice)
+            in
+            List.map scoreRow (getScorePad model.scores)
 
         topRow =
             tr [ class "score-top-row" ]

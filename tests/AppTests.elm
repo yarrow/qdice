@@ -203,6 +203,10 @@ appTests =
                     \_ ->
                         findAll initialModel [ class "score-box" ]
                             |> Query.count (Expect.equal 39)
+                , test "Those score boxes are clickable" <|
+                    \_ ->
+                        findAll initialModel [ class "score-box" ]
+                            |> Query.each (Query.has [ class "vacant" ])
                 ]
 
             {-

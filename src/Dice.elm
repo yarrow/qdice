@@ -5,7 +5,7 @@ module Dice exposing
     , PipsList(..)
     , flipNextRoll
     , fromPairs
-    , fromPips
+    , fromPipsList
     , mergeDice
     , nextRoll
     , pips
@@ -112,8 +112,8 @@ unPip (PipsList list) =
     list
 
 
-fromPips : PipsList -> DiceList
-fromPips (PipsList pipsList) =
+fromPipsList : PipsList -> DiceList
+fromPipsList (PipsList pipsList) =
     List.map dieFromInt pipsList
 
 

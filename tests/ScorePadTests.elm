@@ -50,7 +50,7 @@ emptyStatic =
 
 emptyActive : ScorePad
 emptyActive =
-    activeScorePad emptyScores aPipsList
+    activeScorePad aPipsList emptyScores
 
 
 isVacant : CanUse -> Bool

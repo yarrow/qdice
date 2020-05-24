@@ -50,8 +50,8 @@ staticScorePad scores =
     List.map staticRow allRanks
 
 
-activeScorePad : Scores -> PipsList -> List ScorePadRow
-activeScorePad scores pipsList =
+activeScorePad : PipsList -> Scores -> List ScorePadRow
+activeScorePad pipsList scores =
     let
         counted =
             Rank.countPips pipsList

@@ -15,24 +15,24 @@ diceTests =
             nextRolls dice =
                 List.map (\die -> Dice.nextRoll die) dice
         in
-        [ test "fromPips clamps the pips value to 1-6" <|
+        [ test "fromPipsList clamps the pips value to 1-6" <|
             \_ ->
                 let
                     result =
-                        Dice.fromPips (PipsList [ 0, 1, 2, 3, 4, 5, 6, 7, 49, -82 ])
+                        Dice.fromPipsList (PipsList [ 0, 1, 2, 3, 4, 5, 6, 7, 49, -82 ])
 
                     clamped =
                         [ 1, 1, 2, 3, 4, 5, 6, 6, 6, 1 ]
                 in
                 List.map Dice.pips result |> Expect.equal clamped
-        , test "fromPips uses Keep for every die" <|
+        , test "fromPipsList uses Keep for every die" <|
             \_ ->
                 let
                     pips =
                         [ 1, 3, 2, 4, 7, 2, 4 ]
 
                     rolls =
-                        nextRolls (Dice.fromPips (PipsList pips))
+                        nextRolls (Dice.fromPipsList (PipsList pips))
 
                     ok =
                         (List.length rolls == List.length pips)
@@ -43,7 +43,7 @@ diceTests =
             \n ->
                 let
                     dice =
-                        Dice.fromPips (PipsList [ n ])
+                        Dice.fromPipsList (PipsList [ n ])
 
                     theUrl =
                         case dice of

@@ -7,6 +7,7 @@ module DiceBoard exposing
     , mergeDice
     , rollForNewDice
     , toDiceList
+    , toPipsList
     )
 
 import Dice exposing (DiceList, Die, NextRoll(..), PipsList(..))
@@ -47,6 +48,11 @@ toDiceList (FiveDice dice) =
     dice
 
 
+toPipsList : FiveDice -> PipsList
+toPipsList (FiveDice dice) =
+    PipsList (List.map Dice.pips dice)
+
+
 rerollCount : DiceBoard -> Int
 rerollCount board =
     case board of
@@ -68,7 +74,7 @@ mergeDice : PipsList -> DiceBoard -> FiveDice
 mergeDice incoming current =
     case current of
         Nothing ->
-            FiveDice (Dice.fromPips incoming)
+            FiveDice (Dice.fromPipsList incoming)
 
         Just (FiveDice oldDice) ->
             FiveDice (Dice.mergeDice incoming oldDice)
