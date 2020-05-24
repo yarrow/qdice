@@ -27,9 +27,14 @@ modelWithDice dice =
     { initialModel | dice = DiceBoard.makeDiceBoard dice }
 
 
+updateModel : Msg -> Model -> Model
+updateModel msg model =
+    update msg model |> Tuple.first
+
+
 modelAfterFirstRoll : Model
 modelAfterFirstRoll =
-    update (GotDice randomPipsList) initialModel |> Tuple.first
+    updateModel (GotDice randomPipsList) initialModel
 
 
 find : Model -> List Test.Html.Selector.Selector -> Query.Single Msg
@@ -72,8 +77,7 @@ appTests =
             in
             [ test "RollDice doesn't change the model" <|
                 \_ ->
-                    update RollDice initialModel
-                        |> Tuple.first
+                    updateModel RollDice initialModel
                         |> Expect.equal initialModel
             , test "RollDice sends Cmd.none if remainingRolls is 0" <|
                 \_ ->
@@ -106,8 +110,7 @@ appTests =
                         rerollFirst =
                             DiceBoard.makeDiceBoard [ reroll, keep, keep, keep, keep ]
                     in
-                    update (DieFlipped 0) (modelWithDice keepAll)
-                        |> Tuple.first
+                    updateModel (DieFlipped 0) (modelWithDice keepAll)
                         |> .dice
                         |> Expect.equal rerollFirst
             , test "Incoming dice replace dice to be rerolled" <|
@@ -122,16 +125,19 @@ appTests =
                         resultingDice =
                             DiceBoard.makeDiceBoard [ keep, ( 2, Keep ), keep, ( 3, Keep ), keep ]
                     in
-                    update (GotDice (Dice.PipsList incomingDice)) (modelWithDice startingDice)
-                        |> Tuple.first
+                    updateModel (GotDice (Dice.PipsList incomingDice)) (modelWithDice startingDice)
                         |> .dice
                         |> Expect.equal resultingDice
             , test "After the first roll, we have 2 rolls remaining" <|
                 \_ ->
-                    update (GotDice randomPipsList) initialModel
-                        |> Tuple.first
+                    updateModel (GotDice randomPipsList) initialModel
                         |> .remainingRolls
                         |> Expect.equal 2
+            , test "RecordScore sets model.remaingRolls to 3" <|
+                \_ ->
+                    updateModel RecordScore modelAfterFirstRoll
+                        |> .remainingRolls
+                        |> Expect.equal 3
             ]
         , describe "Properties of viewing dice" <|
             [ test "The app has a 'Roll Dice' button" <|

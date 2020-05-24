@@ -14,6 +14,7 @@ type Msg
     = RollDice
     | GotDice Dice.PipsList
     | DieFlipped Int
+    | RecordScore
 
 
 rollAllowed : Model -> Bool
@@ -51,6 +52,9 @@ update msg model =
 
         DieFlipped j ->
             ( { model | dice = DiceBoard.flipNextRoll j model.dice }, Cmd.none )
+
+        RecordScore ->
+            ( { model | remainingRolls = 3 }, Cmd.none )
 
 
 view : Model -> Html Msg
