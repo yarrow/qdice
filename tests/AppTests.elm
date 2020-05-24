@@ -201,12 +201,8 @@ appTests =
                             |> Query.count (Expect.equal 13)
                 , test "There are 39 clickable score boxes" <|
                     \_ ->
-                        findAll initialModel [ class "score-box" ]
+                        findAll modelAfterFirstRoll [ class "vacant" ]
                             |> Query.count (Expect.equal 39)
-                , test "Those score boxes are clickable" <|
-                    \_ ->
-                        findAll initialModel [ class "score-box" ]
-                            |> Query.each (Query.has [ class "vacant" ])
                 ]
 
             {-

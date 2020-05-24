@@ -56,15 +56,13 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ header []
-            [ h1 [] [ text "Quarantine Dice" ]
-            , section []
-                [ div []
-                    [ viewDice model
-                    , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
-                    ]
-                , viewScores model
+        [ header [] [ h1 [] [ text "Quarantine Dice" ] ]
+        , section []
+            [ div []
+                [ viewDice model
+                , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
                 ]
+            , viewScores model
             ]
         ]
 
@@ -116,12 +114,12 @@ viewScores model =
                 attrs =
                     case canUse of
                         InUse ->
-                            []
+                            [ class "score-box" ]
 
                         Vacant pair ->
-                            [ class "vacant" ]
+                            [ class "score-box", class "vacant" ]
             in
-            td (class "score-box" :: attrs) [ text score ]
+            td attrs [ text score ]
 
         scoreRow : ScorePadRow -> Html msg
         scoreRow row =
