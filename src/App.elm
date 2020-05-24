@@ -7,7 +7,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Random
-import ScorePad exposing (CanUse(..), ScorePadBox, ScorePadRow, Scores, activeScorePad, emptyScores, staticScorePad)
+import ScorePad exposing (Occupancy(..), ScorePadBox, ScorePadRow, Scores, activeScorePad, emptyScores, staticScorePad)
 
 
 type Msg
@@ -109,15 +109,15 @@ viewScores model =
             td [ class "score-top" ] [ text label ]
 
         displayBox : ScorePadBox -> Html msg
-        displayBox ( canUse, score ) =
+        displayBox ( occupancy, score ) =
             let
                 attrs =
-                    case canUse of
+                    case occupancy of
                         InUse ->
                             [ class "score-box" ]
 
-                        Vacant pair ->
-                            [ class "score-box", class "vacant" ]
+                        Available pair ->
+                            [ class "score-box", class "available" ]
             in
             td attrs [ text score ]
 

@@ -4,7 +4,7 @@ import Dice exposing (PipsList(..))
 import Expect
 import ScorePad
     exposing
-        ( CanUse(..)
+        ( Occupancy(..)
         , ScorePad
         , ScorePadBox
         , ScorePadRow
@@ -53,13 +53,13 @@ emptyActive =
     activeScorePad aPipsList emptyScores
 
 
-isVacant : CanUse -> Bool
-isVacant canUse =
-    case canUse of
+isAvailable : Occupancy -> Bool
+isAvailable occupancy =
+    case occupancy of
         InUse ->
             False
 
-        Vacant _ ->
+        Available _ ->
             True
 
 
@@ -78,8 +78,8 @@ scorePadTests =
             \_ ->
                 List.map .caption emptyActive
                     |> Expect.equalLists theCaptions
-        , test "Every box in ScorePad emptyScores is Vacant" <|
+        , test "Every box in ScorePad emptyScores is Available" <|
             \_ ->
-                List.all (\box -> isVacant (Tuple.first box)) (allBoxes emptyActive)
-                    |> Expect.true "Every box should be Vacant"
+                List.all (\box -> isAvailable (Tuple.first box)) (allBoxes emptyActive)
+                    |> Expect.true "Every box should be Available"
         ]
