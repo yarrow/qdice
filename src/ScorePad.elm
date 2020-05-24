@@ -1,5 +1,6 @@
 module ScorePad exposing
-    ( Occupancy(..)
+    ( Location
+    , Occupancy(..)
     , ScorePad
     , ScorePadBox
     , ScorePadRow
@@ -33,8 +34,12 @@ type alias ScorePadBox =
     ( Occupancy, String )
 
 
+type alias Location =
+    ( Rank, Int )
+
+
 type Occupancy
-    = Available ( Rank, Int )
+    = Available Location
     | InUse
 
 
@@ -123,11 +128,6 @@ boxToString box =
 getRow : Rank -> Scores -> ScoreRow
 getRow rank (Scores scores) =
     Maybe.withDefault threeNothings (Array.get (Rank.toInt rank) scores)
-
-
-getBox : Rank -> Int -> Scores -> ScoreBox
-getBox rank column scores =
-    Debug.todo "getBox"
 
 
 setBox : Occupancy -> Int -> Scores -> Scores

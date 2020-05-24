@@ -7,6 +7,7 @@ import Expect
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Random
+import Rank exposing (Rank)
 import ScorePad
 import Test exposing (..)
 import Test.Html.Query as Query
@@ -15,6 +16,11 @@ import Test.Html.Selector exposing (attribute, class, id, tag, text)
 
 type alias PreDice =
     List ( Int, Dice.NextRoll )
+
+
+chance1 : ( Rank, Int )
+chance1 =
+    ( Rank.Chance, 1 )
 
 
 randomPipsList : Dice.PipsList
@@ -135,12 +141,12 @@ appTests =
                         |> Expect.equal 2
             , test "RecordScore sets model.remaingRolls to 3" <|
                 \_ ->
-                    updateModel RecordScore modelAfterFirstRoll
+                    updateModel (RecordScore chance1) modelAfterFirstRoll
                         |> .remainingRolls
                         |> Expect.equal 3
             , test "RecordScore sets model.dice to Nothing" <|
                 \_ ->
-                    updateModel RecordScore modelAfterFirstRoll
+                    updateModel (RecordScore chance1) modelAfterFirstRoll
                         |> .dice
                         |> Expect.equal Nothing
             ]

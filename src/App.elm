@@ -7,14 +7,14 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Random
-import ScorePad exposing (Occupancy(..), ScorePadBox, ScorePadRow, Scores, activeScorePad, emptyScores, staticScorePad)
+import ScorePad exposing (Location, Occupancy(..), ScorePadBox, ScorePadRow, Scores, activeScorePad, emptyScores, staticScorePad)
 
 
 type Msg
     = RollDice
     | GotDice Dice.PipsList
     | DieFlipped Int
-    | RecordScore
+    | RecordScore Location
 
 
 rollAllowed : Model -> Bool
@@ -53,7 +53,7 @@ update msg model =
         DieFlipped j ->
             ( { model | dice = DiceBoard.flipNextRoll j model.dice }, Cmd.none )
 
-        RecordScore ->
+        RecordScore location ->
             ( { model | dice = Nothing, remainingRolls = 3 }, Cmd.none )
 
 
@@ -118,9 +118,9 @@ viewScores model =
                 InUse ->
                     td [ class "in-use" ] [ text score ]
 
-                Available pair ->
+                Available location ->
                     td [ class "available" ]
-                        [ a [ onClick RecordScore, href "#0" ] [ text score ] ]
+                        [ a [ onClick (RecordScore location), href "#0" ] [ text score ] ]
 
         scoreRow : ScorePadRow -> Html Msg
         scoreRow row =
