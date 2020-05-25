@@ -8,6 +8,7 @@ module ScorePad exposing
     , activeScorePad
     , emptyScores
     , getScoreBox
+    , setScoreBox
     , staticScorePad
     )
 
@@ -126,12 +127,17 @@ boxToString box =
             String.fromInt n
 
 
+getScoreRow : Rank -> Scores -> ScoreRow
+getScoreRow rank (Scores scores) =
+    Maybe.withDefault threeNothings (Array.get (Rank.toInt rank) scores)
+
+
 getScoreBox : Location -> Scores -> ScoreBox
-getScoreBox ( rank, column ) (Scores scores) =
+getScoreBox ( rank, column ) scores =
     let
         maybeBox =
-            Array.get (Rank.toInt rank) scores
-                |> Maybe.andThen (Array.get column)
+            getScoreRow rank scores
+                |> Array.get column
     in
     case maybeBox of
         Nothing ->
@@ -146,11 +152,11 @@ getScoreBoxList rank (Scores scores) =
     Array.toList (Maybe.withDefault threeNothings (Array.get (Rank.toInt rank) scores))
 
 
-setBox : Occupancy -> Int -> Scores -> Scores
-setBox location points scores =
-    case location of
-        InUse ->
-            scores
-
-        Available ( rank, column ) ->
-            Debug.todo "setBox"
+setScoreBox : Location -> ScoreBox -> Scores -> Scores
+setScoreBox ( rank, column ) scoreBox (Scores scores) =
+    let
+        row =
+            getScoreRow rank (Scores scores)
+                |> Array.set column scoreBox
+    in
+    Scores (Array.set (Rank.toInt rank) row scores)

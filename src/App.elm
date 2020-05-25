@@ -7,6 +7,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Random
+import Rank
 import ScorePad exposing (Location, Occupancy(..), ScorePadBox, ScorePadRow, Scores, activeScorePad, emptyScores, staticScorePad)
 
 
@@ -53,8 +54,17 @@ update msg model =
         DieFlipped j ->
             ( { model | dice = DiceBoard.flipNextRoll j model.dice }, Cmd.none )
 
-        RecordScore location ->
-            ( { model | dice = Nothing, remainingRolls = 3 }, Cmd.none )
+        RecordScore ( rank, column ) ->
+            let
+                scoreToInsert =
+                    model.dice
+                        |> Maybe.map DiceBoard.toPipsList
+                        |> Maybe.map (Rank.tallyPipsList rank)
+
+                scores =
+                    ScorePad.setScoreBox ( rank, column ) scoreToInsert model.scores
+            in
+            ( { model | dice = Nothing, remainingRolls = 3, scores = scores }, Cmd.none )
 
 
 view : Model -> Html Msg
