@@ -6,6 +6,7 @@ module Rank exposing
     , countPips
     , numberOfRanks
     , tally
+    , tallyPipsList
     , toInt
     )
 
@@ -81,6 +82,11 @@ runCount n list =
 longestStraight : PipsCounted -> Int
 longestStraight (PipsCounted counted) =
     Array.toList counted |> leftTrimZeros |> runCount 0
+
+
+tallyPipsList : Rank -> PipsList -> Int
+tallyPipsList rank pipsList =
+    tally rank (countPips pipsList)
 
 
 tally : Rank -> PipsCounted -> Int

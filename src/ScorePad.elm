@@ -7,6 +7,7 @@ module ScorePad exposing
     , Scores
     , activeScorePad
     , emptyScores
+    , getScoreBox
     , staticScorePad
     )
 
@@ -50,7 +51,7 @@ staticScorePad scores =
             ( InUse, boxToString box )
 
         staticRow rank =
-            { caption = caption rank, boxes = List.map inUse (getRow rank scores) }
+            { caption = caption rank, boxes = List.map inUse (getScoreBoxList rank scores) }
     in
     List.map staticRow allRanks
 
@@ -64,7 +65,7 @@ activeScorePad pipsList scores =
         activeRow rank =
             let
                 current =
-                    getRow rank scores
+                    getScoreBoxList rank scores
 
                 pointsForThisRoll =
                     tally rank counted
@@ -93,7 +94,7 @@ type alias ScoreBox =
 
 
 type alias ScoreRow =
-    List ScoreBox
+    Array ScoreBox
 
 
 type Scores
@@ -102,7 +103,7 @@ type Scores
 
 threeNothings : ScoreRow
 threeNothings =
-    List.repeat 3 Nothing
+    Array.fromList (List.repeat 3 Nothing)
 
 
 emptyScores : Scores
@@ -125,9 +126,24 @@ boxToString box =
             String.fromInt n
 
 
-getRow : Rank -> Scores -> ScoreRow
-getRow rank (Scores scores) =
-    Maybe.withDefault threeNothings (Array.get (Rank.toInt rank) scores)
+getScoreBox : Location -> Scores -> ScoreBox
+getScoreBox ( rank, column ) (Scores scores) =
+    let
+        maybeBox =
+            Array.get (Rank.toInt rank) scores
+                |> Maybe.andThen (Array.get column)
+    in
+    case maybeBox of
+        Nothing ->
+            Nothing
+
+        Just scoreBox ->
+            scoreBox
+
+
+getScoreBoxList : Rank -> Scores -> List ScoreBox
+getScoreBoxList rank (Scores scores) =
+    Array.toList (Maybe.withDefault threeNothings (Array.get (Rank.toInt rank) scores))
 
 
 setBox : Occupancy -> Int -> Scores -> Scores

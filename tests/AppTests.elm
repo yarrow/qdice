@@ -8,7 +8,7 @@ import Html exposing (Html)
 import Html.Attributes as Attr
 import Random
 import Rank exposing (Rank)
-import ScorePad
+import ScorePad exposing (ScorePad, ScorePadRow, Scores)
 import Test exposing (..)
 import Test.Html.Query as Query
 import Test.Html.Selector exposing (attribute, class, id, tag, text)
@@ -149,6 +149,18 @@ appTests =
                     updateModel (RecordScore chance1) modelAfterFirstRoll
                         |> .dice
                         |> Expect.equal Nothing
+            , test "(RecordScore (rank, j) sets the new model's score at (rank, j) to the points indicated in the scorePad" <|
+                \_ ->
+                    let
+                        scoreForChance =
+                            modelAfterFirstRoll.dice
+                                |> Maybe.map DiceBoard.toPipsList
+                                |> Maybe.map (Rank.tallyPipsList Rank.Chance)
+                    in
+                    updateModel (RecordScore chance1) modelAfterFirstRoll
+                        |> .scores
+                        |> ScorePad.getScoreBox chance1
+                        |> Expect.equal scoreForChance
             ]
         , describe "Properties of viewing dice" <|
             [ test "The app has a 'Roll Dice' button" <|
