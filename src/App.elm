@@ -8,7 +8,18 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Random
 import Rank
-import ScorePad exposing (Location, Occupancy(..), ScorePadBox, ScorePadRow, Scores, activeScorePad, emptyScores, staticScorePad)
+import ScorePad
+    exposing
+        ( Location
+        , Occupancy(..)
+        , RowKind(..)
+        , ScorePadBox
+        , ScorePadRow
+        , Scores
+        , activeScorePad
+        , emptyScores
+        , staticScorePad
+        )
 
 
 type Msg
@@ -145,8 +156,16 @@ viewScores model =
             let
                 capt =
                     td [ class "caption" ] [ text row.caption ]
+
+                rowClass =
+                    case row.kind of
+                        Rolled ->
+                            "score-row"
+
+                        Calculated ->
+                            "summation-row"
             in
-            tr [ class "score-row" ] <| capt :: List.map displayBox row.boxes
+            tr [ class rowClass ] <| capt :: List.map displayBox row.boxes
 
         scoreRows =
             let

@@ -12,8 +12,10 @@ import Rank exposing (Rank, numberOfRanks, upperRanks)
 import ScorePad
     exposing
         ( Occupancy(..)
+        , RowKind(..)
         , ScorePad
         , ScorePadBox
+        , ScorePadRow
         , Scores
         , activeScorePad
         , emptyScores
@@ -147,8 +149,7 @@ subtests =
             parse static == parse active
     , subtest "The upperTotal row is the sum of the upperRanks rows" <|
         \scores ->
-            -- FIXME : this should fail when we finally fix the test
-            sectionSum upperRanks scores /= getSumRow upperTotal scores
+            sectionSum upperRanks scores == getSumRow upperTotal scores
     ]
 
 
@@ -175,9 +176,14 @@ aPipsList =
     PipsList [ 1, 3, 2, 5, 6 ]
 
 
-allBoxes : ScorePad -> List ScorePadBox
-allBoxes scores =
-    List.concatMap .boxes scores
+rolledRows : ScorePad -> List ScorePadRow
+rolledRows scores =
+    List.filter (\r -> r.kind == Rolled) scores
+
+
+rolledBoxes : ScorePad -> List ScorePadBox
+rolledBoxes scores =
+    List.concatMap .boxes (rolledRows scores)
 
 
 emptyStatic : ScorePad
@@ -203,20 +209,20 @@ isAvailable occupancy =
 regularTests : Test
 regularTests =
     describe "ScorePad tests" <|
-        [ test "Every box in staticScorePad emptyScores is (InUse, '')" <|
+        [ test "Every Rolled box in staticScorePad emptyScores is (InUse, '')" <|
             \_ ->
-                List.all (\box -> box == ( InUse, "" )) (allBoxes emptyStatic)
+                List.all (\box -> box == ( InUse, "" )) (rolledBoxes emptyStatic)
                     |> Expect.true "Every box should be (InUse, '')"
-        , test "Each staticScorePad box has the correct caption" <|
+        , test "Each Rolled staticScorePad row has the correct caption" <|
             \_ ->
-                List.map .caption emptyStatic
+                List.map .caption (rolledRows emptyStatic)
                     |> Expect.equalLists theCaptions
         , test "Each activeScorePad box has the correct caption" <|
             \_ ->
-                List.map .caption emptyActive
+                List.map .caption (rolledRows emptyActive)
                     |> Expect.equalLists theCaptions
-        , test "Every box in ScorePad emptyScores is Available" <|
+        , test "Every Rolled box in ScorePad emptyScores is Available" <|
             \_ ->
-                List.all (\box -> isAvailable (Tuple.first box)) (allBoxes emptyActive)
+                List.all (\box -> isAvailable (Tuple.first box)) (rolledBoxes emptyActive)
                     |> Expect.true "Every box should be Available"
         ]

@@ -223,11 +223,13 @@ appTests =
                             |> Query.count (Expect.equal 13)
                 , test "There are 39 in-use score boxes" <|
                     \_ ->
-                        findAll initialModel [ class "in-use" ]
+                        findAll initialModel [ class "score-row" ]
+                            |> Query.keep (class "in-use")
                             |> Query.count (Expect.equal 39)
                 , test "... and all in-use score boxes are blank" <|
                     \_ ->
-                        findAll initialModel [ class "in-use" ]
+                        findAll initialModel [ class "score-row" ]
+                            |> Query.keep (class "in-use")
                             |> Query.each (Query.contains [ Html.text "" ])
                 ]
             , describe "The scorepad after the first roll" <|

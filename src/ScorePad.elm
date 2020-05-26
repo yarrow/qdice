@@ -1,6 +1,7 @@
 module ScorePad exposing
     ( Location
     , Occupancy(..)
+    , RowKind(..)
     , ScorePad
     , ScorePadBox
     , ScorePadRow
@@ -70,6 +71,7 @@ type alias ScorePad =
 
 type alias ScorePadRow =
     { caption : String
+    , kind : RowKind
     , boxes : List ScorePadBox
     }
 
@@ -87,24 +89,36 @@ type Occupancy
     | InUse
 
 
-staticScoreRows : List Rank -> Scores -> ScorePad
+type RowKind
+    = Rolled
+    | Calculated
+
+
+staticScoreRows : List Rank -> Scores -> List ScorePadRow
 staticScoreRows ranks scores =
     let
         inUse box =
             ( InUse, boxToString box )
 
         staticRow rank =
-            { caption = caption rank, boxes = List.map inUse (getScoreBoxList rank scores) }
+            { kind = Rolled
+            , caption = caption rank
+            , boxes = List.map inUse (getScoreBoxList rank scores)
+            }
     in
     List.map staticRow ranks
 
 
 staticScorePad : Scores -> ScorePad
 staticScorePad scores =
-    staticScoreRows upperRanks scores ++ staticScoreRows lowerRanks scores
+    List.concat
+        [ staticScoreRows upperRanks scores
+        , topSummationRows scores
+        , staticScoreRows lowerRanks scores
+        ]
 
 
-activeScoreRows : List Rank -> PipsList -> Scores -> ScorePad
+activeScoreRows : List Rank -> PipsList -> Scores -> List ScorePadRow
 activeScoreRows ranks pipsList scores =
     let
         counted =
@@ -127,6 +141,7 @@ activeScoreRows ranks pipsList scores =
                             ( InUse, String.fromInt points )
             in
             { caption = caption rank
+            , kind = Rolled
             , boxes = List.indexedMap makeBox current
             }
     in
@@ -135,7 +150,39 @@ activeScoreRows ranks pipsList scores =
 
 activeScorePad : PipsList -> Scores -> ScorePad
 activeScorePad pipsList scores =
-    activeScoreRows upperRanks pipsList scores ++ activeScoreRows lowerRanks pipsList scores
+    List.concat
+        [ activeScoreRows upperRanks pipsList scores
+        , topSummationRows scores
+        , activeScoreRows lowerRanks pipsList scores
+        ]
+
+
+topSummationRows scores =
+    [ { caption = upperTotal
+      , kind = Calculated
+      , boxes = List.map (\n -> ( InUse, String.fromInt n )) (getUpperTotal scores)
+      }
+    ]
+
+
+
+-- Summation rows
+
+
+getUpperTotal : Scores -> List Int
+getUpperTotal (Scores scores) =
+    let
+        uppers : List (List Int)
+        uppers =
+            Array.toList scores
+                |> List.take numberOfUppers
+                |> List.map Array.toList
+                |> List.map (List.map (Maybe.withDefault 0))
+
+        addRows a b =
+            List.map2 (+) a b
+    in
+    List.foldr addRows [ 0, 0, 0 ] uppers
 
 
 
