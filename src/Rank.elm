@@ -4,10 +4,12 @@ module Rank exposing
     , allRanks
     , caption
     , countPips
+    , lowerRanks
     , numberOfRanks
     , tally
     , tallyPipsList
     , toInt
+    , upperRanks
     )
 
 import Array exposing (Array)
@@ -165,6 +167,16 @@ type Rank
     | LargeStraight
     | FiveOfAKind
     | Chance
+
+
+upperRanks : List Rank
+upperRanks =
+    [ Ones, Twos, Threes, Fours, Fives, Sixes ]
+
+
+lowerRanks : List Rank
+lowerRanks =
+    [ ThreeOfAKind, FourOfAKind, FullHouse, SmallStraight, LargeStraight, FiveOfAKind, Chance ]
 
 
 allRanks : List Rank

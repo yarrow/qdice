@@ -8,8 +8,14 @@ module ScorePad exposing
     , activeScorePad
     , emptyScores
     , getScoreBox
+    , grandTotal
+    , makeScoresForTesting
     , setScoreBox
     , staticScorePad
+    , totalScore
+    , upperBonus
+    , upperTotal
+    , weightScore
     )
 
 import Array exposing (Array)
@@ -19,6 +25,32 @@ import Rank exposing (Rank(..), allRanks, caption, numberOfRanks, tally, toInt)
 
 
 ----- ScorePad
+-- Total row captions
+
+
+upperTotal : String
+upperTotal =
+    "Total"
+
+
+upperBonus : String
+upperBonus =
+    "Bonus"
+
+
+totalScore : String
+totalScore =
+    "Total Score"
+
+
+weightScore : String
+weightScore =
+    "Weighted Score"
+
+
+grandTotal : String
+grandTotal =
+    "Grand Total"
 
 
 type alias ScorePad =
@@ -99,6 +131,16 @@ type alias ScoreRow =
 
 type Scores
     = Scores (Array ScoreRow)
+
+
+makeScoresForTesting : Array ScoreRow -> Scores
+makeScoresForTesting scoreRows =
+    if Array.length scoreRows == numberOfRanks then
+        Scores scoreRows
+
+    else
+        -- make sure the error shows up early
+        Scores (Array.fromList [])
 
 
 threeNothings : ScoreRow
