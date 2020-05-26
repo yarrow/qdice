@@ -56,32 +56,24 @@ sumDiceIfAtLeast min counted =
         0
 
 
-leftTrimZeros : List Int -> List Int
-leftTrimZeros list =
-    case list of
-        0 :: tail ->
-            leftTrimZeros tail
-
-        _ ->
-            list
-
-
-runCount : Int -> List Int -> Int
-runCount n list =
-    case list of
-        [] ->
-            n
-
-        0 :: _ ->
-            n
-
-        _ :: tail ->
-            runCount (n + 1) tail
-
-
 longestStraight : PipsCounted -> Int
 longestStraight (PipsCounted counted) =
-    Array.toList counted |> leftTrimZeros |> runCount 0
+    let
+        longestRun : ( Int, Int ) -> List Int -> ( Int, Int )
+        longestRun ( thisRun, longestPreviousRun ) list =
+            case list of
+                [] ->
+                    ( 0, max thisRun longestPreviousRun )
+
+                head :: tail ->
+                    case head of
+                        0 ->
+                            longestRun ( 0, max thisRun longestPreviousRun ) tail
+
+                        _ ->
+                            longestRun ( thisRun + 1, longestPreviousRun ) tail
+    in
+    longestRun ( 0, 0 ) (Array.toList counted) |> Tuple.second
 
 
 tallyPipsList : Rank -> PipsList -> Int

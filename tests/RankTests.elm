@@ -1,10 +1,10 @@
 module RankTests exposing (rankTests)
 
-import Array exposing (Array)
+import Array
 import Dice exposing (PipsList(..))
 import DiceBoard
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, intRange, list, string)
+import Expect
+import Fuzz exposing (intRange)
 import Random
 import Rank exposing (PipsCounted(..), Rank(..), tally)
 import Test exposing (..)
@@ -150,13 +150,14 @@ rankTests =
                         , [ 2, 3, 4, 5, 2 ]
                         , [ 3, 4, 5, 6, 3 ]
                         , [ 6, 4, 6, 3, 5 ]
+                        , [ 3, 1, 5, 4, 6 ]
                         ]
 
                     bad =
                         [ [ 1, 2, 4, 5, 6 ], [ 2, 4, 4, 5, 6 ], [ 1, 4, 5, 2, 4 ], [ 6, 4, 2, 3, 6 ] ]
 
                     expectedScores =
-                        List.repeat 8 30 ++ List.repeat 4 0
+                        List.repeat 9 30 ++ List.repeat 4 0
 
                     score plain =
                         tally SmallStraight (diceCount plain)
