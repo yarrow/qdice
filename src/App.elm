@@ -52,7 +52,15 @@ update msg model =
             ( newModel, Cmd.none )
 
         DieFlipped j ->
-            ( { model | dice = DiceBoard.flipNextRoll j model.dice }, Cmd.none )
+            let
+                newModel =
+                    if model.remainingRolls == 0 then
+                        model
+
+                    else
+                        { model | dice = DiceBoard.flipNextRoll j model.dice }
+            in
+            ( newModel, Cmd.none )
 
         RecordScore ( rank, column ) ->
             let

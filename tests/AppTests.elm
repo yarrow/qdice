@@ -119,6 +119,21 @@ appTests =
                     updateModel (DieFlipped 0) (modelWithDice keepAll)
                         |> .dice
                         |> Expect.equal rerollFirst
+            , test "`DieFlipped` does nothing if model.remainingRolls == 0" <|
+                \_ ->
+                    let
+                        withDice =
+                            modelWithDice keepAll
+
+                        outOfRolls =
+                            { withDice | remainingRolls = 0 }
+
+                        originalDice =
+                            outOfRolls.dice
+                    in
+                    updateModel (DieFlipped 0) outOfRolls
+                        |> .dice
+                        |> Expect.equal originalDice
             , test "Incoming dice replace dice to be rerolled" <|
                 \_ ->
                     let
