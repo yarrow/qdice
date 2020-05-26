@@ -6,6 +6,7 @@ module Rank exposing
     , countPips
     , lowerRanks
     , numberOfRanks
+    , numberOfUppers
     , tally
     , tallyPipsList
     , toInt
@@ -179,6 +180,16 @@ lowerRanks =
     [ ThreeOfAKind, FourOfAKind, FullHouse, SmallStraight, LargeStraight, FiveOfAKind, Chance ]
 
 
+numberOfUppers : Int
+numberOfUppers =
+    List.length upperRanks
+
+
+numberOfRanks : Int
+numberOfRanks =
+    numberOfUppers + List.length lowerRanks
+
+
 allRanks : List Rank
 allRanks =
     [ Ones
@@ -289,8 +300,3 @@ toInt rank =
 
         Chance ->
             12
-
-
-numberOfRanks : Int
-numberOfRanks =
-    13

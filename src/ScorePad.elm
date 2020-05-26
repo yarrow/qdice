@@ -20,7 +20,18 @@ module ScorePad exposing
 
 import Array exposing (Array)
 import Dice exposing (PipsList(..))
-import Rank exposing (Rank(..), allRanks, caption, numberOfRanks, tally, toInt)
+import Rank
+    exposing
+        ( Rank(..)
+        , allRanks
+        , caption
+        , lowerRanks
+        , numberOfRanks
+        , numberOfUppers
+        , tally
+        , toInt
+        , upperRanks
+        )
 
 
 
@@ -76,8 +87,8 @@ type Occupancy
     | InUse
 
 
-staticScorePad : Scores -> ScorePad
-staticScorePad scores =
+staticScoreRows : List Rank -> Scores -> ScorePad
+staticScoreRows ranks scores =
     let
         inUse box =
             ( InUse, boxToString box )
@@ -85,11 +96,16 @@ staticScorePad scores =
         staticRow rank =
             { caption = caption rank, boxes = List.map inUse (getScoreBoxList rank scores) }
     in
-    List.map staticRow allRanks
+    List.map staticRow ranks
 
 
-activeScorePad : PipsList -> Scores -> ScorePad
-activeScorePad pipsList scores =
+staticScorePad : Scores -> ScorePad
+staticScorePad scores =
+    staticScoreRows upperRanks scores ++ staticScoreRows lowerRanks scores
+
+
+activeScoreRows : List Rank -> PipsList -> Scores -> ScorePad
+activeScoreRows ranks pipsList scores =
     let
         counted =
             Rank.countPips pipsList
@@ -114,7 +130,12 @@ activeScorePad pipsList scores =
             , boxes = List.indexedMap makeBox current
             }
     in
-    List.map activeRow allRanks
+    List.map activeRow ranks
+
+
+activeScorePad : PipsList -> Scores -> ScorePad
+activeScorePad pipsList scores =
+    activeScoreRows upperRanks pipsList scores ++ activeScoreRows lowerRanks pipsList scores
 
 
 
