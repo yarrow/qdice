@@ -4,11 +4,11 @@ import App exposing (Model, Msg(..), initialModel, update, view)
 import Dice exposing (NextRoll(..))
 import DiceBoard
 import Expect
-import Html exposing (Html)
+import Html
 import Html.Attributes as Attr
 import Random
 import Rank exposing (Rank)
-import ScorePad exposing (ScorePad, ScorePadRow, Scores)
+import ScorePad
 import Test exposing (..)
 import Test.Html.Query as Query
 import Test.Html.Selector exposing (attribute, class, id, tag, text)

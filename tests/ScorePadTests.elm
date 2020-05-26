@@ -7,8 +7,6 @@ import ScorePad
         ( Occupancy(..)
         , ScorePad
         , ScorePadBox
-        , ScorePadRow
-        , Scores
         , activeScorePad
         , emptyScores
         , staticScorePad
@@ -16,6 +14,7 @@ import ScorePad
 import Test exposing (..)
 
 
+theCaptions : List String
 theCaptions =
     [ "Ones"
     , "Twos"

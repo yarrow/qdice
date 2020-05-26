@@ -13,7 +13,6 @@ module ScorePad exposing
     )
 
 import Array exposing (Array)
-import Debug
 import Dice exposing (PipsList(..))
 import Rank exposing (Rank(..), allRanks, caption, numberOfRanks, tally, toInt)
 
@@ -45,7 +44,7 @@ type Occupancy
     | InUse
 
 
-staticScorePad : Scores -> List ScorePadRow
+staticScorePad : Scores -> ScorePad
 staticScorePad scores =
     let
         inUse box =
@@ -57,7 +56,7 @@ staticScorePad scores =
     List.map staticRow allRanks
 
 
-activeScorePad : PipsList -> Scores -> List ScorePadRow
+activeScorePad : PipsList -> Scores -> ScorePad
 activeScorePad pipsList scores =
     let
         counted =
@@ -112,11 +111,6 @@ emptyScores =
     Scores (Array.fromList (List.repeat numberOfRanks threeNothings))
 
 
-scoreBoxToInt : ScoreBox -> Int
-scoreBoxToInt box =
-    Maybe.withDefault 0 box
-
-
 boxToString : ScoreBox -> String
 boxToString box =
     case box of
@@ -134,17 +128,7 @@ getScoreRow rank (Scores scores) =
 
 getScoreBox : Location -> Scores -> ScoreBox
 getScoreBox ( rank, column ) scores =
-    let
-        maybeBox =
-            getScoreRow rank scores
-                |> Array.get column
-    in
-    case maybeBox of
-        Nothing ->
-            Nothing
-
-        Just scoreBox ->
-            scoreBox
+    Maybe.withDefault Nothing (getScoreRow rank scores |> Array.get column)
 
 
 getScoreBoxList : Rank -> Scores -> List ScoreBox
