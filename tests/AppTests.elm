@@ -203,12 +203,20 @@ appTests =
                         |> .scores
                         |> ScorePad.getScoreBox chance1
                         |> Expect.equal scoreForChance
+            , test "NewGame resets the model to the initial model" <|
+                \_ ->
+                    updateModel NewGame rollableModel
+                        |> Expect.equal initialModel
             ]
         , describe "Properties of viewing dice" <|
             [ test "The app has a 'Roll Dice' button" <|
                 \_ ->
-                    find initialModel [ tag "button", id "roll-dice" ]
+                    find initialModel [ tag "button", class "roll-dice" ]
                         |> Query.has [ text "Roll Dice" ]
+            , test "The Roll Dice button changes to New Game if there are no turns left" <|
+                \_ ->
+                    find { initialModel | turnsLeft = 0 } [ tag "button", class "roll-dice" ]
+                        |> Query.has [ text "New Game" ]
             , test "There is a dice table" <|
                 \_ ->
                     find initialModel [ class "dice" ]

@@ -28,6 +28,7 @@ type Msg
     | GotDice Dice.PipsList
     | DieFlipped Int
     | RecordScore Location
+    | NewGame
 
 
 rollAllowed : Model -> Bool
@@ -94,6 +95,9 @@ update msg model =
             in
             ( newModel, Cmd.none )
 
+        NewGame ->
+            ( initialModel, Cmd.none )
+
 
 view : Model -> Html Msg
 view model =
@@ -102,11 +106,23 @@ view model =
         , section []
             [ div []
                 [ viewDice model
-                , button [ id "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
+                , viewButton model
                 ]
             , viewScores model
             ]
         ]
+
+
+viewButton : Model -> Html Msg
+viewButton model =
+    if model.turnsLeft == 0 then
+        button [ class "roll-dice", onClick NewGame ] [ text "New Game" ]
+
+    else if rollAllowed model then
+        button [ class "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
+
+    else
+        button [ class "dont-roll-dice" ] [ text "Roll Dice" ]
 
 
 viewDice : Model -> Html Msg

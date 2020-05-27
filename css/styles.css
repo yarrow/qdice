@@ -7,8 +7,8 @@ section {
   flex-direction: row;
   flex-wrap: wrap;
 }
-button {
-  background-color: #60b5cc;
+button.roll-dice {
+  background-color: #92ca17;
   border: 0;
   color: #444444;
   font-size: 24px;
@@ -17,8 +17,18 @@ button {
   font-family: 'Barlow Semi Condensed', sans-serif;
 }
 
-button:hover {
+button.roll-dice:hover {
   background-color: #87c512;
+}
+
+button.dont-roll-dice {
+  background-color: #c8c8c8;
+  border: 0;
+  color: #888888;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 10px 30px;
+  font-family: 'Barlow Semi Condensed', sans-serif;
 }
 
 .dice {
