@@ -16,7 +16,7 @@ module ScorePad exposing
     , totalScore
     , upperBonus
     , upperTotal
-    , weightScore
+    , weightedScore
     )
 
 import Array exposing (Array)
@@ -24,7 +24,6 @@ import Dice exposing (PipsList(..))
 import Rank
     exposing
         ( Rank(..)
-        , allRanks
         , caption
         , lowerRanks
         , numberOfRanks
@@ -55,8 +54,8 @@ totalScore =
     "Total Score"
 
 
-weightScore : String
-weightScore =
+weightedScore : String
+weightedScore =
     "Weighted Score"
 
 
@@ -134,6 +133,9 @@ makeScorePad scoreRows (Scores scores) =
         rowTotal =
             List.map3 (\a b c -> a + b + c) topTotal bonus bottomTotal
 
+        withWeights =
+            List.map2 (*) [ 1, 2, 3 ] rowTotal
+
         sumRow caption row =
             { caption = caption
             , kind = Calculated
@@ -144,7 +146,7 @@ makeScorePad scoreRows (Scores scores) =
         [ scoreRows upperRanks (Scores scores)
         , [ sumRow upperTotal topTotal, sumRow upperBonus bonus ]
         , scoreRows lowerRanks (Scores scores)
-        , [ sumRow totalScore rowTotal ]
+        , [ sumRow totalScore rowTotal, sumRow weightedScore withWeights ]
         ]
 
 

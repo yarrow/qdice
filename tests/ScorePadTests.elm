@@ -23,7 +23,7 @@ import ScorePad
         , totalScore
         , upperBonus
         , upperTotal
-        , weightScore
+        , weightedScore
         )
 import Shrink
 import Test exposing (Test, describe, fuzz, test)
@@ -153,7 +153,7 @@ subtests =
     , subtest "Each upperBonus box is 35 if the corresponding upperTotal box is >= 63, 0 otherwise" <|
         \scores ->
             let
-                totals =
+                topTotals =
                     Array.toList (getSumRow upperTotal scores)
 
                 bonuses =
@@ -162,7 +162,7 @@ subtests =
                 goodBonus total bonus =
                     (total >= 63 && bonus == 35) || (total < 63 && bonus == 0)
             in
-            List.all (\bool -> bool) (List.map2 goodBonus totals bonuses)
+            List.all (\bool -> bool) (List.map2 goodBonus topTotals bonuses)
     , subtest "The totalScore row is the sum of the Rolled rows, plus the bonus row" <|
         \scores ->
             let
@@ -176,6 +176,16 @@ subtests =
                     List.map2 (+) allBoxes bonus
             in
             expected == Array.toList (getSumRow totalScore scores)
+    , subtest "The weightedScore row is the totalScore row, times [1,2,3]" <|
+        \scores ->
+            let
+                totals =
+                    Array.toList (getSumRow totalScore scores)
+
+                expected =
+                    List.map2 (*) [ 1, 2, 3 ] totals
+            in
+            expected == Array.toList (getSumRow weightedScore scores)
     ]
 
 
