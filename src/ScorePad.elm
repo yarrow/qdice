@@ -41,7 +41,7 @@ import Rank
 
 upperTotal : String
 upperTotal =
-    "Total"
+    "Upper"
 
 
 upperBonus : String
@@ -51,17 +51,17 @@ upperBonus =
 
 totalScore : String
 totalScore =
-    "Total Score"
+    "Combined"
 
 
 weightedScore : String
 weightedScore =
-    "Weighted Score"
+    "x1 x2 x3"
 
 
 grandTotal : String
 grandTotal =
-    "Grand Total"
+    "Total"
 
 
 type alias ScorePad =

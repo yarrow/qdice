@@ -8,7 +8,9 @@ section {
   flex-wrap: wrap;
 }
 button {
-  float: left; background-color: #60b5cc; border: 0; color: rgb(44, 44, 44);
+  background-color: #60b5cc;
+  border: 0;
+  color: #444444;
   font-size: 24px;
   cursor: pointer;
   padding: 10px 30px;
@@ -16,7 +18,7 @@ button {
 }
 
 button:hover {
-  background-color: #80d5ec;
+  background-color: #87c512;
 }
 
 .dice {
@@ -42,7 +44,7 @@ td a {
 }
 .scorepad {
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: 16px;
+    font-size: 14px;
     table-layout: fixed;
     border-collapse: collapse;
     border-spacing: 0;
@@ -50,23 +52,27 @@ td a {
     caption-side: bottom;
 
 }
+.score-top {
+    font-family: 'Barlow Semi Condensed', sans-serif;
+    font-size: 16px;
+}
 .summation-row {
     background-color: #60b5cc 
 }
 .in-use {
     border: 2px solid #306277;
-    height: 30px;
-    width: 30px;
+    height: 25px;
+    width: 25px;
 }
 .available {
     border: 2px solid #306277;
-    height: 30px;
-    width: 30px;
+    height: 25px;
+    width: 25px;
     background-color: #a7f542;
 }
 .caption {
     border: 2px solid #306277;
-    height: 30px;
+    height: 25px;
     padding: 0px 10px;
 }
 

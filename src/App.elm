@@ -139,7 +139,7 @@ viewScores : Model -> Html Msg
 viewScores model =
     let
         topBox label =
-            td [ class "score-top" ] [ text label ]
+            th [ class "score-top" ] [ text label ]
 
         displayBox : ScorePadBox -> Html Msg
         displayBox ( occupancy, score ) =
@@ -164,8 +164,16 @@ viewScores model =
 
                         Calculated ->
                             "summation-row"
+
+                scoreDisplay =
+                    case row.boxes of
+                        [ ( InUse, score ) ] ->
+                            [ td [ class "in-use", colspan 3 ] [ text score ] ]
+
+                        _ ->
+                            List.map displayBox row.boxes
             in
-            tr [ class rowClass ] <| capt :: List.map displayBox row.boxes
+            tr [ class rowClass ] <| capt :: scoreDisplay
 
         scoreRows =
             let
