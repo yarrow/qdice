@@ -19,6 +19,7 @@ import ScorePad
         , Scores
         , activeScorePad
         , emptyScores
+        , grandTotal
         , staticScorePad
         , totalScore
         , upperBonus
@@ -178,6 +179,22 @@ subtests =
                     List.map2 (*) [ 1, 2, 3 ] totals
             in
             expected == getSumRow weightedScore scores
+    , subtest "The grandTotal box is the sum of the totalScore row" <|
+        \scores ->
+            let
+                weighted =
+                    getSumRow weightedScore scores
+
+                expected =
+                    List.foldr (+) 0 weighted
+
+                grandRow =
+                    getSumRow grandTotal scores
+
+                grand =
+                    Maybe.withDefault -99 (List.head grandRow)
+            in
+            expected == grand
     ]
 
 

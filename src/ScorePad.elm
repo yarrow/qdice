@@ -134,6 +134,9 @@ makeScorePad scoreRows (Scores scores) =
         withWeights =
             List.map2 (*) [ 1, 2, 3 ] rowTotal
 
+        wholeMegilla =
+            List.foldr (+) 0 withWeights
+
         sumRow caption row =
             { caption = caption
             , kind = Calculated
@@ -144,7 +147,10 @@ makeScorePad scoreRows (Scores scores) =
         [ scoreRows upperRanks (Scores scores)
         , [ sumRow upperTotal topTotal, sumRow upperBonus bonus ]
         , scoreRows lowerRanks (Scores scores)
-        , [ sumRow totalScore rowTotal, sumRow weightedScore withWeights ]
+        , [ sumRow totalScore rowTotal
+          , sumRow weightedScore withWeights
+          , sumRow grandTotal [ wholeMegilla ]
+          ]
         ]
 
 
