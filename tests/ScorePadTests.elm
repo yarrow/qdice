@@ -30,7 +30,7 @@ import Test exposing (Test, describe, fuzz, test)
 
 
 type alias Info =
-    Dict String (Array Int)
+    Dict String (List Int)
 
 
 parse : ScorePad -> Info
@@ -46,19 +46,19 @@ parse scorePad =
                     0
 
         rowParse row =
-            ( row.caption, Array.fromList (List.map boxParse row.boxes) )
+            ( row.caption, List.map boxParse row.boxes )
     in
     Dict.fromList (List.map rowParse scorePad)
 
 
-sectionSum : List Rank -> Scores -> Array Int
+sectionSum : List Rank -> Scores -> List Int
 sectionSum ranks scores =
     let
         info =
             parse (staticScorePad scores)
 
         missingRow =
-            Array.fromList [ -100, -100, -100 ]
+            [ -100, -100, -100 ]
 
         getRow rank =
             Maybe.withDefault missingRow (Dict.get (Rank.caption rank) info)
@@ -66,31 +66,23 @@ sectionSum ranks scores =
         section =
             List.map getRow ranks
 
-        sum j a b =
-            Maybe.withDefault -200 (Array.get j a)
-                + Maybe.withDefault -200 (Array.get j b)
-
         add a b =
-            Array.fromList
-                [ sum 0 a b
-                , sum 1 a b
-                , sum 2 a b
-                ]
+            List.map2 (+) a b
 
         zero =
-            Array.fromList [ 0, 0, 0 ]
+            [ 0, 0, 0 ]
     in
     List.foldr add zero section
 
 
-getSumRow : String -> Scores -> Array Int
+getSumRow : String -> Scores -> List Int
 getSumRow caption scores =
     let
         info =
             parse (staticScorePad scores)
 
         missingRow =
-            Array.fromList [ 4000, 4000, 4000 ]
+            [ 4000, 4000, 4000 ]
     in
     Maybe.withDefault missingRow (Dict.get caption info)
 
@@ -102,7 +94,7 @@ genScores =
             Random.Extra.maybe Random.Extra.bool (Random.int 0 50)
 
         genScoreRow =
-            Random.Array.array 3 genScoreBox
+            Random.list 3 genScoreBox
     in
     Random.map ScorePad.makeScoresForTesting (Random.Array.array numberOfRanks genScoreRow)
 
@@ -154,10 +146,10 @@ subtests =
         \scores ->
             let
                 topTotals =
-                    Array.toList (getSumRow upperTotal scores)
+                    getSumRow upperTotal scores
 
                 bonuses =
-                    Array.toList (getSumRow upperBonus scores)
+                    getSumRow upperBonus scores
 
                 goodBonus total bonus =
                     (total >= 63 && bonus == 35) || (total < 63 && bonus == 0)
@@ -167,25 +159,25 @@ subtests =
         \scores ->
             let
                 allBoxes =
-                    Array.toList (sectionSum allRanks scores)
+                    sectionSum allRanks scores
 
                 bonus =
-                    Array.toList (getSumRow upperBonus scores)
+                    getSumRow upperBonus scores
 
                 expected =
                     List.map2 (+) allBoxes bonus
             in
-            expected == Array.toList (getSumRow totalScore scores)
+            expected == getSumRow totalScore scores
     , subtest "The weightedScore row is the totalScore row, times [1,2,3]" <|
         \scores ->
             let
                 totals =
-                    Array.toList (getSumRow totalScore scores)
+                    getSumRow totalScore scores
 
                 expected =
                     List.map2 (*) [ 1, 2, 3 ] totals
             in
-            expected == Array.toList (getSumRow weightedScore scores)
+            expected == getSumRow weightedScore scores
     ]
 
 

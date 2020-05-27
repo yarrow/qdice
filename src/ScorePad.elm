@@ -101,9 +101,7 @@ makeScorePad scoreRows (Scores scores) =
             let
                 section : List (List Int)
                 section =
-                    sectionRows
-                        |> List.map Array.toList
-                        |> List.map (List.map (Maybe.withDefault 0))
+                    List.map (List.map (Maybe.withDefault 0)) sectionRows
 
                 addRows a b =
                     List.map2 (+) a b
@@ -169,7 +167,7 @@ staticScoreRows ranks scores =
         staticRow rank =
             { kind = Rolled
             , caption = caption rank
-            , boxes = List.map inUse (getScoreBoxList rank scores)
+            , boxes = List.map inUse (getScoreRow rank scores)
             }
     in
     List.map staticRow ranks
@@ -184,7 +182,7 @@ activeScoreRows pipsList ranks scores =
         activeRow rank =
             let
                 current =
-                    getScoreBoxList rank scores
+                    getScoreRow rank scores
 
                 pointsForThisRoll =
                     tally rank counted
@@ -214,7 +212,7 @@ type alias ScoreBox =
 
 
 type alias ScoreRow =
-    Array ScoreBox
+    List ScoreBox
 
 
 type Scores
@@ -233,7 +231,7 @@ makeScoresForTesting scoreRows =
 
 threeNothings : ScoreRow
 threeNothings =
-    Array.fromList (List.repeat 3 Nothing)
+    List.repeat 3 Nothing
 
 
 emptyScores : Scores
@@ -258,12 +256,10 @@ getScoreRow rank (Scores scores) =
 
 getScoreBox : Location -> Scores -> ScoreBox
 getScoreBox ( rank, column ) scores =
-    Maybe.withDefault Nothing (getScoreRow rank scores |> Array.get column)
-
-
-getScoreBoxList : Rank -> Scores -> List ScoreBox
-getScoreBoxList rank (Scores scores) =
-    Array.toList (Maybe.withDefault threeNothings (Array.get (Rank.toInt rank) scores))
+    getScoreRow rank scores
+        |> Array.fromList
+        |> Array.get column
+        |> Maybe.withDefault Nothing
 
 
 setScoreBox : Location -> ScoreBox -> Scores -> Scores
@@ -271,6 +267,8 @@ setScoreBox ( rank, column ) scoreBox (Scores scores) =
     let
         row =
             getScoreRow rank (Scores scores)
+                |> Array.fromList
                 |> Array.set column scoreBox
+                |> Array.toList
     in
     Scores (Array.set (Rank.toInt rank) row scores)
