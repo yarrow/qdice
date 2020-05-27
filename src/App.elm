@@ -18,6 +18,7 @@ import ScorePad
         , Scores
         , activeScorePad
         , emptyScores
+        , numberOfTurns
         , staticScorePad
         )
 
@@ -197,13 +198,18 @@ viewScores model =
 type alias Model =
     { dice : DiceBoard
     , rollsLeft : Int
+    , turnsLeft : Int
     , scores : Scores
     }
 
 
 initialModel : Model
 initialModel =
-    { dice = Nothing, rollsLeft = 3, scores = emptyScores }
+    { dice = Nothing
+    , rollsLeft = 3
+    , turnsLeft = ScorePad.numberOfTurns
+    , scores = emptyScores
+    }
 
 
 main : Program () Model Msg

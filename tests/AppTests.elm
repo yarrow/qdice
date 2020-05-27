@@ -65,6 +65,10 @@ appTests =
                 \_ ->
                     initialModel.rollsLeft
                         |> Expect.equal 3
+            , test "We start with 39 turns left" <|
+                \_ ->
+                    initialModel.turnsLeft
+                        |> Expect.equal ScorePad.numberOfTurns
             , test "We start with blank scores" <|
                 \_ ->
                     initialModel.scores

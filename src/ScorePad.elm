@@ -11,6 +11,7 @@ module ScorePad exposing
     , getScoreBox
     , grandTotal
     , makeScoresForTesting
+    , numberOfTurns
     , setScoreBox
     , staticScorePad
     , totalScore
@@ -243,6 +244,13 @@ threeNothings =
 emptyScores : Scores
 emptyScores =
     Scores (Array.fromList (List.repeat numberOfRanks threeNothings))
+
+
+numberOfTurns : Int
+numberOfTurns =
+    case emptyScores of
+        Scores scores ->
+            Array.length scores * List.length threeNothings
 
 
 boxToString : ScoreBox -> String
