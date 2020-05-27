@@ -117,6 +117,9 @@ makeScorePad scoreRows (Scores scores) =
         topTotal =
             getSectionTotal (List.take numberOfUppers scoresList)
 
+        bottomTotal =
+            getSectionTotal (List.drop numberOfUppers scoresList)
+
         bonus =
             List.map
                 (\t ->
@@ -128,6 +131,9 @@ makeScorePad scoreRows (Scores scores) =
                 )
                 topTotal
 
+        rowTotal =
+            List.map3 (\a b c -> a + b + c) topTotal bonus bottomTotal
+
         sumRow caption row =
             { caption = caption
             , kind = Calculated
@@ -138,6 +144,7 @@ makeScorePad scoreRows (Scores scores) =
         [ scoreRows upperRanks (Scores scores)
         , [ sumRow upperTotal topTotal, sumRow upperBonus bonus ]
         , scoreRows lowerRanks (Scores scores)
+        , [ sumRow totalScore rowTotal ]
         ]
 
 

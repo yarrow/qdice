@@ -8,7 +8,7 @@ import Fuzz
 import Random
 import Random.Array
 import Random.Extra
-import Rank exposing (Rank, numberOfRanks, upperRanks)
+import Rank exposing (Rank, allRanks, numberOfRanks, upperRanks)
 import ScorePad
     exposing
         ( Occupancy(..)
@@ -163,6 +163,19 @@ subtests =
                     (total >= 63 && bonus == 35) || (total < 63 && bonus == 0)
             in
             List.all (\bool -> bool) (List.map2 goodBonus totals bonuses)
+    , subtest "The totalScore row is the sum of the Rolled rows, plus the bonus row" <|
+        \scores ->
+            let
+                allBoxes =
+                    Array.toList (sectionSum allRanks scores)
+
+                bonus =
+                    Array.toList (getSumRow upperBonus scores)
+
+                expected =
+                    List.map2 (+) allBoxes bonus
+            in
+            expected == Array.toList (getSumRow totalScore scores)
     ]
 
 
