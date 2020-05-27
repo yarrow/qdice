@@ -158,11 +158,20 @@ appTests =
                     updateModel (GotDice randomPipsList) initialModel
                         |> .rollsLeft
                         |> Expect.equal 2
-            , test "RecordScore sets model.remaingRolls to 3" <|
+            , test "RecordScore sets model.rollsLeft to 3" <|
                 \_ ->
                     updateModel (RecordScore chance1) modelAfterFirstRoll
                         |> .rollsLeft
                         |> Expect.equal 3
+            , test "RecordScore decrements model.turnsLeft" <|
+                \_ ->
+                    let
+                        startingTurns =
+                            modelAfterFirstRoll.turnsLeft
+                    in
+                    updateModel (RecordScore chance1) modelAfterFirstRoll
+                        |> .turnsLeft
+                        |> Expect.equal (startingTurns - 1)
             , test "RecordScore sets model.dice to Nothing" <|
                 \_ ->
                     updateModel (RecordScore chance1) modelAfterFirstRoll

@@ -83,8 +83,16 @@ update msg model =
 
                 scores =
                     ScorePad.setScoreBox ( rank, column ) scoreToInsert model.scores
+
+                newModel =
+                    { model
+                        | dice = Nothing
+                        , rollsLeft = 3
+                        , turnsLeft = model.turnsLeft - 1
+                        , scores = scores
+                    }
             in
-            ( { model | dice = Nothing, rollsLeft = 3, scores = scores }, Cmd.none )
+            ( newModel, Cmd.none )
 
 
 view : Model -> Html Msg
