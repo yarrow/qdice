@@ -150,6 +150,19 @@ subtests =
     , subtest "The upperTotal row is the sum of the upperRanks rows" <|
         \scores ->
             sectionSum upperRanks scores == getSumRow upperTotal scores
+    , subtest "Each upperBonus box is 35 if the corresponding upperTotal box is >= 63, 0 otherwise" <|
+        \scores ->
+            let
+                totals =
+                    Array.toList (getSumRow upperTotal scores)
+
+                bonuses =
+                    Array.toList (getSumRow upperBonus scores)
+
+                goodBonus total bonus =
+                    (total >= 63 && bonus == 35) || (total < 63 && bonus == 0)
+            in
+            List.all (\bool -> bool) (List.map2 goodBonus totals bonuses)
     ]
 
 
