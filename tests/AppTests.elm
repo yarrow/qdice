@@ -8,7 +8,7 @@ import Html
 import Html.Attributes as Attr
 import Random
 import Rank exposing (Rank)
-import ScorePad
+import ScorePad exposing (numberOfTurns)
 import Test exposing (..)
 import Test.Html.Query as Query
 import Test.Html.Selector exposing (attribute, class, id, tag, text)
@@ -65,10 +65,10 @@ appTests =
                 \_ ->
                     initialModel.rollsLeft
                         |> Expect.equal 3
-            , test "We start with 39 turns left" <|
+            , test "We start with numberOfTurns turns left" <|
                 \_ ->
                     initialModel.turnsLeft
-                        |> Expect.equal ScorePad.numberOfTurns
+                        |> Expect.equal numberOfTurns
             , test "We start with blank scores" <|
                 \_ ->
                     initialModel.scores
@@ -234,11 +234,11 @@ appTests =
                     \_ ->
                         findAll initialModel [ class "score-row" ]
                             |> Query.count (Expect.equal 13)
-                , test "There are 39 in-use score boxes" <|
+                , test "There are numberOfTurns in-use score boxes" <|
                     \_ ->
                         findAll initialModel [ class "score-row" ]
                             |> Query.keep (class "in-use")
-                            |> Query.count (Expect.equal 39)
+                            |> Query.count (Expect.equal numberOfTurns)
                 , test "... and all in-use score boxes are blank" <|
                     \_ ->
                         findAll initialModel [ class "score-row" ]
@@ -254,10 +254,10 @@ appTests =
                     \_ ->
                         findAll modelAfterFirstRoll [ class "score-row" ]
                             |> Query.count (Expect.equal 13)
-                , test "There are 39 available score boxes" <|
+                , test "There are numberOfTurns available score boxes" <|
                     \_ ->
                         findAll modelAfterFirstRoll [ class "available" ]
-                            |> Query.count (Expect.equal 39)
+                            |> Query.count (Expect.equal numberOfTurns)
                 , test "... and no available score box is blank" <|
                     \_ ->
                         True |> Expect.true "I don't know how to test for this"
