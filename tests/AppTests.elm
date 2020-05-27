@@ -63,7 +63,7 @@ appTests =
                         |> Expect.equal Nothing
             , test "We start with three rolls available" <|
                 \_ ->
-                    initialModel.remainingRolls
+                    initialModel.rollsLeft
                         |> Expect.equal 3
             , test "We start with blank scores" <|
                 \_ ->
@@ -85,9 +85,9 @@ appTests =
                 \_ ->
                     updateModel RollDice initialModel
                         |> Expect.equal initialModel
-            , test "RollDice sends Cmd.none if remainingRolls is 0" <|
+            , test "RollDice sends Cmd.none if rollsLeft is 0" <|
                 \_ ->
-                    update RollDice { modelAfterFirstRoll | remainingRolls = 0 }
+                    update RollDice { modelAfterFirstRoll | rollsLeft = 0 }
                         |> Tuple.second
                         |> Expect.equal Cmd.none
             , test "RollDice sends Cmd.none if there are no dice to be rerolled" <|
@@ -119,14 +119,14 @@ appTests =
                     updateModel (DieFlipped 0) (modelWithDice keepAll)
                         |> .dice
                         |> Expect.equal rerollFirst
-            , test "`DieFlipped` does nothing if model.remainingRolls == 0" <|
+            , test "`DieFlipped` does nothing if model.rollsLeft == 0" <|
                 \_ ->
                     let
                         withDice =
                             modelWithDice keepAll
 
                         outOfRolls =
-                            { withDice | remainingRolls = 0 }
+                            { withDice | rollsLeft = 0 }
 
                         originalDice =
                             outOfRolls.dice
@@ -152,12 +152,12 @@ appTests =
             , test "After the first roll, we have 2 rolls remaining" <|
                 \_ ->
                     updateModel (GotDice randomPipsList) initialModel
-                        |> .remainingRolls
+                        |> .rollsLeft
                         |> Expect.equal 2
             , test "RecordScore sets model.remaingRolls to 3" <|
                 \_ ->
                     updateModel (RecordScore chance1) modelAfterFirstRoll
-                        |> .remainingRolls
+                        |> .rollsLeft
                         |> Expect.equal 3
             , test "RecordScore sets model.dice to Nothing" <|
                 \_ ->
@@ -202,7 +202,7 @@ appTests =
                 \_ ->
                     findAll initialModel [ tag "tr", attribute <| Attr.class "dice-row" ]
                         |> Query.count (Expect.equal 5)
-            , test "The inital model shows 3 remainingRolls" <|
+            , test "The inital model shows 3 rollsLeft" <|
                 \_ ->
                     find initialModel [ tag "caption" ]
                         |> Query.has [ text "3 rolls remaining" ]

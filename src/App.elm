@@ -31,7 +31,7 @@ type Msg
 
 rollAllowed : Model -> Bool
 rollAllowed model =
-    if model.remainingRolls == 0 then
+    if model.rollsLeft == 0 then
         False
 
     else
@@ -57,7 +57,7 @@ update msg model =
                 newModel =
                     { model
                         | dice = Just (DiceBoard.mergeDice incomingDice model.dice)
-                        , remainingRolls = model.remainingRolls - 1
+                        , rollsLeft = model.rollsLeft - 1
                     }
             in
             ( newModel, Cmd.none )
@@ -65,7 +65,7 @@ update msg model =
         DieFlipped j ->
             let
                 newModel =
-                    if model.remainingRolls == 0 then
+                    if model.rollsLeft == 0 then
                         model
 
                     else
@@ -83,7 +83,7 @@ update msg model =
                 scores =
                     ScorePad.setScoreBox ( rank, column ) scoreToInsert model.scores
             in
-            ( { model | dice = Nothing, remainingRolls = 3, scores = scores }, Cmd.none )
+            ( { model | dice = Nothing, rollsLeft = 3, scores = scores }, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -103,7 +103,7 @@ view model =
 viewDice : Model -> Html Msg
 viewDice model =
     table [ class "dice", id "dice" ] <|
-        [ caption [] [ text (String.fromInt model.remainingRolls ++ " rolls remaining") ]
+        [ caption [] [ text (String.fromInt model.rollsLeft ++ " rolls remaining") ]
         , tr [] [ th [] [ text "Reroll" ], th [] [ text "Keep" ] ]
         ]
             ++ DiceBoard.display blankRow diceRow model.dice
@@ -139,7 +139,7 @@ viewScores : Model -> Html Msg
 viewScores model =
     let
         topBox label =
-            th [ class "score-top" ] [ text label ]
+            td [ class "score-top" ] [ text label ]
 
         displayBox : ScorePadBox -> Html Msg
         displayBox ( occupancy, score ) =
@@ -196,14 +196,14 @@ viewScores model =
 
 type alias Model =
     { dice : DiceBoard
-    , remainingRolls : Int
+    , rollsLeft : Int
     , scores : Scores
     }
 
 
 initialModel : Model
 initialModel =
-    { dice = Nothing, remainingRolls = 3, scores = emptyScores }
+    { dice = Nothing, rollsLeft = 3, scores = emptyScores }
 
 
 main : Program () Model Msg
