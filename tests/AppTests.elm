@@ -28,9 +28,9 @@ randomPipsList =
     Random.step (DiceBoard.rollForNewDice Nothing) (Random.initialSeed 0) |> Tuple.first
 
 
-modelWithDice : PreDice -> Model
-modelWithDice dice =
-    { initialModel | dice = DiceBoard.makeDiceBoard dice }
+setDice : Model -> PreDice -> Model
+setDice model dice =
+    { model | dice = DiceBoard.makeDiceBoard dice }
 
 
 updateModel : Msg -> Model -> Model
@@ -84,19 +84,33 @@ appTests =
 
                 keepAll =
                     [ keep, keep, keep, keep, keep ]
+
+                rollableModel =
+                    updateModel (GotDice randomPipsList) initialModel
+                        |> updateModel (DieFlipped 0)
             in
             [ test "RollDice doesn't change the model" <|
                 \_ ->
-                    updateModel RollDice initialModel
-                        |> Expect.equal initialModel
-            , test "RollDice sends Cmd.none if rollsLeft is 0" <|
+                    updateModel RollDice rollableModel
+                        |> Expect.equal rollableModel
+            , test "RollDice sends a nontrivial Cmd (GotDice, but we can't test that) rollsLeft > 0, turnsLeft >0, and at least one die is Reroll" <|
                 \_ ->
-                    update RollDice { modelAfterFirstRoll | rollsLeft = 0 }
+                    update RollDice rollableModel
+                        |> Tuple.second
+                        |> Expect.notEqual Cmd.none
+            , test "RollDice sends Cmd.none if model.rollsLeft is 0" <|
+                \_ ->
+                    update RollDice { rollableModel | rollsLeft = 0 }
+                        |> Tuple.second
+                        |> Expect.equal Cmd.none
+            , test "RollDice sends Cmd.none if model.turnsLeft is 0" <|
+                \_ ->
+                    update RollDice { rollableModel | turnsLeft = 0 }
                         |> Tuple.second
                         |> Expect.equal Cmd.none
             , test "RollDice sends Cmd.none if there are no dice to be rerolled" <|
                 \_ ->
-                    update RollDice (modelWithDice keepAll)
+                    update RollDice (setDice rollableModel keepAll)
                         |> Tuple.second
                         |> Expect.equal Cmd.none
             , test "After the first roll, all dice have nextRoll == Keep" <|
@@ -120,14 +134,14 @@ appTests =
                         rerollFirst =
                             DiceBoard.makeDiceBoard [ reroll, keep, keep, keep, keep ]
                     in
-                    updateModel (DieFlipped 0) (modelWithDice keepAll)
+                    updateModel (DieFlipped 0) (setDice initialModel keepAll)
                         |> .dice
                         |> Expect.equal rerollFirst
             , test "`DieFlipped` does nothing if model.rollsLeft == 0" <|
                 \_ ->
                     let
                         withDice =
-                            modelWithDice keepAll
+                            setDice initialModel keepAll
 
                         outOfRolls =
                             { withDice | rollsLeft = 0 }
@@ -150,7 +164,7 @@ appTests =
                         resultingDice =
                             DiceBoard.makeDiceBoard [ keep, ( 2, Keep ), keep, ( 3, Keep ), keep ]
                     in
-                    updateModel (GotDice (Dice.PipsList incomingDice)) (modelWithDice startingDice)
+                    updateModel (GotDice (Dice.PipsList incomingDice)) (setDice initialModel startingDice)
                         |> .dice
                         |> Expect.equal resultingDice
             , test "After the first roll, we have 2 rolls remaining" <|

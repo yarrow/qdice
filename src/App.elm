@@ -32,7 +32,7 @@ type Msg
 
 rollAllowed : Model -> Bool
 rollAllowed model =
-    if model.rollsLeft == 0 then
+    if model.rollsLeft == 0 || model.turnsLeft == 0 then
         False
 
     else
