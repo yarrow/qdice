@@ -104,34 +104,31 @@ view model =
     div []
         [ header [] [ h1 [] [ text "Quarantine Dice" ] ]
         , section []
-            [ div []
-                [ viewDice model
-                , viewButton model
-                ]
+            [ viewDice model
             , viewScores model
             ]
         ]
 
 
-viewButton : Model -> Html Msg
-viewButton model =
-    if model.turnsLeft == 0 then
-        button [ class "roll-dice", onClick NewGame ] [ text "New Game" ]
-
-    else if rollAllowed model then
-        button [ class "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
-
-    else
-        button [ class "dont-roll-dice" ] [ text "Roll Dice" ]
-
-
 viewDice : Model -> Html Msg
 viewDice model =
+    let
+        theButton =
+            if model.turnsLeft == 0 then
+                button [ class "roll-dice", onClick NewGame ] [ text "New Game" ]
+
+            else if rollAllowed model then
+                button [ class "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
+
+            else
+                button [ class "dont-roll-dice" ] [ text "Roll Dice" ]
+    in
     table [ class "dice", id "dice" ] <|
         [ caption [] [ text (String.fromInt model.rollsLeft ++ " rolls remaining") ]
         , tr [] [ th [] [ text "Reroll" ], th [] [ text "Keep" ] ]
         ]
             ++ DiceBoard.display blankRow diceRow model.dice
+            ++ [ tr [ class "button-row" ] [ td [ class "dice-button", colspan 2 ] [ theButton ] ] ]
 
 
 tdDie : Dice.Die -> Html msg

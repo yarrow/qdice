@@ -1,3 +1,6 @@
+h1 {
+  font-size: 24px;
+}
 html {
     font-family: 'Barlow Semi Condensed', sans-serif;
     font-size: 14px;
@@ -7,28 +10,29 @@ section {
   flex-direction: row;
   flex-wrap: wrap;
 }
-button.roll-dice {
+button {
   background-color: #92ca17;
   border: 0;
   color: #444444;
   font-size: 24px;
   cursor: pointer;
-  padding: 10px 30px;
   font-family: 'Barlow Semi Condensed', sans-serif;
+  height: 40px;
 }
-
+tr.button-row {
+}
+td.dice-button {
+  vertical-align: bottom;
+  background-color: #ffffff;
+  padding-top: 14px;
+  padding-bottom: 7px;
+}
 button.roll-dice:hover {
   background-color: #87c512;
 }
 
 button.dont-roll-dice {
   background-color: #c8c8c8;
-  border: 0;
-  color: #888888;
-  font-size: 24px;
-  cursor: pointer;
-  padding: 10px 30px;
-  font-family: 'Barlow Semi Condensed', sans-serif;
 }
 
 .dice {
@@ -41,8 +45,8 @@ button.dont-roll-dice {
     caption-side: bottom;
 }
 .die {
-    width: 85px;
-    height: 85px;
+    width: 58px;
+    height: 58px;
     border: 2px solid #306277;
 }
 table {
@@ -69,15 +73,16 @@ td a {
 .summation-row {
     background-color: #60b5cc 
 }
+.score-row {
+    height: 33px;
+}
 .in-use {
     border: 2px solid #306277;
-    height: 25px;
-    width: 25px;
+    width: 40px;
 }
 .available {
     border: 2px solid #306277;
-    height: 25px;
-    width: 25px;
+    width: 40px;
     background-color: #a7f542;
 }
 .caption {
