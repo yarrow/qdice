@@ -118,4 +118,22 @@ diceTests =
                 in
                 DiceBoard.keepOnly (Straight [ 2, 3, 4 ]) (DiceBoard.makeDiceBoard start)
                     |> Expect.equal (DiceBoard.makeDiceBoard expected)
+        , test "suggestions Diceboard lists all the suggested diceToKeep for those dice, and the urls for the dice images" <|
+            \_ ->
+                let
+                    u n =
+                        Dice.url (Dice.dieFromPair ( n, Keep ))
+
+                    diceBoard =
+                        DiceBoard.makeDiceBoard
+                            [ ( 4, Reroll ), ( 2, Reroll ), ( 2, Keep ), ( 4, Keep ), ( 3, Reroll ) ]
+
+                    expected =
+                        [ ( OfAKind 4, [ u 4, u 4 ] )
+                        , ( OfAKind 2, [ u 2, u 2 ] )
+                        , ( Straight [ 2, 3, 4 ], [ u 2, u 3, u 4 ] )
+                        ]
+                in
+                DiceBoard.suggestions diceBoard
+                    |> Expect.equalLists expected
         ]

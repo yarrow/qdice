@@ -7,6 +7,7 @@ module DiceBoard exposing
     , makeDiceBoard
     , mergeDice
     , rollForNewDice
+    , suggestions
     , toDiceList
     , toPipsList
     )
@@ -102,20 +103,31 @@ flipNextRoll n board =
     Maybe.map (flip n) board
 
 
-keepOnly : DiceToKeep -> DiceBoard -> DiceBoard
-keepOnly suggestion diceBoard =
+suggestions : DiceBoard -> List ( DiceToKeep, List String )
+suggestions diceBoard =
+    case diceBoard of
+        Nothing ->
+            []
+
+        Just fiveDice ->
+            let
+                keepSets =
+                    Rank.suggestKeeping (toPipsList fiveDice)
+
+                keptUrls diceToKeep =
+                    justKeepOnly diceToKeep fiveDice
+                        |> toDiceList
+                        |> List.filter (\die -> Dice.nextRoll die == Keep)
+                        |> List.map Dice.url
+                        |> List.sort
+            in
+            List.map (\keep -> ( keep, keptUrls keep )) keepSets
+
+
+justKeepOnly : DiceToKeep -> FiveDice -> FiveDice
+justKeepOnly suggested (FiveDice diceList) =
     let
-        keepInDiceList suggested (FiveDice diceList) =
-            FiveDice
-                (case suggested of
-                    OfAKind pipsToKeep ->
-                        keepByPips pipsToKeep diceList
-
-                    Straight straight ->
-                        keepStraight straight diceList
-                )
-
-        keepByPips pipsToKeep diceList =
+        keepByPips pipsToKeep =
             List.map
                 (\die ->
                     if Dice.pips die == pipsToKeep then
@@ -126,7 +138,7 @@ keepOnly suggestion diceBoard =
                 )
                 diceList
 
-        keepStraight straight diceList =
+        keepStraight straight =
             let
                 straighten ( set, old, new ) =
                     case old of
@@ -155,7 +167,19 @@ keepOnly suggestion diceBoard =
             in
             List.reverse dice
     in
-    Maybe.map (keepInDiceList suggestion) diceBoard
+    FiveDice
+        (case suggested of
+            OfAKind pipsToKeep ->
+                keepByPips pipsToKeep
+
+            Straight straight ->
+                keepStraight straight
+        )
+
+
+keepOnly : DiceToKeep -> DiceBoard -> DiceBoard
+keepOnly suggestion diceBoard =
+    Maybe.map (justKeepOnly suggestion) diceBoard
 
 
 
