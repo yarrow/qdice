@@ -5,6 +5,7 @@ import DiceBoard
 import Expect
 import Fuzz exposing (intRange)
 import Random
+import Rank exposing (DiceToKeep(..))
 import Test exposing (..)
 
 
@@ -95,4 +96,26 @@ diceTests =
                     flipNextRoll 0 (Dice.fromPairs [ ( 1, Keep ), ( 2, Reroll ) ])
                         |> Expect.equal (Dice.fromPairs [ ( 1, Reroll ), ( 2, Reroll ) ])
             ]
+        , test "keepOnly (OfAKind 4) sets all dice with 4 pips to Keep and the rest to Reroll" <|
+            \_ ->
+                let
+                    start =
+                        [ ( 4, Reroll ), ( 1, Reroll ), ( 2, Keep ), ( 4, Keep ), ( 4, Reroll ) ]
+
+                    expected =
+                        [ ( 4, Keep ), ( 1, Reroll ), ( 2, Reroll ), ( 4, Keep ), ( 4, Keep ) ]
+                in
+                DiceBoard.keepOnly (OfAKind 4) (DiceBoard.makeDiceBoard start)
+                    |> Expect.equal (DiceBoard.makeDiceBoard expected)
+        , test "keepOnly (Straight [2,3,4]) sets exactly one die with 2 pips, one with 3, and one with 4 to Keep, and all other dice to Reroll" <|
+            \_ ->
+                let
+                    start =
+                        [ ( 4, Reroll ), ( 2, Reroll ), ( 2, Keep ), ( 4, Keep ), ( 3, Reroll ) ]
+
+                    expected =
+                        [ ( 4, Keep ), ( 2, Keep ), ( 2, Reroll ), ( 4, Reroll ), ( 3, Keep ) ]
+                in
+                DiceBoard.keepOnly (Straight [ 2, 3, 4 ]) (DiceBoard.makeDiceBoard start)
+                    |> Expect.equal (DiceBoard.makeDiceBoard expected)
         ]

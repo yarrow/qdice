@@ -3,6 +3,7 @@ module DiceBoard exposing
     , display
     , flipNextRoll
     , hasRerolls
+    , keepOnly
     , makeDiceBoard
     , mergeDice
     , rollForNewDice
@@ -12,6 +13,8 @@ module DiceBoard exposing
 
 import Dice exposing (DiceList, Die, NextRoll(..), PipsList(..))
 import Random exposing (Generator)
+import Rank exposing (DiceToKeep(..))
+import Set
 
 
 
@@ -97,6 +100,62 @@ flipNextRoll n board =
             \j (FiveDice dice) -> FiveDice (Dice.flipNextRoll j dice)
     in
     Maybe.map (flip n) board
+
+
+keepOnly : DiceToKeep -> DiceBoard -> DiceBoard
+keepOnly suggestion diceBoard =
+    let
+        keepInDiceList suggested (FiveDice diceList) =
+            FiveDice
+                (case suggested of
+                    OfAKind pipsToKeep ->
+                        keepByPips pipsToKeep diceList
+
+                    Straight straight ->
+                        keepStraight straight diceList
+                )
+
+        keepByPips pipsToKeep diceList =
+            List.map
+                (\die ->
+                    if Dice.pips die == pipsToKeep then
+                        Dice.dieFromPair ( pipsToKeep, Keep )
+
+                    else
+                        Dice.dieFromPair ( Dice.pips die, Reroll )
+                )
+                diceList
+
+        keepStraight straight diceList =
+            let
+                straighten ( set, old, new ) =
+                    case old of
+                        [] ->
+                            ( set, old, new )
+
+                        die :: tail ->
+                            let
+                                face =
+                                    Dice.pips die
+
+                                ( newSet, newDie ) =
+                                    if Set.member face set then
+                                        ( Set.remove face set, Dice.dieFromPair ( face, Keep ) )
+
+                                    else
+                                        ( set, Dice.dieFromPair ( face, Reroll ) )
+                            in
+                            straighten ( newSet, tail, newDie :: new )
+
+                wanted =
+                    Set.fromList straight
+
+                ( _, _, dice ) =
+                    straighten ( wanted, diceList, [] )
+            in
+            List.reverse dice
+    in
+    Maybe.map (keepInDiceList suggestion) diceBoard
 
 
 

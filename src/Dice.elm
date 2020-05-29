@@ -3,6 +3,7 @@ module Dice exposing
     , Die
     , NextRoll(..)
     , PipsList(..)
+    , dieFromPair
     , flipNextRoll
     , fromPairs
     , fromPipsList
