@@ -10,6 +10,13 @@ section {
   flex-direction: row;
   flex-wrap: wrap;
 }
+.rolls-left {
+  border: 2px solid #306277;
+  height: 25px;
+  padding: 0px 10px;
+  background-color: #ffffff;
+}
+
 button {
   background-color: #92ca17;
   border: 0;
@@ -19,8 +26,10 @@ button {
   font-family: 'Barlow Semi Condensed', sans-serif;
   height: 40px;
 }
-tr.suggestions td {
-    height: 35px
+td.suggestion {
+  height: 35px;
+  text-align: center;
+  background-color: #ffffff;
 }
 td.dice-button {
   vertical-align: bottom;

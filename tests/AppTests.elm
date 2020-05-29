@@ -242,12 +242,12 @@ appTests =
                         |> Query.count (Expect.equal 5)
             , test "The inital model shows 3 rollsLeft" <|
                 \_ ->
-                    find initialModel [ tag "caption" ]
-                        |> Query.has [ text "3 rolls remaining" ]
+                    find initialModel [ class "rolls-left" ]
+                        |> Query.has [ text "3 rolls left" ]
             , test "After the first roll, we show two rolls remaining" <|
                 \_ ->
-                    find modelAfterFirstRoll [ tag "caption" ]
-                        |> Query.has [ text "2 rolls remaining" ]
+                    find modelAfterFirstRoll [ class "rolls-left" ]
+                        |> Query.has [ text "2 rolls left" ]
             , fuzz pipsFuzz "After a roll, we see the suggested keep sets" <|
                 \pipsList ->
                     let

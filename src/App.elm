@@ -136,14 +136,18 @@ viewDice model =
 
             else
                 []
+
+        rollsLeft =
+            String.fromInt model.rollsLeft ++ " rolls left"
     in
     table [ class "dice", id "dice" ] <|
-        [ caption [] [ text (String.fromInt model.rollsLeft ++ " rolls remaining") ]
-        , tr [] [ th [] [ text "Reroll" ], th [] [ text "Keep" ] ]
-        ]
-            ++ DiceBoard.display blankRow diceRow model.dice
-            ++ [ buttonRow ]
-            ++ suggestions
+        List.concat
+            [ [ tr [] [ th [] [ text "Reroll" ], th [] [ text "Keep" ] ] ]
+            , DiceBoard.display blankRow diceRow model.dice
+            , [ tr [] [ td [ colspan 2, class "rolls-left" ] [ text rollsLeft ] ] ]
+            , [ buttonRow ]
+            , suggestions
+            ]
 
 
 suggestionRows : DiceBoard -> List (Html Msg)
@@ -158,9 +162,9 @@ suggestionRows diceBoard =
                     List.map (\u -> img [ src u ] []) urls
 
                 attrs =
-                    [ colspan 2, onClick (KeepSet diceToKeep) ]
+                    [ class "suggestion", colspan 2, onClick (KeepSet diceToKeep) ]
             in
-            tr [ class "suggestion" ] [ td attrs contents ]
+            tr [] [ td attrs contents ]
     in
     List.map suggestion suggestions
 
