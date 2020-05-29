@@ -6,7 +6,7 @@ import DiceBoard
 import Expect
 import Fuzz exposing (intRange)
 import Random
-import Rank exposing (PipsCounted(..), Rank(..), tally)
+import Rank exposing (DiceToKeep(..), PipsCounted(..), Rank(..), tally)
 import Test exposing (..)
 
 
@@ -166,4 +166,24 @@ rankTests =
                         List.map score (good ++ bad)
                 in
                 scoresFound |> Expect.equalLists expectedScores
+        , test "suggestKeeping (PipsList [1,2,4,3,4]) == [OfAKind 4, Straight [1,2,3,4]]" <|
+            \_ ->
+                Rank.suggestKeeping (PipsList [ 1, 2, 4, 3, 4 ])
+                    |> Expect.equalLists [ OfAKind 4, Straight [ 1, 2, 3, 4 ] ]
+        , test "suggestKeeping (PipsList [1,1,2,6,6]) == [OfAKind 6, OfAKind 1]" <|
+            \_ ->
+                Rank.suggestKeeping (PipsList [ 1, 1, 2, 6, 6 ])
+                    |> Expect.equalLists [ OfAKind 6, OfAKind 1 ]
+        , test "suggestKeeping (PipsList [5,5,5,5,5]) == []" <|
+            \_ ->
+                Rank.suggestKeeping (PipsList [ 5, 5, 5, 5, 5 ])
+                    |> Expect.equalLists []
+        , test "suggestKeeping (PipsList [1,2,3,4,5]) == []" <|
+            \_ ->
+                Rank.suggestKeeping (PipsList [ 1, 2, 3, 4, 5 ])
+                    |> Expect.equalLists []
+        , test "suggestKeeping (PipsList [1,6,1,6,6]) == [OfAKind 6, OfAKind 1]" <|
+            \_ ->
+                Rank.suggestKeeping (PipsList [ 1, 6, 1, 6, 6 ])
+                    |> Expect.equalLists [ OfAKind 6, OfAKind 1 ]
         ]

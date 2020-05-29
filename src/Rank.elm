@@ -1,5 +1,6 @@
 module Rank exposing
-    ( PipsCounted(..)
+    ( DiceToKeep(..)
+    , PipsCounted(..)
     , Rank(..)
     , allRanks
     , caption
@@ -7,6 +8,7 @@ module Rank exposing
     , lowerRanks
     , numberOfRanks
     , numberOfUppers
+    , suggestKeeping
     , tally
     , tallyPipsList
     , toInt
@@ -19,6 +21,57 @@ import Dice exposing (PipsList(..))
 
 type PipsCounted
     = PipsCounted (Array Int)
+
+
+type DiceToKeep
+    = Straight (List Int)
+    | OfAKind Int
+
+
+suggestKeeping : PipsList -> List DiceToKeep
+suggestKeeping pipsList =
+    let
+        counted =
+            countPips pipsList
+
+        pairOrBetter =
+            case counted of
+                PipsCounted kounted ->
+                    kounted
+                        |> Array.toList
+                        |> List.indexedMap
+                            (\pips count ->
+                                if count >= 2 && count < 5 then
+                                    pips
+
+                                else
+                                    0
+                            )
+                        |> List.filter (\n -> n > 0)
+                        |> List.map OfAKind
+
+        diceToKeep =
+            case straightSuggestion counted of
+                Just straight ->
+                    straight :: pairOrBetter
+
+                Nothing ->
+                    pairOrBetter
+    in
+    List.reverse diceToKeep
+
+
+straightSuggestion : PipsCounted -> Maybe DiceToKeep
+straightSuggestion counted =
+    let
+        ( start, length ) =
+            findRun counted
+    in
+    if length == 3 || length == 4 then
+        Just (Straight (List.range start (start + length - 1)))
+
+    else
+        Nothing
 
 
 countPips : PipsList -> PipsCounted
@@ -59,24 +112,35 @@ sumDiceIfAtLeast min counted =
         0
 
 
-longestStraight : PipsCounted -> Int
-longestStraight (PipsCounted counted) =
+findRun : PipsCounted -> ( Int, Int )
+findRun (PipsCounted counted) =
     let
-        longestRun : ( Int, Int ) -> List Int -> ( Int, Int )
-        longestRun ( thisRun, longestPreviousRun ) list =
+        find ( j, start, length ) list =
             case list of
                 [] ->
-                    ( 0, max thisRun longestPreviousRun )
+                    ( j, start, length )
 
-                head :: tail ->
-                    case head of
-                        0 ->
-                            longestRun ( 0, max thisRun longestPreviousRun ) tail
+                present :: tail ->
+                    if present > 0 then
+                        find ( j + 1, start, length + 1 ) tail
 
-                        _ ->
-                            longestRun ( thisRun + 1, longestPreviousRun ) tail
+                    else if length >= 3 then
+                        -- There are only five dice, so there can be at most
+                        -- one run of three or longer
+                        ( j, start, length )
+
+                    else
+                        find ( j + 1, j + 1, 0 ) tail
+
+        ( _, theStart, theLength ) =
+            find ( 0, 0, 0 ) (Array.toList counted)
     in
-    longestRun ( 0, 0 ) (Array.toList counted) |> Tuple.second
+    ( theStart, theLength )
+
+
+longestStraight : PipsCounted -> Int
+longestStraight counted =
+    findRun counted |> Tuple.second
 
 
 tallyPipsList : Rank -> PipsList -> Int
