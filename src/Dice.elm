@@ -14,6 +14,7 @@ module Dice exposing
     , rerollCount
     , unPip
     , url
+    , urlSmall
     )
 
 import Array
@@ -63,9 +64,19 @@ nextRoll (Die die) =
     die.nextRoll
 
 
+aUrl : String -> Die -> String
+aUrl location d =
+    location ++ "/die-" ++ String.fromInt (pips d) ++ ".png"
+
+
 url : Die -> String
-url d =
-    "assets/die-" ++ String.fromInt (pips d) ++ ".png"
+url =
+    aUrl "assets"
+
+
+urlSmall : Die -> String
+urlSmall =
+    aUrl "assets/smol"
 
 
 minPip : Int

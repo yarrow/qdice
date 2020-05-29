@@ -4,11 +4,13 @@ import App exposing (Model, Msg(..), initialModel, update, view)
 import Dice exposing (NextRoll(..))
 import DiceBoard
 import Expect
+import Fuzz
 import Html
 import Html.Attributes as Attr
 import Random
 import Rank exposing (Rank)
 import ScorePad exposing (numberOfTurns)
+import Shrink
 import Test exposing (..)
 import Test.Html.Query as Query
 import Test.Html.Selector exposing (attribute, class, id, tag, text)
@@ -41,6 +43,11 @@ updateModel msg model =
 modelAfterFirstRoll : Model
 modelAfterFirstRoll =
     updateModel (GotDice randomPipsList) initialModel
+
+
+pipsFuzz : Fuzz.Fuzzer Dice.PipsList
+pipsFuzz =
+    Fuzz.custom (DiceBoard.rollForNewDice Nothing) Shrink.noShrink
 
 
 find : Model -> List Test.Html.Selector.Selector -> Query.Single Msg
@@ -225,10 +232,6 @@ appTests =
                 \_ ->
                     findAll initialModel [ tag "img" ]
                         |> Query.count (Expect.equal 0)
-            , test "When there are dice, there are five dice" <|
-                \_ ->
-                    findAll modelAfterFirstRoll [ tag "img" ]
-                        |> Query.count (Expect.equal 5)
             , test "There are five dice rows" <|
                 \_ ->
                     findAll modelAfterFirstRoll [ tag "tr", attribute <| Attr.class "dice-row" ]
@@ -245,6 +248,30 @@ appTests =
                 \_ ->
                     find modelAfterFirstRoll [ tag "caption" ]
                         |> Query.has [ text "2 rolls remaining" ]
+            , fuzz pipsFuzz "After a roll, we see the suggested keep sets" <|
+                \pipsList ->
+                    let
+                        model =
+                            updateModel (GotDice pipsList) initialModel
+
+                        suggestions =
+                            case model.dice of
+                                Nothing ->
+                                    []
+
+                                Just fiveDice ->
+                                    Rank.suggestKeeping (DiceBoard.toPipsList fiveDice)
+                    in
+                    findAll model [ class "suggestion" ]
+                        |> Query.count (Expect.equal (List.length suggestions))
+            , test "We only see suggests keep sets if rollsLeft is nonzero" <|
+                \_ ->
+                    let
+                        model =
+                            { modelAfterFirstRoll | rollsLeft = 0 }
+                    in
+                    findAll model [ class "suggestion" ]
+                        |> Query.count (Expect.equal 0)
             ]
         , describe "Properties of viewing scores" <|
             [ describe "The scorepad with no dice" <|

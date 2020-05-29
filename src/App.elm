@@ -27,6 +27,7 @@ type Msg
     = RollDice
     | GotDice Dice.PipsList
     | DieFlipped Int
+    | KeepSet Rank.DiceToKeep
     | RecordScore Location
     | NewGame
 
@@ -75,6 +76,9 @@ update msg model =
             in
             ( newModel, Cmd.none )
 
+        KeepSet diceToKeep ->
+            ( { model | dice = DiceBoard.keepOnly diceToKeep model.dice }, Cmd.none )
+
         RecordScore ( rank, column ) ->
             let
                 scoreToInsert =
@@ -122,13 +126,47 @@ viewDice model =
 
             else
                 button [ class "dont-roll-dice" ] [ text "Roll Dice" ]
+
+        buttonRow =
+            tr [ class "button-row" ] [ td [ class "dice-button", colspan 2 ] [ theButton ] ]
+
+        suggestions =
+            if model.rollsLeft > 0 then
+                suggestionRows model.dice
+
+            else
+                []
     in
     table [ class "dice", id "dice" ] <|
         [ caption [] [ text (String.fromInt model.rollsLeft ++ " rolls remaining") ]
         , tr [] [ th [] [ text "Reroll" ], th [] [ text "Keep" ] ]
         ]
             ++ DiceBoard.display blankRow diceRow model.dice
-            ++ [ tr [ class "button-row" ] [ td [ class "dice-button", colspan 2 ] [ theButton ] ] ]
+            ++ [ buttonRow ]
+            ++ suggestions
+
+
+suggestionRows : DiceBoard -> List (Html Msg)
+suggestionRows diceBoard =
+    let
+        suggestions =
+            DiceBoard.suggestions diceBoard
+
+        suggestion ( diceToKeep, urls ) =
+            let
+                contents =
+                    List.map (\u -> img [ src u ] []) urls
+
+                attrs =
+                    [ colspan 2, onClick (KeepSet diceToKeep) ]
+            in
+            tr [ class "suggestion" ] [ td attrs contents ]
+    in
+    List.map suggestion suggestions
+
+
+
+--List.map foo (DiceBoard.suggestions diceBoard)
 
 
 tdDie : Dice.Die -> Html msg

@@ -122,7 +122,7 @@ diceTests =
             \_ ->
                 let
                     u n =
-                        Dice.url (Dice.dieFromPair ( n, Keep ))
+                        Dice.urlSmall (Dice.dieFromPair ( n, Keep ))
 
                     diceBoard =
                         DiceBoard.makeDiceBoard

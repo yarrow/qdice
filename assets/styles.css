@@ -19,7 +19,8 @@ button {
   font-family: 'Barlow Semi Condensed', sans-serif;
   height: 40px;
 }
-tr.button-row {
+tr.suggestions td {
+    height: 35px
 }
 td.dice-button {
   vertical-align: bottom;

@@ -118,7 +118,7 @@ suggestions diceBoard =
                     justKeepOnly diceToKeep fiveDice
                         |> toDiceList
                         |> List.filter (\die -> Dice.nextRoll die == Keep)
-                        |> List.map Dice.url
+                        |> List.map Dice.urlSmall
                         |> List.sort
             in
             List.map (\keep -> ( keep, keptUrls keep )) keepSets
