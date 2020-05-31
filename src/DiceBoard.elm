@@ -9,10 +9,10 @@ module DiceBoard exposing
     , rollForNewDice
     , suggestions
     , toDiceList
-    , toPipsList
+    , toPips
     )
 
-import Dice exposing (DiceList, Die, NextRoll(..), Pip, PipList, PipsList(..))
+import Dice exposing (DiceList, Die, NextRoll(..), Pip)
 import Random exposing (Generator)
 import Rank exposing (DiceToKeep(..))
 import Set
@@ -52,8 +52,8 @@ toDiceList (FiveDice dice) =
     dice
 
 
-toPipsList : FiveDice -> PipList
-toPipsList (FiveDice dice) =
+toPips : FiveDice -> List Pip
+toPips (FiveDice dice) =
     List.map .pips dice
 
 
@@ -68,7 +68,7 @@ rerollCount board =
 
 
 
--- Note that `mergeDice Nothing` depends on the incoming PipsList to
+-- Note that `mergeDice Nothing` depends on the incoming List Pip to
 -- have been generated from rollForNewDice.  If this is NOT the case,
 -- then the invariant that a FiveDice has either 0 or 5 dice will be
 -- broken. I can't think of a way around this that doesn't make things

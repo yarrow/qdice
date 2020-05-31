@@ -203,7 +203,7 @@ appTests =
                     let
                         scoreForChance =
                             modelAfterFirstRoll.dice
-                                |> Maybe.map DiceBoard.toPipsList
+                                |> Maybe.map DiceBoard.toPips
                                 |> Maybe.map (Rank.tallyPips Rank.Chance)
                     in
                     updateModel (RecordScore chance1) modelAfterFirstRoll
@@ -260,7 +260,7 @@ appTests =
                                     []
 
                                 Just fiveDice ->
-                                    Rank.suggestKeeping (DiceBoard.toPipsList fiveDice)
+                                    Rank.suggestKeeping (DiceBoard.toPips fiveDice)
                     in
                     findAll model [ class "suggestion" ]
                         |> Query.count (Expect.equal (List.length suggestions))

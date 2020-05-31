@@ -83,7 +83,7 @@ update msg model =
             let
                 scoreToInsert =
                     model.dice
-                        |> Maybe.map DiceBoard.toPipsList
+                        |> Maybe.map DiceBoard.toPips
                         |> Maybe.map (Rank.tallyPips rank)
 
                 scores =
@@ -247,7 +247,7 @@ viewScores model =
                             staticScorePad
 
                         Just dice ->
-                            activeScorePad (DiceBoard.toPipsList dice)
+                            activeScorePad (DiceBoard.toPips dice)
             in
             List.map scoreRow (getScorePad model.scores)
 
