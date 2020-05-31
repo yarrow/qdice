@@ -1,10 +1,10 @@
 module ScorePadTests exposing (fuzzTests, regularTests)
 
 import Array exposing (Array)
-import Dice exposing (Pip)
 import Dict exposing (Dict)
 import Expect
 import Fuzz
+import Pip exposing (Pip)
 import Random
 import Random.Array
 import Random.Extra
@@ -218,7 +218,7 @@ theCaptions =
 
 somePips : List Pip
 somePips =
-    Dice.pipListFromIntList [ 1, 3, 2, 5, 6 ]
+    Pip.pipListFromIntList [ 1, 3, 2, 5, 6 ]
 
 
 rolledRows : ScorePad -> List ScorePadRow

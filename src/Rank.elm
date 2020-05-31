@@ -16,7 +16,7 @@ module Rank exposing
     )
 
 import Array exposing (Array)
-import Dice exposing (Pip)
+import Pip exposing (Pip)
 
 
 type PipsCounted
@@ -79,7 +79,7 @@ countPips pipList =
     -- FIXME — We need to import maxPips instead of using the magic number 7
     let
         faces =
-            List.map Dice.pipToInt pipList
+            List.map Pip.pipToInt pipList
 
         increment jth counter =
             case Array.get jth counter of

@@ -2,79 +2,23 @@ module Dice exposing
     ( DiceList
     , Die
     , NextRoll(..)
-    , Pip
-    , PipList
     , dieFromPair
     , flipNextRoll
     , fromPairs
     , fromPips
     , mergeDice
-    , pipFromInt
-    , pipListFromIntList
-    , pipListToIntList
-    , pipToInt
-    , randomPip
     , rerollCount
     , url
     , urlSmall
     )
 
 import Array
-import Random
-
-
-
-{---- Heading for 
-
-module Pip exposing
-    ( List,
-    , Pip
-    , ...
-    )
-
------}
-
-
-type Pip
-    = Pip Int
-
-
-minPip : Int
-minPip =
-    1
-
-
-maxPip : Int
-maxPip =
-    6
-
-
-pipFromInt : Int -> Pip
-pipFromInt n =
-    Pip (clamp minPip maxPip n)
-
-
-pipToInt : Pip -> Int
-pipToInt (Pip n) =
-    n
-
-
-pipListToIntList : List Pip -> List Int
-pipListToIntList list =
-    List.map pipToInt list
-
-
-pipListFromIntList : List Int -> List Pip
-pipListFromIntList list =
-    List.map pipFromInt list
-
-
-type alias PipList =
-    List Pip
-
-
-
---- The Die type (singular of Dice, not opposite of Live ^_^)
+import Pip
+    exposing
+        ( Pip
+        , pipFromInt
+        , pipToInt
+        )
 
 
 type alias Die =
@@ -104,6 +48,13 @@ flipRoll die =
     }
 
 
+dieFromPair : ( Int, NextRoll ) -> Die
+dieFromPair ( n, nextStatus ) =
+    { pips = pipFromInt n
+    , nextRoll = nextStatus
+    }
+
+
 aUrl : String -> Die -> String
 aUrl location d =
     location ++ "/die-" ++ String.fromInt (pipToInt d.pips) ++ ".png"
@@ -117,23 +68,6 @@ url =
 urlSmall : Die -> String
 urlSmall =
     aUrl "assets/smol"
-
-
-randomPip : Random.Generator Pip
-randomPip =
-    Random.map Pip (Random.int minPip maxPip)
-
-
-dieFromPair : ( Int, NextRoll ) -> Die
-dieFromPair ( n, nextStatus ) =
-    { pips = pipFromInt n
-    , nextRoll = nextStatus
-    }
-
-
-dieFromInt : Int -> Die
-dieFromInt n =
-    dieFromPair ( n, Keep )
 
 
 

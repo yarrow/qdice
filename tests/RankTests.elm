@@ -1,10 +1,10 @@
 module RankTests exposing (rankTests)
 
 import Array
-import Dice exposing (Pip)
 import DiceBoard
 import Expect
 import Fuzz exposing (intRange)
+import Pip exposing (Pip)
 import Random
 import Rank exposing (DiceToKeep(..), PipsCounted(..), Rank(..), tally)
 import Test exposing (..)
@@ -12,7 +12,7 @@ import Test exposing (..)
 
 pipify : List Int -> List Pip
 pipify list =
-    Dice.pipListFromIntList list
+    Pip.pipListFromIntList list
 
 
 diceCount : List Int -> PipsCounted
@@ -35,7 +35,7 @@ diceFromSeed seed =
 
 sumDice : List Pip -> Int
 sumDice pips =
-    List.sum (Dice.pipListToIntList pips)
+    List.sum (Pip.pipListToIntList pips)
 
 
 ofAKind : List Pip -> Int
@@ -67,7 +67,7 @@ rankTests =
                     countTimesVal pips val =
                         let
                             faces =
-                                Dice.pipListToIntList pips
+                                Pip.pipListToIntList pips
                         in
                         val * List.length (List.filter (\n -> n == val) faces)
 

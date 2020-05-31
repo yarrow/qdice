@@ -1,9 +1,10 @@
 module DiceTests exposing (diceTests)
 
-import Dice exposing (NextRoll(..), Pip, flipNextRoll)
+import Dice exposing (NextRoll(..), flipNextRoll)
 import DiceBoard
 import Expect
 import Fuzz exposing (intRange)
+import Pip exposing (Pip)
 import Random
 import Rank exposing (DiceToKeep(..))
 import Test exposing (..)
@@ -16,7 +17,7 @@ diceTests =
             \n ->
                 let
                     die =
-                        { pips = Dice.pipFromInt n, nextRoll = Keep }
+                        { pips = Pip.pipFromInt n, nextRoll = Keep }
 
                     theUrl =
                         Dice.url die

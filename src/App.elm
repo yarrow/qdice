@@ -6,6 +6,7 @@ import DiceBoard exposing (DiceBoard)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
+import Pip exposing (Pip)
 import Random
 import Rank
 import ScorePad
@@ -25,7 +26,7 @@ import ScorePad
 
 type Msg
     = RollDice
-    | GotDice (List Dice.Pip)
+    | GotDice (List Pip)
     | DieFlipped Int
     | KeepSet Rank.DiceToKeep
     | RecordScore Location

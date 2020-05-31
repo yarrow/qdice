@@ -7,6 +7,7 @@ import Expect
 import Fuzz
 import Html
 import Html.Attributes as Attr
+import Pip exposing (Pip)
 import Random
 import Rank exposing (Rank)
 import ScorePad exposing (numberOfTurns)
@@ -25,7 +26,7 @@ chance1 =
     ( Rank.Chance, 1 )
 
 
-randomPips : List Dice.Pip
+randomPips : List Pip
 randomPips =
     Random.step (DiceBoard.rollForNewDice Nothing) (Random.initialSeed 0) |> Tuple.first
 
@@ -45,7 +46,7 @@ modelAfterFirstRoll =
     updateModel (GotDice randomPips) initialModel
 
 
-pipsFuzz : Fuzz.Fuzzer (List Dice.Pip)
+pipsFuzz : Fuzz.Fuzzer (List Pip)
 pipsFuzz =
     Fuzz.custom (DiceBoard.rollForNewDice Nothing) Shrink.noShrink
 
@@ -171,7 +172,7 @@ appTests =
                         resultingDice =
                             DiceBoard.makeDiceBoard [ keep, ( 2, Keep ), keep, ( 3, Keep ), keep ]
                     in
-                    updateModel (GotDice (Dice.pipListFromIntList incomingDice)) (setDice initialModel startingDice)
+                    updateModel (GotDice (Pip.pipListFromIntList incomingDice)) (setDice initialModel startingDice)
                         |> .dice
                         |> Expect.equal resultingDice
             , test "After the first roll, we have 2 rolls remaining" <|

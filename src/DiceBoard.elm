@@ -12,7 +12,8 @@ module DiceBoard exposing
     , toPips
     )
 
-import Dice exposing (DiceList, Die, NextRoll(..), Pip)
+import Dice exposing (DiceList, Die, NextRoll(..))
+import Pip exposing (Pip)
 import Random exposing (Generator)
 import Rank exposing (DiceToKeep(..))
 import Set
@@ -87,7 +88,7 @@ mergeDice incoming current =
 
 rollForNewDice : DiceBoard -> Generator (List Pip)
 rollForNewDice diceBoard =
-    Random.list (rerollCount diceBoard) Dice.randomPip
+    Random.list (rerollCount diceBoard) Pip.randomPip
 
 
 hasRerolls : DiceBoard -> Bool
@@ -139,7 +140,7 @@ justKeepOnly suggested (FiveDice diceList) =
                 (\die ->
                     { die
                         | nextRoll =
-                            if Dice.pipToInt die.pips == pipsToKeep then
+                            if Pip.pipToInt die.pips == pipsToKeep then
                                 Keep
 
                             else
@@ -159,7 +160,7 @@ justKeepOnly suggested (FiveDice diceList) =
                         die :: tail ->
                             let
                                 face =
-                                    Dice.pipToInt die.pips
+                                    Pip.pipToInt die.pips
 
                                 ( newSet, newDie ) =
                                     if Set.member face set then

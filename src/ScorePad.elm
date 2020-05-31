@@ -21,7 +21,7 @@ module ScorePad exposing
     )
 
 import Array exposing (Array)
-import Dice exposing (Pip)
+import Pip exposing (Pip)
 import Rank
     exposing
         ( Rank(..)
