@@ -12,7 +12,7 @@ module DiceBoard exposing
     , toPipsList
     )
 
-import Dice exposing (DiceList, Die, NextRoll(..), PipList, PipsList(..))
+import Dice exposing (DiceList, Die, NextRoll(..), Pip, PipList, PipsList(..))
 import Random exposing (Generator)
 import Rank exposing (DiceToKeep(..))
 import Set
@@ -68,25 +68,26 @@ rerollCount board =
 
 
 
--- Note that mergeDice depends on the incoming PipsList to have been
--- generated from rollForNewDice.  If this is NOT the case, then the
--- invariant that a FiveDice has either 0 or 5 dice will be broken.
--- I can't think of a way around this that doesn't make things worse.
+-- Note that `mergeDice Nothing` depends on the incoming PipsList to
+-- have been generated from rollForNewDice.  If this is NOT the case,
+-- then the invariant that a FiveDice has either 0 or 5 dice will be
+-- broken. I can't think of a way around this that doesn't make things
+-- worse.
 
 
-mergeDice : PipsList -> DiceBoard -> FiveDice
+mergeDice : List Pip -> DiceBoard -> FiveDice
 mergeDice incoming current =
     case current of
         Nothing ->
-            FiveDice (Dice.fromPipsList incoming)
+            FiveDice (Dice.fromPips incoming)
 
         Just (FiveDice oldDice) ->
             FiveDice (Dice.mergeDice incoming oldDice)
 
 
-rollForNewDice : DiceBoard -> Generator PipsList
+rollForNewDice : DiceBoard -> Generator (List Pip)
 rollForNewDice diceBoard =
-    Random.map PipsList (Random.list (rerollCount diceBoard) Dice.randomPip)
+    Random.list (rerollCount diceBoard) Dice.randomPip
 
 
 hasRerolls : DiceBoard -> Bool

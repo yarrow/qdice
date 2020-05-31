@@ -25,7 +25,7 @@ chance1 =
     ( Rank.Chance, 1 )
 
 
-randomPipsList : Dice.PipsList
+randomPipsList : List Dice.Pip
 randomPipsList =
     Random.step (DiceBoard.rollForNewDice Nothing) (Random.initialSeed 0) |> Tuple.first
 
@@ -45,7 +45,7 @@ modelAfterFirstRoll =
     updateModel (GotDice randomPipsList) initialModel
 
 
-pipsFuzz : Fuzz.Fuzzer Dice.PipsList
+pipsFuzz : Fuzz.Fuzzer (List Dice.Pip)
 pipsFuzz =
     Fuzz.custom (DiceBoard.rollForNewDice Nothing) Shrink.noShrink
 
@@ -171,7 +171,7 @@ appTests =
                         resultingDice =
                             DiceBoard.makeDiceBoard [ keep, ( 2, Keep ), keep, ( 3, Keep ), keep ]
                     in
-                    updateModel (GotDice (Dice.PipsList incomingDice)) (setDice initialModel startingDice)
+                    updateModel (GotDice (Dice.pipListFromIntList incomingDice)) (setDice initialModel startingDice)
                         |> .dice
                         |> Expect.equal resultingDice
             , test "After the first roll, we have 2 rolls remaining" <|

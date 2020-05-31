@@ -1,6 +1,6 @@
 module DiceTests exposing (diceTests)
 
-import Dice exposing (NextRoll(..), PipsList(..), flipNextRoll, unPip)
+import Dice exposing (NextRoll(..), Pip, PipsList(..), flipNextRoll)
 import DiceBoard
 import Expect
 import Fuzz exposing (intRange)
@@ -62,10 +62,10 @@ diceTests =
                     |> Expect.true ("Expected to see " ++ fragment)
         , describe "`rollForNewDice diceBoard` returns a generator for the appropriate number of new dice for diceBoard" <|
             let
+                numberRolled : Random.Generator (List Pip) -> Int
                 numberRolled diceRoller =
                     Random.step diceRoller (Random.initialSeed 42)
                         |> Tuple.first
-                        |> unPip
                         |> List.length
             in
             [ test "`rollForNewDice emptyBoard` returns a 5-dice generator" <|

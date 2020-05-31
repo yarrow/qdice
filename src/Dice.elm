@@ -8,10 +8,12 @@ module Dice exposing
     , dieFromPair
     , flipNextRoll
     , fromPairs
+    , fromPips
     , fromPipsList
     , mergeDice
     , pipFromInt
     , pipListFromIntList
+    , pipListToIntList
     , pipToInt
     , randomPip
     , rerollCount
@@ -61,8 +63,8 @@ pipToInt (Pip n) =
     n
 
 
-pipToIntList : List Pip -> List Int
-pipToIntList list =
+pipListToIntList : List Pip -> List Int
+pipListToIntList list =
     List.map pipToInt list
 
 
@@ -121,9 +123,9 @@ urlSmall =
     aUrl "assets/smol"
 
 
-randomPip : Random.Generator Int
+randomPip : Random.Generator Pip
 randomPip =
-    Random.int minPip maxPip
+    Random.map Pip (Random.int minPip maxPip)
 
 
 dieFromPair : ( Int, NextRoll ) -> Die
@@ -165,8 +167,18 @@ fromPipsList (PipsList pipsList) =
     List.map dieFromInt pipsList
 
 
-mergeDice : PipsList -> DiceList -> DiceList
-mergeDice (PipsList incoming) current =
+fromPips : List Pip -> DiceList
+fromPips pips =
+    List.map dieFromPip pips
+
+
+dieFromPip : Pip -> Die
+dieFromPip pip =
+    { pips = pip, nextRoll = Keep }
+
+
+mergeDice : List Pip -> DiceList -> DiceList
+mergeDice incoming current =
     case ( incoming, current ) of
         ( [], _ ) ->
             current
@@ -177,10 +189,10 @@ mergeDice (PipsList incoming) current =
         ( new :: tailIncoming, old :: tailCurrent ) ->
             case old.nextRoll of
                 Keep ->
-                    old :: mergeDice (PipsList incoming) tailCurrent
+                    old :: mergeDice incoming tailCurrent
 
                 Reroll ->
-                    dieFromInt new :: mergeDice (PipsList tailIncoming) tailCurrent
+                    dieFromPip new :: mergeDice tailIncoming tailCurrent
 
 
 rerollCount : DiceList -> Int

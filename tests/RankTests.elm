@@ -1,7 +1,7 @@
 module RankTests exposing (rankTests)
 
 import Array
-import Dice exposing (Pip, PipsList(..))
+import Dice exposing (Pip)
 import DiceBoard
 import Expect
 import Fuzz exposing (intRange)
@@ -20,7 +20,7 @@ diceCount list =
     Rank.countPips (pipify list)
 
 
-diceFromSeed : Int -> ( PipsList, Rank.PipsCounted )
+diceFromSeed : Int -> ( List Pip, Rank.PipsCounted )
 diceFromSeed seed =
     let
         dice =
@@ -28,21 +28,21 @@ diceFromSeed seed =
                 |> Tuple.first
 
         counted =
-            Rank.countPips (Dice.singular dice)
+            Rank.countPips dice
     in
     ( dice, counted )
 
 
-sumDice : PipsList -> Int
-sumDice (PipsList dice) =
-    List.sum dice
+sumDice : List Pip -> Int
+sumDice pips =
+    List.sum (Dice.pipListToIntList pips)
 
 
-ofAKind : PipsList -> Int
-ofAKind dice =
+ofAKind : List Pip -> Int
+ofAKind pips =
     let
         counted =
-            (\(PipsCounted x) -> x) (Rank.countPips <| Dice.singular dice)
+            (\(PipsCounted x) -> x) (Rank.countPips <| pips)
     in
     Maybe.withDefault 0 (List.maximum (Array.toList counted))
 
@@ -64,8 +64,12 @@ rankTests =
                     ( dice, counted ) =
                         diceFromSeed seed
 
-                    countTimesVal (PipsList pipsList) val =
-                        val * List.length (List.filter (\n -> n == val) pipsList)
+                    countTimesVal pips val =
+                        let
+                            faces =
+                                Dice.pipListToIntList pips
+                        in
+                        val * List.length (List.filter (\n -> n == val) faces)
 
                     expected =
                         List.map (countTimesVal dice) [ 1, 2, 3, 4, 5, 6 ]

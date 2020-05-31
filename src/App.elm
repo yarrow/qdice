@@ -25,7 +25,7 @@ import ScorePad
 
 type Msg
     = RollDice
-    | GotDice Dice.PipsList
+    | GotDice (List Dice.Pip)
     | DieFlipped Int
     | KeepSet Rank.DiceToKeep
     | RecordScore Location
