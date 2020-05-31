@@ -12,7 +12,7 @@ module DiceBoard exposing
     , toPipsList
     )
 
-import Dice exposing (DiceList, Die, NextRoll(..), PipsList(..))
+import Dice exposing (DiceList, Die, NextRoll(..), PipList, PipsList(..))
 import Random exposing (Generator)
 import Rank exposing (DiceToKeep(..))
 import Set
@@ -52,9 +52,9 @@ toDiceList (FiveDice dice) =
     dice
 
 
-toPipsList : FiveDice -> PipsList
+toPipsList : FiveDice -> PipList
 toPipsList (FiveDice dice) =
-    PipsList (List.map Dice.pips dice)
+    List.map .pips dice
 
 
 rerollCount : DiceBoard -> Int
@@ -112,16 +112,22 @@ suggestions diceBoard =
         Just fiveDice ->
             let
                 keepSets =
-                    Rank.suggestKeeping (toPipsList fiveDice)
+                    case fiveDice of
+                        FiveDice diceList ->
+                            Rank.suggestKeeping (List.map .pips diceList)
 
                 keptUrls diceToKeep =
                     justKeepOnly diceToKeep fiveDice
                         |> toDiceList
-                        |> List.filter (\die -> Dice.nextRoll die == Keep)
+                        |> List.filter (\die -> die.nextRoll == Keep)
                         |> List.map Dice.urlSmall
                         |> List.sort
             in
             List.map (\keep -> ( keep, keptUrls keep )) keepSets
+
+
+type alias Args =
+    ( Set.Set Int, DiceList, DiceList )
 
 
 justKeepOnly : DiceToKeep -> FiveDice -> FiveDice
@@ -130,16 +136,20 @@ justKeepOnly suggested (FiveDice diceList) =
         keepByPips pipsToKeep =
             List.map
                 (\die ->
-                    if Dice.pips die == pipsToKeep then
-                        Dice.dieFromPair ( pipsToKeep, Keep )
+                    { die
+                        | nextRoll =
+                            if Dice.pipToInt die.pips == pipsToKeep then
+                                Keep
 
-                    else
-                        Dice.dieFromPair ( Dice.pips die, Reroll )
+                            else
+                                Reroll
+                    }
                 )
                 diceList
 
         keepStraight straight =
             let
+                straighten : Args -> Args
                 straighten ( set, old, new ) =
                     case old of
                         [] ->
@@ -148,14 +158,14 @@ justKeepOnly suggested (FiveDice diceList) =
                         die :: tail ->
                             let
                                 face =
-                                    Dice.pips die
+                                    Dice.pipToInt die.pips
 
                                 ( newSet, newDie ) =
                                     if Set.member face set then
-                                        ( Set.remove face set, Dice.dieFromPair ( face, Keep ) )
+                                        ( Set.remove face set, { die | nextRoll = Keep } )
 
                                     else
-                                        ( set, Dice.dieFromPair ( face, Reroll ) )
+                                        ( set, { die | nextRoll = Reroll } )
                             in
                             straighten ( newSet, tail, newDie :: new )
 

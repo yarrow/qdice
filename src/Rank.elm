@@ -16,7 +16,7 @@ module Rank exposing
     )
 
 import Array exposing (Array)
-import Dice exposing (PipsList(..))
+import Dice exposing (Pip, PipsList(..))
 
 
 type PipsCounted
@@ -28,11 +28,11 @@ type DiceToKeep
     | OfAKind Int
 
 
-suggestKeeping : PipsList -> List DiceToKeep
-suggestKeeping pipsList =
+suggestKeeping : List Pip -> List DiceToKeep
+suggestKeeping pipList =
     let
         counted =
-            countPips pipsList
+            countPips pipList
 
         pairOrBetter =
             case counted of
@@ -74,9 +74,13 @@ straightSuggestion counted =
         Nothing
 
 
-countPips : PipsList -> PipsCounted
-countPips (PipsList dice) =
+countPips : List Pip -> PipsCounted
+countPips pipList =
+    -- FIXME — We need to import maxPips instead of using the magic number 7
     let
+        faces =
+            List.map Dice.pipToInt pipList
+
         increment jth counter =
             case Array.get jth counter of
                 Just old ->
@@ -85,7 +89,7 @@ countPips (PipsList dice) =
                 Nothing ->
                     counter
     in
-    PipsCounted (List.foldr increment (Array.repeat 7 0) dice)
+    PipsCounted (List.foldr increment (Array.repeat 7 0) faces)
 
 
 valueTimesCount : Int -> PipsCounted -> Int
@@ -143,9 +147,9 @@ longestStraight counted =
     findRun counted |> Tuple.second
 
 
-tallyPipsList : Rank -> PipsList -> Int
-tallyPipsList rank pipsList =
-    tally rank (countPips pipsList)
+tallyPipsList : Rank -> List Pip -> Int
+tallyPipsList rank pipList =
+    tally rank (countPips pipList)
 
 
 nWhen : Int -> Bool -> Int

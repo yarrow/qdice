@@ -14,7 +14,7 @@ diceTests =
     describe "Tests for Dice.elm and DiceBoard.elm" <|
         let
             nextRolls dice =
-                List.map (\die -> Dice.nextRoll die) dice
+                List.map (\die -> die.nextRoll) dice
         in
         [ test "fromPipsList clamps the pips value to 1-6" <|
             \_ ->
@@ -23,9 +23,9 @@ diceTests =
                         Dice.fromPipsList (PipsList [ 0, 1, 2, 3, 4, 5, 6, 7, 49, -82 ])
 
                     clamped =
-                        [ 1, 1, 2, 3, 4, 5, 6, 6, 6, 1 ]
+                        Dice.pipListFromIntList [ 1, 1, 2, 3, 4, 5, 6, 6, 6, 1 ]
                 in
-                List.map Dice.pips result |> Expect.equal clamped
+                List.map .pips result |> Expect.equal clamped
         , test "fromPipsList uses Keep for every die" <|
             \_ ->
                 let

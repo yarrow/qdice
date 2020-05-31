@@ -1,7 +1,7 @@
 module RankTests exposing (rankTests)
 
 import Array
-import Dice exposing (PipsList(..))
+import Dice exposing (Pip, PipsList(..))
 import DiceBoard
 import Expect
 import Fuzz exposing (intRange)
@@ -10,9 +10,14 @@ import Rank exposing (DiceToKeep(..), PipsCounted(..), Rank(..), tally)
 import Test exposing (..)
 
 
+pipify : List Int -> List Pip
+pipify list =
+    Dice.pipListFromIntList list
+
+
 diceCount : List Int -> PipsCounted
 diceCount list =
-    Rank.countPips (PipsList list)
+    Rank.countPips (pipify list)
 
 
 diceFromSeed : Int -> ( PipsList, Rank.PipsCounted )
@@ -23,7 +28,7 @@ diceFromSeed seed =
                 |> Tuple.first
 
         counted =
-            Rank.countPips dice
+            Rank.countPips (Dice.singular dice)
     in
     ( dice, counted )
 
@@ -37,7 +42,7 @@ ofAKind : PipsList -> Int
 ofAKind dice =
     let
         counted =
-            (\(PipsCounted x) -> x) (Rank.countPips dice)
+            (\(PipsCounted x) -> x) (Rank.countPips <| Dice.singular dice)
     in
     Maybe.withDefault 0 (List.maximum (Array.toList counted))
 
@@ -166,24 +171,24 @@ rankTests =
                         List.map score (good ++ bad)
                 in
                 scoresFound |> Expect.equalLists expectedScores
-        , test "suggestKeeping (PipsList [1,2,4,3,4]) == [OfAKind 4, Straight [1,2,3,4]]" <|
+        , test "suggestKeeping (pipify [1,2,4,3,4]) == [OfAKind 4, Straight [1,2,3,4]]" <|
             \_ ->
-                Rank.suggestKeeping (PipsList [ 1, 2, 4, 3, 4 ])
+                Rank.suggestKeeping (pipify [ 1, 2, 4, 3, 4 ])
                     |> Expect.equalLists [ OfAKind 4, Straight [ 1, 2, 3, 4 ] ]
-        , test "suggestKeeping (PipsList [1,1,2,6,6]) == [OfAKind 6, OfAKind 1]" <|
+        , test "suggestKeeping (pipify [1,1,2,6,6]) == [OfAKind 6, OfAKind 1]" <|
             \_ ->
-                Rank.suggestKeeping (PipsList [ 1, 1, 2, 6, 6 ])
+                Rank.suggestKeeping (pipify [ 1, 1, 2, 6, 6 ])
                     |> Expect.equalLists [ OfAKind 6, OfAKind 1 ]
-        , test "suggestKeeping (PipsList [5,5,5,5,5]) == []" <|
+        , test "suggestKeeping (pipify [5,5,5,5,5]) == []" <|
             \_ ->
-                Rank.suggestKeeping (PipsList [ 5, 5, 5, 5, 5 ])
+                Rank.suggestKeeping (pipify [ 5, 5, 5, 5, 5 ])
                     |> Expect.equalLists []
-        , test "suggestKeeping (PipsList [1,2,3,4,5]) == []" <|
+        , test "suggestKeeping (pipify [1,2,3,4,5]) == []" <|
             \_ ->
-                Rank.suggestKeeping (PipsList [ 1, 2, 3, 4, 5 ])
+                Rank.suggestKeeping (pipify [ 1, 2, 3, 4, 5 ])
                     |> Expect.equalLists []
-        , test "suggestKeeping (PipsList [1,6,1,6,6]) == [OfAKind 6, OfAKind 1]" <|
+        , test "suggestKeeping (pipify [1,6,1,6,6]) == [OfAKind 6, OfAKind 1]" <|
             \_ ->
-                Rank.suggestKeeping (PipsList [ 1, 6, 1, 6, 6 ])
+                Rank.suggestKeeping (pipify [ 1, 6, 1, 6, 6 ])
                     |> Expect.equalLists [ OfAKind 6, OfAKind 1 ]
         ]

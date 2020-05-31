@@ -21,7 +21,7 @@ module ScorePad exposing
     )
 
 import Array exposing (Array)
-import Dice exposing (PipsList(..))
+import Dice exposing (Pip, PipsList(..))
 import Rank
     exposing
         ( Rank(..)
@@ -160,9 +160,9 @@ staticScorePad scores =
     makeScorePad staticScoreRows scores
 
 
-activeScorePad : PipsList -> Scores -> ScorePad
-activeScorePad pipsList scores =
-    makeScorePad (activeScoreRows pipsList) scores
+activeScorePad : List Pip -> Scores -> ScorePad
+activeScorePad pipList scores =
+    makeScorePad (activeScoreRows pipList) scores
 
 
 staticScoreRows : List Rank -> Scores -> List ScorePadRow
@@ -180,7 +180,7 @@ staticScoreRows ranks scores =
     List.map staticRow ranks
 
 
-activeScoreRows : PipsList -> List Rank -> Scores -> List ScorePadRow
+activeScoreRows : List Pip -> List Rank -> Scores -> List ScorePadRow
 activeScoreRows pipsList ranks scores =
     let
         counted =

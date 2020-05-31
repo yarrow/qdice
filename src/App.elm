@@ -181,7 +181,7 @@ tdDie d =
 diceRow : Int -> Dice.Die -> Html Msg
 diceRow j d =
     tr [ class "dice-row", onClick (DieFlipped j) ] <|
-        case Dice.nextRoll d of
+        case d.nextRoll of
             Dice.Keep ->
                 [ tdBlank, tdDie d ]
 

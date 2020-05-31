@@ -124,7 +124,7 @@ appTests =
                 \_ ->
                     let
                         allKeep diceList =
-                            List.all (\d -> Dice.nextRoll d == Keep) diceList
+                            List.all (\d -> d.nextRoll == Keep) diceList
 
                         passed =
                             case modelAfterFirstRoll.dice of

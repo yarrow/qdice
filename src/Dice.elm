@@ -2,16 +2,21 @@ module Dice exposing
     ( DiceList
     , Die
     , NextRoll(..)
+    , Pip
+    , PipList
     , PipsList(..)
     , dieFromPair
     , flipNextRoll
     , fromPairs
     , fromPipsList
     , mergeDice
-    , nextRoll
-    , pips
+    , pipFromInt
+    , pipListFromIntList
+    , pipToInt
+    , plural
     , randomPip
     , rerollCount
+    , singular
     , unPip
     , url
     , urlSmall
@@ -22,61 +27,19 @@ import Random
 
 
 
---- The Die type (singular of Dice, not opposite of Live ^_^)
+{---- Heading for 
+
+module Pip exposing
+    ( List,
+    , Pip
+    , ...
+    )
+
+-----}
 
 
-type Die
-    = Die
-        { pips : Int
-        , nextRoll : NextRoll
-        }
-
-
-type
-    NextRoll
-    -- On the next roll, do we Keep this die on the board, or do we put it back in the dice
-    -- cup to Reroll it?
-    = Keep
-    | Reroll
-
-
-flipRoll : Die -> Die
-flipRoll (Die die) =
-    Die
-        { die
-            | nextRoll =
-                case die.nextRoll of
-                    Keep ->
-                        Reroll
-
-                    Reroll ->
-                        Keep
-        }
-
-
-pips : Die -> Int
-pips (Die die) =
-    die.pips
-
-
-nextRoll : Die -> NextRoll
-nextRoll (Die die) =
-    die.nextRoll
-
-
-aUrl : String -> Die -> String
-aUrl location d =
-    location ++ "/die-" ++ String.fromInt (pips d) ++ ".png"
-
-
-url : Die -> String
-url =
-    aUrl "assets"
-
-
-urlSmall : Die -> String
-urlSmall =
-    aUrl "assets/smol"
+type Pip
+    = Pip Int
 
 
 minPip : Int
@@ -89,6 +52,76 @@ maxPip =
     6
 
 
+pipFromInt : Int -> Pip
+pipFromInt n =
+    Pip (clamp minPip maxPip n)
+
+
+pipToInt : Pip -> Int
+pipToInt (Pip n) =
+    n
+
+
+pipToIntList : List Pip -> List Int
+pipToIntList list =
+    List.map pipToInt list
+
+
+pipListFromIntList : List Int -> List Pip
+pipListFromIntList list =
+    List.map pipFromInt list
+
+
+type alias PipList =
+    List Pip
+
+
+
+--- The Die type (singular of Dice, not opposite of Live ^_^)
+
+
+type alias Die =
+    { pips : Pip
+    , nextRoll : NextRoll
+    }
+
+
+type
+    NextRoll
+    -- On the next roll, do we Keep this die on the board, or do we put it back in the dice
+    -- cup to Reroll it?
+    = Keep
+    | Reroll
+
+
+flipRoll : Die -> Die
+flipRoll die =
+    { die
+        | nextRoll =
+            case die.nextRoll of
+                Keep ->
+                    Reroll
+
+                Reroll ->
+                    Keep
+    }
+
+
+aUrl : String -> Die -> String
+aUrl location d =
+    location ++ "/die-" ++ String.fromInt (pipToInt d.pips) ++ ".png"
+
+
+url : Die -> String
+url =
+    aUrl "assets"
+
+
+urlSmall : Die -> String
+urlSmall =
+    aUrl "assets/smol"
+
+
 randomPip : Random.Generator Int
 randomPip =
     Random.int minPip maxPip
@@ -96,10 +129,9 @@ randomPip =
 
 dieFromPair : ( Int, NextRoll ) -> Die
 dieFromPair ( n, nextStatus ) =
-    Die
-        { pips = clamp minPip maxPip n
-        , nextRoll = nextStatus
-        }
+    { pips = pipFromInt n
+    , nextRoll = nextStatus
+    }
 
 
 dieFromInt : Int -> Die
@@ -117,6 +149,16 @@ type alias DiceList =
 
 type PipsList
     = PipsList (List Int)
+
+
+plural : List Pip -> PipsList
+plural list =
+    PipsList (List.map pipToInt list)
+
+
+singular : PipsList -> List Pip
+singular (PipsList pipsList) =
+    List.map pipFromInt pipsList
 
 
 unPip : PipsList -> List Int
@@ -139,7 +181,7 @@ mergeDice (PipsList incoming) current =
             []
 
         ( new :: tailIncoming, old :: tailCurrent ) ->
-            case nextRoll old of
+            case old.nextRoll of
                 Keep ->
                     old :: mergeDice (PipsList incoming) tailCurrent
 
@@ -149,7 +191,7 @@ mergeDice (PipsList incoming) current =
 
 rerollCount : DiceList -> Int
 rerollCount dice =
-    List.length (List.filter (\die -> nextRoll die == Reroll) dice)
+    List.length (List.filter (\die -> die.nextRoll == Reroll) dice)
 
 
 flipNextRoll : Int -> DiceList -> DiceList
