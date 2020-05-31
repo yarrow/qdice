@@ -148,6 +148,15 @@ tallyPipsList rank pipsList =
     tally rank (countPips pipsList)
 
 
+nWhen : Int -> Bool -> Int
+nWhen n condition =
+    if condition then
+        n
+
+    else
+        0
+
+
 tally : Rank -> PipsCounted -> Int
 tally rank =
     case rank of
@@ -184,35 +193,16 @@ tally rank =
                     hasPair (PipsCounted kounted) =
                         List.any (\count -> count == 2) (Array.toList kounted)
                 in
-                if max == 5 || (max == 3 && hasPair counted) then
-                    25
-
-                else
-                    0
+                nWhen 25 (max == 5 || (max == 3 && hasPair counted))
 
         SmallStraight ->
-            \counted ->
-                if longestStraight counted >= 4 then
-                    30
-
-                else
-                    0
+            \counted -> nWhen 30 (longestStraight counted >= 4)
 
         LargeStraight ->
-            \counted ->
-                if longestStraight counted == 5 then
-                    40
-
-                else
-                    0
+            \counted -> nWhen 40 (longestStraight counted == 5)
 
         FiveOfAKind ->
-            \(PipsCounted counted) ->
-                if List.any (\n -> n == 5) (Array.toList counted) then
-                    50
-
-                else
-                    0
+            \(PipsCounted counted) -> nWhen 50 (List.any (\n -> n == 5) (Array.toList counted))
 
         Chance ->
             sumDice
