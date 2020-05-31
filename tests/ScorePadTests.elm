@@ -218,7 +218,7 @@ theCaptions =
 
 somePips : List Pip
 somePips =
-    Pip.pipListFromIntList [ 1, 3, 2, 5, 6 ]
+    Pip.mapFromInt [ 1, 3, 2, 5, 6 ]
 
 
 rolledRows : ScorePad -> List ScorePadRow

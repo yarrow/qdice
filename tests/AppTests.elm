@@ -172,7 +172,7 @@ appTests =
                         resultingDice =
                             DiceBoard.makeDiceBoard [ keep, ( 2, Keep ), keep, ( 3, Keep ), keep ]
                     in
-                    updateModel (GotDice (Pip.pipListFromIntList incomingDice)) (setDice initialModel startingDice)
+                    updateModel (GotDice (Pip.mapFromInt incomingDice)) (setDice initialModel startingDice)
                         |> .dice
                         |> Expect.equal resultingDice
             , test "After the first roll, we have 2 rolls remaining" <|

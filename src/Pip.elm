@@ -1,8 +1,8 @@
 module Pip exposing
     ( Pip
     , fromInt
-    , pipListFromIntList
-    , pipListToIntList
+    , mapFromInt
+    , mapToInt
     , randomPip
     , toInt
     )
@@ -35,13 +35,13 @@ toInt (Pip n) =
     n
 
 
-pipListToIntList : List Pip -> List Int
-pipListToIntList list =
+mapToInt : List Pip -> List Int
+mapToInt list =
     List.map toInt list
 
 
-pipListFromIntList : List Int -> List Pip
-pipListFromIntList list =
+mapFromInt : List Int -> List Pip
+mapFromInt list =
     List.map fromInt list
 
 
