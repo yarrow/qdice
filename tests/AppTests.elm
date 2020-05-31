@@ -204,7 +204,7 @@ appTests =
                         scoreForChance =
                             modelAfterFirstRoll.dice
                                 |> Maybe.map DiceBoard.toPipsList
-                                |> Maybe.map (Rank.tallyPipsList Rank.Chance)
+                                |> Maybe.map (Rank.tallyPips Rank.Chance)
                     in
                     updateModel (RecordScore chance1) modelAfterFirstRoll
                         |> .scores

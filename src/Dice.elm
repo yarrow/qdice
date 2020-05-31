@@ -13,7 +13,6 @@ module Dice exposing
     , pipFromInt
     , pipListFromIntList
     , pipToInt
-    , plural
     , randomPip
     , rerollCount
     , singular
@@ -149,11 +148,6 @@ type alias DiceList =
 
 type PipsList
     = PipsList (List Int)
-
-
-plural : List Pip -> PipsList
-plural list =
-    PipsList (List.map pipToInt list)
 
 
 singular : PipsList -> List Pip

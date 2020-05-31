@@ -10,13 +10,13 @@ module Rank exposing
     , numberOfUppers
     , suggestKeeping
     , tally
-    , tallyPipsList
+    , tallyPips
     , toInt
     , upperRanks
     )
 
 import Array exposing (Array)
-import Dice exposing (Pip, PipsList(..))
+import Dice exposing (Pip)
 
 
 type PipsCounted
@@ -147,8 +147,8 @@ longestStraight counted =
     findRun counted |> Tuple.second
 
 
-tallyPipsList : Rank -> List Pip -> Int
-tallyPipsList rank pipList =
+tallyPips : Rank -> List Pip -> Int
+tallyPips rank pipList =
     tally rank (countPips pipList)
 
 

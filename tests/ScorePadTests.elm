@@ -1,7 +1,7 @@
 module ScorePadTests exposing (fuzzTests, regularTests)
 
 import Array exposing (Array)
-import Dice exposing (Pip, PipsList(..))
+import Dice exposing (Pip)
 import Dict exposing (Dict)
 import Expect
 import Fuzz
@@ -137,7 +137,7 @@ subtests =
                     staticScorePad scores
 
                 active =
-                    activeScorePad aPipsList scores
+                    activeScorePad somePips scores
             in
             parse static == parse active
     , subtest "The upperTotal row is the sum of the upperRanks rows" <|
@@ -216,8 +216,8 @@ theCaptions =
     ]
 
 
-aPipsList : List Pip
-aPipsList =
+somePips : List Pip
+somePips =
     Dice.pipListFromIntList [ 1, 3, 2, 5, 6 ]
 
 
@@ -238,7 +238,7 @@ emptyStatic =
 
 emptyActive : ScorePad
 emptyActive =
-    activeScorePad aPipsList emptyScores
+    activeScorePad somePips emptyScores
 
 
 isAvailable : Occupancy -> Bool
