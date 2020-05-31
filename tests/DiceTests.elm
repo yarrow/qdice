@@ -1,6 +1,6 @@
 module DiceTests exposing (diceTests)
 
-import Dice exposing (NextRoll(..), Pip, PipsList(..), flipNextRoll)
+import Dice exposing (NextRoll(..), Pip, flipNextRoll)
 import DiceBoard
 import Expect
 import Fuzz exposing (intRange)
@@ -12,47 +12,14 @@ import Test exposing (..)
 diceTests : Test
 diceTests =
     describe "Tests for Dice.elm and DiceBoard.elm" <|
-        let
-            nextRolls dice =
-                List.map (\die -> die.nextRoll) dice
-        in
-        [ test "fromPipsList clamps the pips value to 1-6" <|
-            \_ ->
-                let
-                    result =
-                        Dice.fromPipsList (PipsList [ 0, 1, 2, 3, 4, 5, 6, 7, 49, -82 ])
-
-                    clamped =
-                        Dice.pipListFromIntList [ 1, 1, 2, 3, 4, 5, 6, 6, 6, 1 ]
-                in
-                List.map .pips result |> Expect.equal clamped
-        , test "fromPipsList uses Keep for every die" <|
-            \_ ->
-                let
-                    pips =
-                        [ 1, 3, 2, 4, 7, 2, 4 ]
-
-                    rolls =
-                        nextRolls (Dice.fromPipsList (PipsList pips))
-
-                    ok =
-                        (List.length rolls == List.length pips)
-                            && List.all (\r -> r == Keep) rolls
-                in
-                ok |> Expect.true "Wrong number of dice, or found one with Reroll"
-        , fuzz (intRange 1 6) "The url for a die with `n` pips contains '/die-`n`.`" <|
+        [ fuzz (intRange 1 6) "The url for a die with `n` pips contains '/die-`n`.`" <|
             \n ->
                 let
-                    dice =
-                        Dice.fromPipsList (PipsList [ n ])
+                    die =
+                        { pips = Dice.pipFromInt n, nextRoll = Keep }
 
                     theUrl =
-                        case dice of
-                            [] ->
-                                ""
-
-                            die :: _ ->
-                                Dice.url die
+                        Dice.url die
 
                     fragment =
                         "/die-" ++ String.fromInt n ++ "."

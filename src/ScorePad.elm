@@ -181,10 +181,10 @@ staticScoreRows ranks scores =
 
 
 activeScoreRows : List Pip -> List Rank -> Scores -> List ScorePadRow
-activeScoreRows pipsList ranks scores =
+activeScoreRows pips ranks scores =
     let
         counted =
-            Rank.countPips pipsList
+            Rank.countPips pips
 
         activeRow rank =
             let

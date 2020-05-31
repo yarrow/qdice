@@ -4,12 +4,10 @@ module Dice exposing
     , NextRoll(..)
     , Pip
     , PipList
-    , PipsList(..)
     , dieFromPair
     , flipNextRoll
     , fromPairs
     , fromPips
-    , fromPipsList
     , mergeDice
     , pipFromInt
     , pipListFromIntList
@@ -17,8 +15,6 @@ module Dice exposing
     , pipToInt
     , randomPip
     , rerollCount
-    , singular
-    , unPip
     , url
     , urlSmall
     )
@@ -146,25 +142,6 @@ dieFromInt n =
 
 type alias DiceList =
     List Die
-
-
-type PipsList
-    = PipsList (List Int)
-
-
-singular : PipsList -> List Pip
-singular (PipsList pipsList) =
-    List.map pipFromInt pipsList
-
-
-unPip : PipsList -> List Int
-unPip (PipsList list) =
-    list
-
-
-fromPipsList : PipsList -> DiceList
-fromPipsList (PipsList pipsList) =
-    List.map dieFromInt pipsList
 
 
 fromPips : List Pip -> DiceList

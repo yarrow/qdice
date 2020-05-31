@@ -25,8 +25,8 @@ chance1 =
     ( Rank.Chance, 1 )
 
 
-randomPipsList : List Dice.Pip
-randomPipsList =
+randomPips : List Dice.Pip
+randomPips =
     Random.step (DiceBoard.rollForNewDice Nothing) (Random.initialSeed 0) |> Tuple.first
 
 
@@ -42,7 +42,7 @@ updateModel msg model =
 
 modelAfterFirstRoll : Model
 modelAfterFirstRoll =
-    updateModel (GotDice randomPipsList) initialModel
+    updateModel (GotDice randomPips) initialModel
 
 
 pipsFuzz : Fuzz.Fuzzer (List Dice.Pip)
@@ -93,7 +93,7 @@ appTests =
                     [ keep, keep, keep, keep, keep ]
 
                 rollableModel =
-                    updateModel (GotDice randomPipsList) initialModel
+                    updateModel (GotDice randomPips) initialModel
                         |> updateModel (DieFlipped 0)
             in
             [ test "RollDice doesn't change the model" <|
@@ -176,7 +176,7 @@ appTests =
                         |> Expect.equal resultingDice
             , test "After the first roll, we have 2 rolls remaining" <|
                 \_ ->
-                    updateModel (GotDice randomPipsList) initialModel
+                    updateModel (GotDice randomPips) initialModel
                         |> .rollsLeft
                         |> Expect.equal 2
             , test "RecordScore sets model.rollsLeft to 3" <|
@@ -249,10 +249,10 @@ appTests =
                     find modelAfterFirstRoll [ class "rolls-left" ]
                         |> Query.has [ text "2 rolls left" ]
             , fuzz pipsFuzz "After a roll, we see the suggested keep sets" <|
-                \pipsList ->
+                \pips ->
                     let
                         model =
-                            updateModel (GotDice pipsList) initialModel
+                            updateModel (GotDice pips) initialModel
 
                         suggestions =
                             case model.dice of
