@@ -17,7 +17,7 @@ diceTests =
             \n ->
                 let
                     die =
-                        { pips = Pip.pipFromInt n, nextRoll = Keep }
+                        { pips = Pip.fromInt n, nextRoll = Keep }
 
                     theUrl =
                         Dice.url die

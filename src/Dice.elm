@@ -13,12 +13,7 @@ module Dice exposing
     )
 
 import Array
-import Pip
-    exposing
-        ( Pip
-        , pipFromInt
-        , pipToInt
-        )
+import Pip exposing (Pip)
 
 
 type alias Die =
@@ -50,14 +45,14 @@ flipRoll die =
 
 dieFromPair : ( Int, NextRoll ) -> Die
 dieFromPair ( n, nextStatus ) =
-    { pips = pipFromInt n
+    { pips = Pip.fromInt n
     , nextRoll = nextStatus
     }
 
 
 aUrl : String -> Die -> String
 aUrl location d =
-    location ++ "/die-" ++ String.fromInt (pipToInt d.pips) ++ ".png"
+    location ++ "/die-" ++ String.fromInt (Pip.toInt d.pips) ++ ".png"
 
 
 url : Die -> String

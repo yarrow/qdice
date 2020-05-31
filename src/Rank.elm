@@ -79,7 +79,7 @@ countPips pipList =
     -- FIXME — We need to import maxPips instead of using the magic number 7
     let
         faces =
-            List.map Pip.pipToInt pipList
+            List.map Pip.toInt pipList
 
         increment jth counter =
             case Array.get jth counter of

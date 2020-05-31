@@ -1,10 +1,10 @@
 module Pip exposing
     ( Pip
-    , pipFromInt
+    , fromInt
     , pipListFromIntList
     , pipListToIntList
-    , pipToInt
     , randomPip
+    , toInt
     )
 
 import Array
@@ -25,24 +25,24 @@ maxPip =
     6
 
 
-pipFromInt : Int -> Pip
-pipFromInt n =
+fromInt : Int -> Pip
+fromInt n =
     Pip (clamp minPip maxPip n)
 
 
-pipToInt : Pip -> Int
-pipToInt (Pip n) =
+toInt : Pip -> Int
+toInt (Pip n) =
     n
 
 
 pipListToIntList : List Pip -> List Int
 pipListToIntList list =
-    List.map pipToInt list
+    List.map toInt list
 
 
 pipListFromIntList : List Int -> List Pip
 pipListFromIntList list =
-    List.map pipFromInt list
+    List.map fromInt list
 
 
 randomPip : Random.Generator Pip

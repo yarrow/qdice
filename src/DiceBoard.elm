@@ -140,7 +140,7 @@ justKeepOnly suggested (FiveDice diceList) =
                 (\die ->
                     { die
                         | nextRoll =
-                            if Pip.pipToInt die.pips == pipsToKeep then
+                            if Pip.toInt die.pips == pipsToKeep then
                                 Keep
 
                             else
@@ -160,7 +160,7 @@ justKeepOnly suggested (FiveDice diceList) =
                         die :: tail ->
                             let
                                 face =
-                                    Pip.pipToInt die.pips
+                                    Pip.toInt die.pips
 
                                 ( newSet, newDie ) =
                                     if Set.member face set then
