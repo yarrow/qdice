@@ -6,7 +6,7 @@ import Expect
 import Fuzz exposing (intRange)
 import Pip exposing (Pip)
 import Random
-import Rank exposing (DiceToKeep(..), PipsCounted(..), Rank(..), tally)
+import Rank exposing (DiceToKeep(..), PipsCounted, Rank(..), tally)
 import Test exposing (..)
 
 
@@ -37,7 +37,7 @@ ofAKind : List Pip -> Int
 ofAKind pips =
     let
         counted =
-            (\(PipsCounted x) -> x) (Rank.countPips <| pips)
+            Rank.countPips pips
     in
     Maybe.withDefault 0 (List.maximum (Array.toList counted))
 

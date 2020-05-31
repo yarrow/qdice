@@ -1,6 +1,6 @@
 module Rank exposing
     ( DiceToKeep(..)
-    , PipsCounted(..)
+    , PipsCounted
     , Rank(..)
     , allRanks
     , caption
@@ -19,8 +19,8 @@ import Array exposing (Array)
 import Pip exposing (Pip)
 
 
-type PipsCounted
-    = PipsCounted (Array Int)
+type alias PipsCounted =
+    Array Int
 
 
 type DiceToKeep
@@ -35,20 +35,18 @@ suggestKeeping pipList =
             countPips pipList
 
         pairOrBetter =
-            case counted of
-                PipsCounted kounted ->
-                    kounted
-                        |> Array.toList
-                        |> List.indexedMap
-                            (\pips count ->
-                                if count >= 2 && count < 5 then
-                                    pips
+            counted
+                |> Array.toList
+                |> List.indexedMap
+                    (\pips count ->
+                        if count >= 2 && count < 5 then
+                            pips
 
-                                else
-                                    0
-                            )
-                        |> List.filter (\n -> n > 0)
-                        |> List.map OfAKind
+                        else
+                            0
+                    )
+                |> List.filter (\n -> n > 0)
+                |> List.map OfAKind
 
         diceToKeep =
             case straightSuggestion counted of
@@ -89,21 +87,21 @@ countPips pipList =
                 Nothing ->
                     counter
     in
-    PipsCounted (List.foldr increment (Array.repeat 7 0) faces)
+    List.foldr increment (Array.repeat 7 0) faces
 
 
 valueTimesCount : Int -> PipsCounted -> Int
-valueTimesCount value (PipsCounted counted) =
+valueTimesCount value counted =
     value * Maybe.withDefault 0 (Array.get value counted)
 
 
 sumDice : PipsCounted -> Int
-sumDice (PipsCounted count) =
+sumDice count =
     Array.foldl (+) 0 (Array.indexedMap (*) count)
 
 
 ofAKind : PipsCounted -> Int
-ofAKind (PipsCounted counted) =
+ofAKind counted =
     Maybe.withDefault 0 (List.maximum (Array.toList counted))
 
 
@@ -117,7 +115,7 @@ sumDiceIfAtLeast min counted =
 
 
 findRun : PipsCounted -> ( Int, Int )
-findRun (PipsCounted counted) =
+findRun counted =
     let
         find ( j, start, length ) list =
             case list of
@@ -194,7 +192,7 @@ tally rank =
                     max =
                         ofAKind counted
 
-                    hasPair (PipsCounted kounted) =
+                    hasPair kounted =
                         List.any (\count -> count == 2) (Array.toList kounted)
                 in
                 nWhen 25 (max == 5 || (max == 3 && hasPair counted))
@@ -206,7 +204,7 @@ tally rank =
             \counted -> nWhen 40 (longestStraight counted == 5)
 
         FiveOfAKind ->
-            \(PipsCounted counted) -> nWhen 50 (List.any (\n -> n == 5) (Array.toList counted))
+            \counted -> nWhen 50 (List.any (\n -> n == 5) (Array.toList counted))
 
         Chance ->
             sumDice
