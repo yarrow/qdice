@@ -2,7 +2,7 @@ module Rank exposing
     ( DiceToKeep(..)
     , PipsCounted
     , Rank(..)
-    , allRanks
+    , arbitraryRank
     , captions
     , countPips
     , fns
@@ -15,8 +15,6 @@ module Rank exposing
     , toInt
     , upper
     )
-
---FIXME -- kill tally
 
 import Array exposing (Array)
 import Pip exposing (Pip)
@@ -149,8 +147,13 @@ longestStraight counted =
 
 
 tallyPips : Rank -> List Pip -> Int
-tallyPips rank pipList =
-    tally rank (countPips pipList)
+tallyPips (Rank rank) pipList =
+    let
+        fn : PipsCounted -> Int
+        fn =
+            Maybe.withDefault (\_ -> 0) (Array.get rank fnArray)
+    in
+    fn (countPips pipList)
 
 
 nWhen : Int -> Bool -> Int
@@ -172,49 +175,6 @@ fullHouse counted =
             List.any (\count -> count == 2) (Array.toList kounted)
     in
     nWhen 25 (max == 5 || (max == 3 && hasPair counted))
-
-
-tally : Rank -> PipsCounted -> Int
-tally rank =
-    case rank of
-        Ones ->
-            valueTimesCount 1
-
-        Twos ->
-            valueTimesCount 2
-
-        Threes ->
-            valueTimesCount 3
-
-        Fours ->
-            valueTimesCount 4
-
-        Fives ->
-            valueTimesCount 5
-
-        Sixes ->
-            valueTimesCount 6
-
-        ThreeOfAKind ->
-            sumDiceIfAtLeast 3
-
-        FourOfAKind ->
-            sumDiceIfAtLeast 4
-
-        FullHouse ->
-            fullHouse
-
-        SmallStraight ->
-            \counted -> nWhen 30 (longestStraight counted >= 4)
-
-        LargeStraight ->
-            \counted -> nWhen 40 (longestStraight counted == 5)
-
-        FiveOfAKind ->
-            \counted -> nWhen 50 (List.any (\n -> n == 5) (Array.toList counted))
-
-        Chance ->
-            sumDice
 
 
 table : List ( String, PipsCounted -> Int )
@@ -250,6 +210,11 @@ fns =
     List.map Tuple.second table
 
 
+fnArray : Array (PipsCounted -> Int)
+fnArray =
+    Array.fromList fns
+
+
 scoreAll : PipsCounted -> List Int
 scoreAll counted =
     List.map (\f -> f counted) fns
@@ -265,58 +230,18 @@ lower list =
     List.drop numberOfUppers list
 
 
-
-{--FIXME uncomment me!
-type SealedRank
-    = SealedRank Int
-
-ranks : List SealedRank
-ranks =
-    List.indexedMap (\j _ -> SealedRank j) table
-    --}
-
-
-ranks =
-    allRanks
-
-
 type Rank
-    = Ones
-    | Twos
-    | Threes
-    | Fours
-    | Fives
-    | Sixes
-    | ThreeOfAKind
-    | FourOfAKind
-    | FullHouse
-    | SmallStraight
-    | LargeStraight
-    | FiveOfAKind
-    | Chance
+    = Rank Int
+
+
+ranks : List Rank
+ranks =
+    List.indexedMap (\j _ -> Rank j) table
 
 
 numberOfRanks : Int
 numberOfRanks =
     List.length table
-
-
-allRanks : List Rank
-allRanks =
-    [ Ones
-    , Twos
-    , Threes
-    , Fours
-    , Fives
-    , Sixes
-    , ThreeOfAKind
-    , FourOfAKind
-    , FullHouse
-    , SmallStraight
-    , LargeStraight
-    , FiveOfAKind
-    , Chance
-    ]
 
 
 
@@ -328,43 +253,14 @@ allRanks =
 
 
 toInt : Rank -> Int
-toInt rank =
-    case rank of
-        Ones ->
-            0
+toInt (Rank rank) =
+    rank
 
-        Twos ->
-            1
 
-        Threes ->
-            2
 
-        Fours ->
-            3
+--- for testing
 
-        Fives ->
-            4
 
-        Sixes ->
-            5
-
-        ThreeOfAKind ->
-            6
-
-        FourOfAKind ->
-            7
-
-        FullHouse ->
-            8
-
-        SmallStraight ->
-            9
-
-        LargeStraight ->
-            10
-
-        FiveOfAKind ->
-            11
-
-        Chance ->
-            12
+arbitraryRank : Rank
+arbitraryRank =
+    Rank (numberOfRanks - 1)

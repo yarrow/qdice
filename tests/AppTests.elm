@@ -23,7 +23,7 @@ type alias PreDice =
 
 chance1 : ( Rank, Int )
 chance1 =
-    ( Rank.Chance, 1 )
+    ( Rank.arbitraryRank, 1 )
 
 
 randomPips : List Pip
@@ -202,15 +202,15 @@ appTests =
             , test "(RecordScore (rank, j) sets the new model's score at (rank, j) to the points indicated in the scorePad" <|
                 \_ ->
                     let
-                        scoreForChance =
+                        scoreForRank =
                             modelAfterFirstRoll.dice
                                 |> Maybe.map DiceBoard.toPips
-                                |> Maybe.map (Rank.tallyPips Rank.Chance)
+                                |> Maybe.map (Rank.tallyPips Rank.arbitraryRank)
                     in
                     updateModel (RecordScore chance1) modelAfterFirstRoll
                         |> .scores
                         |> ScorePad.getScoreBox chance1
-                        |> Expect.equal scoreForChance
+                        |> Expect.equal scoreForRank
             , test "NewGame resets the model to the initial model" <|
                 \_ ->
                     updateModel NewGame rollableModel
