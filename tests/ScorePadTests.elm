@@ -1,6 +1,5 @@
 module ScorePadTests exposing (fuzzTests, regularTests)
 
-import Array exposing (Array)
 import Dict exposing (Dict)
 import Expect
 import Fuzz
@@ -8,7 +7,7 @@ import Pip exposing (Pip)
 import Random
 import Random.Array
 import Random.Extra
-import Rank exposing (Rank, allRanks, numberOfRanks, upperRanks)
+import Rank
 import ScorePad
     exposing
         ( Occupancy(..)
@@ -52,8 +51,18 @@ parse scorePad =
     Dict.fromList (List.map rowParse scorePad)
 
 
-sectionSum : List Rank -> Scores -> List Int
-sectionSum ranks scores =
+upperCaptions : List String
+upperCaptions =
+    Rank.upper Rank.captions
+
+
+allScoreCaptions : List String
+allScoreCaptions =
+    Rank.captions
+
+
+sectionSum : List String -> Scores -> List Int
+sectionSum captions scores =
     let
         info =
             parse (staticScorePad scores)
@@ -61,11 +70,11 @@ sectionSum ranks scores =
         missingRow =
             [ -100, -100, -100 ]
 
-        getRow rank =
-            Maybe.withDefault missingRow (Dict.get (Rank.caption rank) info)
+        getRow caption =
+            Maybe.withDefault missingRow (Dict.get caption info)
 
         section =
-            List.map getRow ranks
+            List.map getRow captions
 
         add a b =
             List.map2 (+) a b
@@ -97,7 +106,7 @@ genScores =
         genScoreRow =
             Random.list 3 genScoreBox
     in
-    Random.map ScorePad.makeScoresForTesting (Random.Array.array numberOfRanks genScoreRow)
+    Random.map ScorePad.makeScoresForTesting (Random.Array.array Rank.numberOfRanks genScoreRow)
 
 
 scoreFuzz : Fuzz.Fuzzer Scores
@@ -142,7 +151,7 @@ subtests =
             parse static == parse active
     , subtest "The upperTotal row is the sum of the upperRanks rows" <|
         \scores ->
-            sectionSum upperRanks scores == getSumRow upperTotal scores
+            sectionSum upperCaptions scores == getSumRow upperTotal scores
     , subtest "Each upperBonus box is 35 if the corresponding upperTotal box is >= 63, 0 otherwise" <|
         \scores ->
             let
@@ -160,7 +169,7 @@ subtests =
         \scores ->
             let
                 allBoxes =
-                    sectionSum allRanks scores
+                    sectionSum allScoreCaptions scores
 
                 bonus =
                     getSumRow upperBonus scores

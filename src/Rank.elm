@@ -3,17 +3,20 @@ module Rank exposing
     , PipsCounted
     , Rank(..)
     , allRanks
-    , caption
+    , captions
     , countPips
-    , lowerRanks
+    , fns
+    , lower
     , numberOfRanks
-    , numberOfUppers
+    , ranks
+    , scoreAll
     , suggestKeeping
-    , tally
     , tallyPips
     , toInt
-    , upperRanks
+    , upper
     )
+
+--FIXME -- kill tally
 
 import Array exposing (Array)
 import Pip exposing (Pip)
@@ -159,6 +162,18 @@ nWhen n condition =
         0
 
 
+fullHouse : PipsCounted -> Int
+fullHouse counted =
+    let
+        max =
+            ofAKind counted
+
+        hasPair kounted =
+            List.any (\count -> count == 2) (Array.toList kounted)
+    in
+    nWhen 25 (max == 5 || (max == 3 && hasPair counted))
+
+
 tally : Rank -> PipsCounted -> Int
 tally rank =
     case rank of
@@ -187,15 +202,7 @@ tally rank =
             sumDiceIfAtLeast 4
 
         FullHouse ->
-            \counted ->
-                let
-                    max =
-                        ofAKind counted
-
-                    hasPair kounted =
-                        List.any (\count -> count == 2) (Array.toList kounted)
-                in
-                nWhen 25 (max == 5 || (max == 3 && hasPair counted))
+            fullHouse
 
         SmallStraight ->
             \counted -> nWhen 30 (longestStraight counted >= 4)
@@ -208,6 +215,69 @@ tally rank =
 
         Chance ->
             sumDice
+
+
+table : List ( String, PipsCounted -> Int )
+table =
+    [ ( "Ones", valueTimesCount 1 )
+    , ( "Twos", valueTimesCount 2 )
+    , ( "Threes", valueTimesCount 3 )
+    , ( "Fours", valueTimesCount 4 )
+    , ( "Fives", valueTimesCount 5 )
+    , ( "Sixes", valueTimesCount 6 )
+    , ( "3 of a kind", sumDiceIfAtLeast 3 )
+    , ( "4 of a kind", sumDiceIfAtLeast 4 )
+    , ( "Full House", fullHouse )
+    , ( "Sm Strght", \counted -> nWhen 30 (longestStraight counted >= 4) )
+    , ( "Lg Strght", \counted -> nWhen 40 (longestStraight counted >= 5) )
+    , ( "5 of a kind", \counted -> nWhen 50 (List.any (\n -> n == 5) (Array.toList counted)) )
+    , ( "Chance", sumDice )
+    ]
+
+
+numberOfUppers : Int
+numberOfUppers =
+    6
+
+
+captions : List String
+captions =
+    List.map Tuple.first table
+
+
+fns : List (PipsCounted -> Int)
+fns =
+    List.map Tuple.second table
+
+
+scoreAll : PipsCounted -> List Int
+scoreAll counted =
+    List.map (\f -> f counted) fns
+
+
+upper : List a -> List a
+upper list =
+    List.take numberOfUppers list
+
+
+lower : List a -> List a
+lower list =
+    List.drop numberOfUppers list
+
+
+
+{--FIXME uncomment me!
+type SealedRank
+    = SealedRank Int
+
+ranks : List SealedRank
+ranks =
+    List.indexedMap (\j _ -> SealedRank j) table
+    --}
+
+
+ranks =
+    allRanks
 
 
 type Rank
@@ -226,24 +296,9 @@ type Rank
     | Chance
 
 
-upperRanks : List Rank
-upperRanks =
-    [ Ones, Twos, Threes, Fours, Fives, Sixes ]
-
-
-lowerRanks : List Rank
-lowerRanks =
-    [ ThreeOfAKind, FourOfAKind, FullHouse, SmallStraight, LargeStraight, FiveOfAKind, Chance ]
-
-
-numberOfUppers : Int
-numberOfUppers =
-    List.length upperRanks
-
-
 numberOfRanks : Int
 numberOfRanks =
-    numberOfUppers + List.length lowerRanks
+    List.length table
 
 
 allRanks : List Rank
@@ -270,49 +325,6 @@ allRanks =
    goodness =
        ...
 -}
-
-
-caption : Rank -> String
-caption rank =
-    case rank of
-        Ones ->
-            "Ones"
-
-        Twos ->
-            "Twos"
-
-        Threes ->
-            "Threes"
-
-        Fours ->
-            "Fours"
-
-        Fives ->
-            "Fives"
-
-        Sixes ->
-            "Sixes"
-
-        ThreeOfAKind ->
-            "3 of a kind"
-
-        FourOfAKind ->
-            "4 of a kind"
-
-        FullHouse ->
-            "Full House"
-
-        SmallStraight ->
-            "Sm Strght"
-
-        LargeStraight ->
-            "Lg Strght"
-
-        FiveOfAKind ->
-            "5 of a kind"
-
-        Chance ->
-            "Chance"
 
 
 toInt : Rank -> Int

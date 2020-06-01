@@ -25,13 +25,8 @@ import Pip exposing (Pip)
 import Rank
     exposing
         ( Rank(..)
-        , caption
-        , lowerRanks
         , numberOfRanks
-        , numberOfUppers
-        , tally
         , toInt
-        , upperRanks
         )
 
 
@@ -94,8 +89,18 @@ type RowKind
     | Calculated
 
 
-makeScorePad : (List Rank -> Scores -> List ScorePadRow) -> Scores -> ScorePad
-makeScorePad scoreRows (Scores scores) =
+staticScorePad : Scores -> ScorePad
+staticScorePad (Scores scores) =
+    makeScorePad staticScorePadRows (Array.toList scores)
+
+
+activeScorePad : List Pip -> Scores -> ScorePad
+activeScorePad pipList (Scores scores) =
+    makeScorePad (activeScorePadRows pipList) (Array.toList scores)
+
+
+makeScorePad : (List ScoreRow -> List ScorePadRow) -> List ScoreRow -> ScorePad
+makeScorePad padRows scores =
     let
         getSectionTotal : List ScoreRow -> List Int
         getSectionTotal sectionRows =
@@ -109,14 +114,11 @@ makeScorePad scoreRows (Scores scores) =
             in
             List.foldr addRows [ 0, 0, 0 ] section
 
-        scoresList =
-            Array.toList scores
-
         topTotal =
-            getSectionTotal (List.take numberOfUppers scoresList)
+            getSectionTotal (Rank.upper scores)
 
         bottomTotal =
-            getSectionTotal (List.drop numberOfUppers scoresList)
+            getSectionTotal (Rank.lower scores)
 
         bonus =
             List.map
@@ -143,11 +145,14 @@ makeScorePad scoreRows (Scores scores) =
             , kind = Calculated
             , boxes = List.map (\n -> ( InUse, String.fromInt n )) row
             }
+
+        scorePadRows =
+            padRows scores
     in
     List.concat
-        [ scoreRows upperRanks (Scores scores)
+        [ Rank.upper scorePadRows
         , [ sumRow upperTotal topTotal, sumRow upperBonus bonus ]
-        , scoreRows lowerRanks (Scores scores)
+        , Rank.lower scorePadRows
         , [ sumRow totalScore rowTotal
           , sumRow weightedScore withWeights
           , sumRow grandTotal [ wholeMegilla ]
@@ -155,44 +160,32 @@ makeScorePad scoreRows (Scores scores) =
         ]
 
 
-staticScorePad : Scores -> ScorePad
-staticScorePad scores =
-    makeScorePad staticScoreRows scores
-
-
-activeScorePad : List Pip -> Scores -> ScorePad
-activeScorePad pipList scores =
-    makeScorePad (activeScoreRows pipList) scores
-
-
-staticScoreRows : List Rank -> Scores -> List ScorePadRow
-staticScoreRows ranks scores =
+staticScorePadRows : List ScoreRow -> List ScorePadRow
+staticScorePadRows scores =
     let
         inUse box =
             ( InUse, boxToString box )
 
-        staticRow rank =
+        staticRow caption boxes =
             { kind = Rolled
-            , caption = caption rank
-            , boxes = List.map inUse (getScoreRow rank scores)
+            , caption = caption
+            , boxes = List.map inUse boxes
             }
     in
-    List.map staticRow ranks
+    List.map2 staticRow Rank.captions scores
 
 
-activeScoreRows : List Pip -> List Rank -> Scores -> List ScorePadRow
-activeScoreRows pips ranks scores =
+activeScorePadRows : List Pip -> List ScoreRow -> List ScorePadRow
+activeScorePadRows pips scores =
     let
         counted =
             Rank.countPips pips
 
-        activeRow rank =
+        activeRow rank caption fn boxes =
             let
-                current =
-                    getScoreRow rank scores
-
+                pointsForThisRoll : Int
                 pointsForThisRoll =
-                    tally rank counted
+                    fn counted
 
                 makeBox column box =
                     case box of
@@ -202,12 +195,12 @@ activeScoreRows pips ranks scores =
                         Just points ->
                             ( InUse, String.fromInt points )
             in
-            { caption = caption rank
+            { caption = caption
             , kind = Rolled
-            , boxes = List.indexedMap makeBox current
+            , boxes = List.indexedMap makeBox boxes
             }
     in
-    List.map activeRow ranks
+    List.map4 activeRow Rank.ranks Rank.captions Rank.fns scores
 
 
 
