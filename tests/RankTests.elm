@@ -2,11 +2,12 @@ module RankTests exposing (rankTests)
 
 import Array
 import DiceBoard
+import Dict exposing (Dict)
 import Expect
 import Fuzz exposing (intRange)
 import Pip exposing (Pip)
 import Random
-import Rank exposing (DiceToKeep(..), PipsCounted, Rank(..), tally)
+import Rank exposing (DiceToKeep(..), PipsCounted, Rank(..))
 import Test exposing (..)
 
 
@@ -42,16 +43,36 @@ ofAKind pips =
     Maybe.withDefault 0 (List.maximum (Array.toList counted))
 
 
+fnDict : Dict String (PipsCounted -> Int)
+fnDict =
+    Dict.fromList (List.map2 (\name fn -> ( name, fn )) Rank.captions Rank.fns)
+
+
+tally : String -> PipsCounted -> Int
+tally name dice =
+    case Dict.get name fnDict of
+        Nothing ->
+            -4321
+
+        Just fn ->
+            fn dice
+
+
+tallyIntList : String -> List Int -> Int
+tallyIntList name dice =
+    tally name (Rank.countPips (Pip.mapFromInt dice))
+
+
 rankTests : Test
 rankTests =
     describe "Test for Rank types" <|
         [ test "Ones counts 1s" <|
             \_ ->
-                tally Ones (diceCount [ 1, 3, 4, 1, 2 ])
+                tallyIntList "Ones" [ 1, 3, 4, 1, 2 ]
                     |> Expect.equal 2
         , test "Twos counts 2s" <|
             \_ ->
-                tally Twos (diceCount [ 2, 2, 4, 1, 2 ])
+                tallyIntList "Twos" [ 2, 2, 4, 1, 2 ]
                     |> Expect.equal 6
         , fuzz (intRange Random.minInt Random.maxInt) "An upper score for N is N times the count of dice with N pips" <|
             \seed ->
@@ -69,7 +90,8 @@ rankTests =
                     expected =
                         List.map (countTimesVal dice) [ 1, 2, 3, 4, 5, 6 ]
                 in
-                List.map (\combo -> tally combo counted) [ Ones, Twos, Threes, Fours, Fives, Sixes ]
+                List.map (\combo -> tally combo counted)
+                    [ "Ones", "Twos", "Threes", "Fours", "Fives", "Sixes" ]
                     |> Expect.equal expected
         , fuzz (intRange Random.minInt Random.maxInt) "Chance score is always the sum of the dice" <|
             \seed ->
@@ -77,7 +99,7 @@ rankTests =
                     ( dice, counted ) =
                         diceFromSeed seed
                 in
-                tally Chance counted
+                tally "Chance" counted
                     |> Expect.equal (sumDice dice)
         , test "5 of a kind is 50, if all dice are the same" <|
             \_ ->
@@ -85,15 +107,15 @@ rankTests =
                     yatz =
                         List.map (\n -> diceCount (List.repeat 5 n)) [ 1, 2, 3, 4, 5, 6 ]
                 in
-                List.map (tally FiveOfAKind) yatz
+                List.map (tally "5 of a kind") yatz
                     |> Expect.equalLists (List.repeat 6 50)
         , test "4 of a kind score of [4,4,4,1,4] is 17" <|
             \_ ->
-                tally FourOfAKind (diceCount [ 4, 4, 4, 1, 4 ])
+                tally "4 of a kind" (diceCount [ 4, 4, 4, 1, 4 ])
                     |> Expect.equal 17
         , test "3 of a kind score of [4,4,4,1,4] is also 17" <|
             \_ ->
-                tally ThreeOfAKind (diceCount [ 4, 4, 4, 1, 4 ])
+                tally "3 of a kind" (diceCount [ 4, 4, 4, 1, 4 ])
                     |> Expect.equal 17
         , fuzz (intRange Random.minInt Random.maxInt) "4 of a kind is the sum of the dice, if there are at least 4 the same" <|
             \seed ->
@@ -108,13 +130,13 @@ rankTests =
                         else
                             0
                 in
-                tally FourOfAKind counted
+                tally "4 of a kind" counted
                     |> Expect.equal expectedScore
         , test "Full House scores 25 for 3 of a kind with a pair, and for 5 of a kind" <|
             \_ ->
                 let
                     score plain =
-                        tally FullHouse (diceCount plain)
+                        tally "Full House" (diceCount plain)
 
                     scoresFound =
                         List.map score [ [ 6, 6, 6, 6, 6 ], [ 4, 5, 4, 5, 4 ], [ 1, 1, 2, 2, 3 ] ]
@@ -136,7 +158,7 @@ rankTests =
                         List.repeat 4 40 ++ List.repeat 4 0
 
                     score plain =
-                        tally LargeStraight (diceCount plain)
+                        tally "Lg Strght" (diceCount plain)
 
                     scoresFound =
                         List.map score (good ++ bad)
@@ -164,7 +186,7 @@ rankTests =
                         List.repeat 9 30 ++ List.repeat 4 0
 
                     score plain =
-                        tally SmallStraight (diceCount plain)
+                        tally "Sm Strght" (diceCount plain)
 
                     scoresFound =
                         List.map score (good ++ bad)
