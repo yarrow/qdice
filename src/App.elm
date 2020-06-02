@@ -11,16 +11,19 @@ import Random
 import Rank
 import ScorePad
     exposing
-        ( Location
-        , Occupancy(..)
+        ( Occupancy(..)
         , RowKind(..)
         , ScorePadBox
         , ScorePadRow
-        , Scores
         , activeScorePad
+        , staticScorePad
+        )
+import Scores
+    exposing
+        ( Location
+        , Scores
         , emptyScores
         , numberOfTurns
-        , staticScorePad
         )
 
 
@@ -88,7 +91,7 @@ update msg model =
                         |> Maybe.map (Rank.tallyPips rank)
 
                 scores =
-                    ScorePad.setScoreBox ( rank, column ) scoreToInsert model.scores
+                    Scores.setScoreBox ( rank, column ) scoreToInsert model.scores
 
                 newModel =
                     { model
@@ -271,7 +274,7 @@ initialModel : Model
 initialModel =
     { dice = Nothing
     , rollsLeft = 3
-    , turnsLeft = ScorePad.numberOfTurns
+    , turnsLeft = Scores.numberOfTurns
     , scores = emptyScores
     }
 

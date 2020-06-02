@@ -1,18 +1,11 @@
 module ScorePad exposing
-    ( Location
-    , Occupancy(..)
+    ( Occupancy(..)
     , RowKind(..)
     , ScorePad
     , ScorePadBox
     , ScorePadRow
-    , Scores
     , activeScorePad
-    , emptyScores
-    , getScoreBox
     , grandTotal
-    , makeScoresForTesting
-    , numberOfTurns
-    , setScoreBox
     , staticScorePad
     , totalScore
     , upperBonus
@@ -20,13 +13,14 @@ module ScorePad exposing
     , weightedScore
     )
 
-import Array
 import Pip exposing (Pip)
 import Rank
+import Scores
     exposing
-        ( Rank(..)
-        , numberOfRanks
-        , toInt
+        ( Location
+        , ScoreBox
+        , ScoreRow
+        , Scores
         )
 
 
@@ -60,6 +54,16 @@ grandTotal =
     "Total"
 
 
+boxToString : ScoreBox -> String
+boxToString box =
+    case box of
+        Nothing ->
+            ""
+
+        Just n ->
+            String.fromInt n
+
+
 type alias ScorePad =
     List ScorePadRow
 
@@ -75,10 +79,6 @@ type alias ScorePadBox =
     ( Occupancy, String )
 
 
-type alias Location =
-    ( Rank, Int )
-
-
 type Occupancy
     = Available Location
     | InUse
@@ -90,13 +90,13 @@ type RowKind
 
 
 staticScorePad : Scores -> ScorePad
-staticScorePad (Scores scores) =
-    makeScorePad staticScorePadRows scores
+staticScorePad scores =
+    makeScorePad staticScorePadRows (Scores.toRows scores)
 
 
 activeScorePad : List Pip -> Scores -> ScorePad
-activeScorePad pipList (Scores scores) =
-    makeScorePad (activeScorePadRows pipList) scores
+activeScorePad pipList scores =
+    makeScorePad (activeScorePadRows pipList) (Scores.toRows scores)
 
 
 makeScorePad : (List ScoreRow -> List ScorePadRow) -> List ScoreRow -> ScorePad
@@ -201,87 +201,3 @@ activeScorePadRows pips scores =
             }
     in
     List.map4 activeRow Rank.ranks Rank.captions Rank.fns scores
-
-
-
----- Scores
-
-
-type alias ScoreBox =
-    Maybe Int
-
-
-type alias ScoreRow =
-    List ScoreBox
-
-
-type Scores
-    = Scores (List ScoreRow)
-
-
-makeScoresForTesting : List ScoreRow -> Scores
-makeScoresForTesting scoreRows =
-    if List.length scoreRows == numberOfRanks then
-        Scores scoreRows
-
-    else
-        -- make sure the error shows up early
-        Scores []
-
-
-threeNothings : ScoreRow
-threeNothings =
-    List.repeat 3 Nothing
-
-
-emptyScores : Scores
-emptyScores =
-    Scores (List.repeat numberOfRanks threeNothings)
-
-
-numberOfTurns : Int
-numberOfTurns =
-    case emptyScores of
-        Scores scores ->
-            List.length scores * List.length threeNothings
-
-
-boxToString : ScoreBox -> String
-boxToString box =
-    case box of
-        Nothing ->
-            ""
-
-        Just n ->
-            String.fromInt n
-
-
-setScoreBox : Location -> ScoreBox -> Scores -> Scores
-setScoreBox ( rank, column ) scoreBox (Scores scores) =
-    let
-        scoreArray =
-            Array.fromList scores
-
-        r =
-            Rank.toInt rank
-
-        row =
-            Maybe.withDefault threeNothings (Array.get r scoreArray)
-
-        newRow =
-            row |> Array.fromList |> Array.set column scoreBox |> Array.toList
-    in
-    Array.set r newRow scoreArray
-        |> Array.toList
-        |> Scores
-
-
-getScoreBox : Location -> Scores -> ScoreBox
-getScoreBox ( rank, column ) (Scores scores) =
-    let
-        row =
-            List.drop (Rank.toInt rank) scores
-                |> List.head
-                |> Maybe.withDefault threeNothings
-    in
-    Maybe.withDefault Nothing (Array.get column (Array.fromList row))
