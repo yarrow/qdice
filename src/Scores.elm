@@ -1,13 +1,13 @@
 module Scores exposing
     ( Location
-    , ScoreBox
-    , ScoreRow
+    , Box
+    , Row
     , Scores
     , emptyScores
-    , getScoreBox
+    , getBox
     , makeScoresForTesting
     , numberOfTurns
-    , setScoreBox
+    , setBox
     , toRows
     )
 
@@ -15,19 +15,19 @@ import Array
 import Rank exposing (Rank, numberOfRanks)
 
 
-type alias ScoreBox =
+type alias Box =
     Maybe Int
 
 
-type alias ScoreRow =
-    List ScoreBox
+type alias Row =
+    List Box
 
 
 type Scores
-    = Scores (List ScoreRow)
+    = Scores (List Row)
 
 
-toRows : Scores -> List ScoreRow
+toRows : Scores -> List Row
 toRows (Scores scores) =
     scores
 
@@ -36,7 +36,7 @@ type alias Location =
     ( Rank, Int )
 
 
-makeScoresForTesting : List ScoreRow -> Scores
+makeScoresForTesting : List Row -> Scores
 makeScoresForTesting scoreRows =
     if List.length scoreRows == numberOfRanks then
         Scores scoreRows
@@ -46,7 +46,7 @@ makeScoresForTesting scoreRows =
         Scores []
 
 
-threeNothings : ScoreRow
+threeNothings : Row
 threeNothings =
     List.repeat 3 Nothing
 
@@ -63,8 +63,8 @@ numberOfTurns =
             List.length scores * List.length threeNothings
 
 
-setScoreBox : Location -> ScoreBox -> Scores -> Scores
-setScoreBox ( rank, column ) scoreBox (Scores scores) =
+setBox : Location -> Box -> Scores -> Scores
+setBox ( rank, column ) scoreBox (Scores scores) =
     let
         scoreArray =
             Array.fromList scores
@@ -83,8 +83,8 @@ setScoreBox ( rank, column ) scoreBox (Scores scores) =
         |> Scores
 
 
-getScoreBox : Location -> Scores -> ScoreBox
-getScoreBox ( rank, column ) (Scores scores) =
+getBox : Location -> Scores -> Box
+getBox ( rank, column ) (Scores scores) =
     let
         row =
             List.drop (Rank.toInt rank) scores

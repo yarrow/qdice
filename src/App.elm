@@ -91,7 +91,7 @@ update msg model =
                         |> Maybe.map (Rank.tallyPips rank)
 
                 scores =
-                    Scores.setScoreBox ( rank, column ) scoreToInsert model.scores
+                    Scores.setBox ( rank, column ) scoreToInsert model.scores
 
                 newModel =
                     { model

@@ -15,13 +15,7 @@ module ScorePad exposing
 
 import Pip exposing (Pip)
 import Rank
-import Scores
-    exposing
-        ( Location
-        , ScoreBox
-        , ScoreRow
-        , Scores
-        )
+import Scores exposing (Location, Scores)
 
 
 
@@ -54,7 +48,7 @@ grandTotal =
     "Total"
 
 
-boxToString : ScoreBox -> String
+boxToString : Scores.Box -> String
 boxToString box =
     case box of
         Nothing ->
@@ -99,10 +93,10 @@ activeScorePad pipList scores =
     makeScorePad (activeScorePadRows pipList) (Scores.toRows scores)
 
 
-makeScorePad : (List ScoreRow -> List ScorePadRow) -> List ScoreRow -> ScorePad
+makeScorePad : (List Scores.Row -> List ScorePadRow) -> List Scores.Row -> ScorePad
 makeScorePad padRows scores =
     let
-        getSectionTotal : List ScoreRow -> List Int
+        getSectionTotal : List Scores.Row -> List Int
         getSectionTotal sectionRows =
             let
                 section : List (List Int)
@@ -160,7 +154,7 @@ makeScorePad padRows scores =
         ]
 
 
-staticScorePadRows : List ScoreRow -> List ScorePadRow
+staticScorePadRows : List Scores.Row -> List ScorePadRow
 staticScorePadRows scores =
     let
         inUse box =
@@ -175,7 +169,7 @@ staticScorePadRows scores =
     List.map2 staticRow Rank.captions scores
 
 
-activeScorePadRows : List Pip -> List ScoreRow -> List ScorePadRow
+activeScorePadRows : List Pip -> List Scores.Row -> List ScorePadRow
 activeScorePadRows pips scores =
     let
         counted =

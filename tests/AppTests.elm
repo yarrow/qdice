@@ -209,7 +209,7 @@ appTests =
                     in
                     updateModel (RecordScore chance1) modelAfterFirstRoll
                         |> .scores
-                        |> Scores.getScoreBox chance1
+                        |> Scores.getBox chance1
                         |> Expect.equal scoreForRank
             , test "NewGame resets the model to the initial model" <|
                 \_ ->
