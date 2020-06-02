@@ -20,7 +20,7 @@ module ScorePad exposing
     , weightedScore
     )
 
-import Array exposing (Array)
+import Array
 import Pip exposing (Pip)
 import Rank
     exposing
@@ -91,12 +91,12 @@ type RowKind
 
 staticScorePad : Scores -> ScorePad
 staticScorePad (Scores scores) =
-    makeScorePad staticScorePadRows (Array.toList scores)
+    makeScorePad staticScorePadRows scores
 
 
 activeScorePad : List Pip -> Scores -> ScorePad
 activeScorePad pipList (Scores scores) =
-    makeScorePad (activeScorePadRows pipList) (Array.toList scores)
+    makeScorePad (activeScorePadRows pipList) scores
 
 
 makeScorePad : (List ScoreRow -> List ScorePadRow) -> List ScoreRow -> ScorePad
@@ -216,17 +216,17 @@ type alias ScoreRow =
 
 
 type Scores
-    = Scores (Array ScoreRow)
+    = Scores (List ScoreRow)
 
 
-makeScoresForTesting : Array ScoreRow -> Scores
+makeScoresForTesting : List ScoreRow -> Scores
 makeScoresForTesting scoreRows =
-    if Array.length scoreRows == numberOfRanks then
+    if List.length scoreRows == numberOfRanks then
         Scores scoreRows
 
     else
         -- make sure the error shows up early
-        Scores (Array.fromList [])
+        Scores []
 
 
 threeNothings : ScoreRow
@@ -236,14 +236,14 @@ threeNothings =
 
 emptyScores : Scores
 emptyScores =
-    Scores (Array.fromList (List.repeat numberOfRanks threeNothings))
+    Scores (List.repeat numberOfRanks threeNothings)
 
 
 numberOfTurns : Int
 numberOfTurns =
     case emptyScores of
         Scores scores ->
-            Array.length scores * List.length threeNothings
+            List.length scores * List.length threeNothings
 
 
 boxToString : ScoreBox -> String
@@ -256,26 +256,32 @@ boxToString box =
             String.fromInt n
 
 
-getScoreRow : Rank -> Scores -> ScoreRow
-getScoreRow rank (Scores scores) =
-    Maybe.withDefault threeNothings (Array.get (Rank.toInt rank) scores)
-
-
-getScoreBox : Location -> Scores -> ScoreBox
-getScoreBox ( rank, column ) scores =
-    getScoreRow rank scores
-        |> Array.fromList
-        |> Array.get column
-        |> Maybe.withDefault Nothing
-
-
 setScoreBox : Location -> ScoreBox -> Scores -> Scores
 setScoreBox ( rank, column ) scoreBox (Scores scores) =
     let
+        scoreArray =
+            Array.fromList scores
+
+        r =
+            Rank.toInt rank
+
         row =
-            getScoreRow rank (Scores scores)
-                |> Array.fromList
-                |> Array.set column scoreBox
-                |> Array.toList
+            Maybe.withDefault threeNothings (Array.get r scoreArray)
+
+        newRow =
+            row |> Array.fromList |> Array.set column scoreBox |> Array.toList
     in
-    Scores (Array.set (Rank.toInt rank) row scores)
+    Array.set r newRow scoreArray
+        |> Array.toList
+        |> Scores
+
+
+getScoreBox : Location -> Scores -> ScoreBox
+getScoreBox ( rank, column ) (Scores scores) =
+    let
+        row =
+            List.drop (Rank.toInt rank) scores
+                |> List.head
+                |> Maybe.withDefault threeNothings
+    in
+    Maybe.withDefault Nothing (Array.get column (Array.fromList row))

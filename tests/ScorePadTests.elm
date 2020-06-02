@@ -106,7 +106,7 @@ genScores =
         genScoreRow =
             Random.list 3 genScoreBox
     in
-    Random.map ScorePad.makeScoresForTesting (Random.Array.array Rank.numberOfRanks genScoreRow)
+    Random.map ScorePad.makeScoresForTesting (Random.list Rank.numberOfRanks genScoreRow)
 
 
 scoreFuzz : Fuzz.Fuzzer Scores

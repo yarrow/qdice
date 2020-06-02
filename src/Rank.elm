@@ -1,7 +1,7 @@
 module Rank exposing
     ( DiceToKeep(..)
     , PipsCounted
-    , Rank(..)
+    , Rank
     , arbitraryRank
     , captions
     , countPips
