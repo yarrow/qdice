@@ -1,6 +1,6 @@
-module Scores exposing
-    ( Location
-    , Box
+module Score exposing
+    ( Box
+    , Location
     , Row
     , Scores
     , emptyScores

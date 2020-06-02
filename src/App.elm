@@ -9,6 +9,12 @@ import Html.Events exposing (onClick)
 import Pip exposing (Pip)
 import Random
 import Rank
+import Score
+    exposing
+        ( Location
+        , Scores
+        , emptyScores
+        )
 import ScorePad
     exposing
         ( Occupancy(..)
@@ -17,13 +23,6 @@ import ScorePad
         , ScorePadRow
         , activeScorePad
         , staticScorePad
-        )
-import Scores
-    exposing
-        ( Location
-        , Scores
-        , emptyScores
-        , numberOfTurns
         )
 
 
@@ -91,7 +90,7 @@ update msg model =
                         |> Maybe.map (Rank.tallyPips rank)
 
                 scores =
-                    Scores.setBox ( rank, column ) scoreToInsert model.scores
+                    Score.setBox ( rank, column ) scoreToInsert model.scores
 
                 newModel =
                     { model
@@ -274,7 +273,7 @@ initialModel : Model
 initialModel =
     { dice = Nothing
     , rollsLeft = 3
-    , turnsLeft = Scores.numberOfTurns
+    , turnsLeft = Score.numberOfTurns
     , scores = emptyScores
     }
 

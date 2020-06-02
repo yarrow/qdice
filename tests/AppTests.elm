@@ -10,7 +10,7 @@ import Html.Attributes as Attr
 import Pip exposing (Pip)
 import Random
 import Rank exposing (Rank)
-import Scores exposing (numberOfTurns)
+import Score exposing (numberOfTurns)
 import Shrink
 import Test exposing (..)
 import Test.Html.Query as Query
@@ -80,7 +80,7 @@ appTests =
             , test "We start with blank scores" <|
                 \_ ->
                     initialModel.scores
-                        |> Expect.equal Scores.emptyScores
+                        |> Expect.equal Score.emptyScores
             ]
         , describe "Properties of update" <|
             let
@@ -209,7 +209,7 @@ appTests =
                     in
                     updateModel (RecordScore chance1) modelAfterFirstRoll
                         |> .scores
-                        |> Scores.getBox chance1
+                        |> Score.getBox chance1
                         |> Expect.equal scoreForRank
             , test "NewGame resets the model to the initial model" <|
                 \_ ->

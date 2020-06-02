@@ -7,6 +7,7 @@ import Pip exposing (Pip)
 import Random
 import Random.Extra
 import Rank
+import Score exposing (Scores, emptyScores)
 import ScorePad
     exposing
         ( Occupancy(..)
@@ -22,7 +23,6 @@ import ScorePad
         , upperTotal
         , weightedScore
         )
-import Scores exposing (Scores, emptyScores)
 import Shrink
 import Test exposing (Test, describe, fuzz, test)
 
@@ -104,7 +104,7 @@ genScores =
         genScoreRow =
             Random.list 3 genScoreBox
     in
-    Random.map Scores.makeScoresForTesting (Random.list Rank.numberOfRanks genScoreRow)
+    Random.map Score.makeScoresForTesting (Random.list Rank.numberOfRanks genScoreRow)
 
 
 scoreFuzz : Fuzz.Fuzzer Scores

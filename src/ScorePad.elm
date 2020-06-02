@@ -15,7 +15,7 @@ module ScorePad exposing
 
 import Pip exposing (Pip)
 import Rank
-import Scores exposing (Location, Scores)
+import Score exposing (Location, Scores)
 
 
 
@@ -48,7 +48,7 @@ grandTotal =
     "Total"
 
 
-boxToString : Scores.Box -> String
+boxToString : Score.Box -> String
 boxToString box =
     case box of
         Nothing ->
@@ -85,18 +85,18 @@ type RowKind
 
 staticScorePad : Scores -> ScorePad
 staticScorePad scores =
-    makeScorePad staticScorePadRows (Scores.toRows scores)
+    makeScorePad staticScorePadRows (Score.toRows scores)
 
 
 activeScorePad : List Pip -> Scores -> ScorePad
 activeScorePad pipList scores =
-    makeScorePad (activeScorePadRows pipList) (Scores.toRows scores)
+    makeScorePad (activeScorePadRows pipList) (Score.toRows scores)
 
 
-makeScorePad : (List Scores.Row -> List ScorePadRow) -> List Scores.Row -> ScorePad
+makeScorePad : (List Score.Row -> List ScorePadRow) -> List Score.Row -> ScorePad
 makeScorePad padRows scores =
     let
-        getSectionTotal : List Scores.Row -> List Int
+        getSectionTotal : List Score.Row -> List Int
         getSectionTotal sectionRows =
             let
                 section : List (List Int)
@@ -154,7 +154,7 @@ makeScorePad padRows scores =
         ]
 
 
-staticScorePadRows : List Scores.Row -> List ScorePadRow
+staticScorePadRows : List Score.Row -> List ScorePadRow
 staticScorePadRows scores =
     let
         inUse box =
@@ -169,7 +169,7 @@ staticScorePadRows scores =
     List.map2 staticRow Rank.captions scores
 
 
-activeScorePadRows : List Pip -> List Scores.Row -> List ScorePadRow
+activeScorePadRows : List Pip -> List Score.Row -> List ScorePadRow
 activeScorePadRows pips scores =
     let
         counted =
