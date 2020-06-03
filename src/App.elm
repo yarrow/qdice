@@ -19,8 +19,6 @@ import ScorePad
     exposing
         ( Occupancy(..)
         , RowKind(..)
-        , ScorePadBox
-        , ScorePadRow
         , makeScorePad
         )
 
@@ -207,7 +205,7 @@ viewScores model =
         topBox label =
             td [ class "score-top" ] [ text label ]
 
-        displayBox : ScorePadBox -> Html Msg
+        displayBox : ScorePad.Box -> Html Msg
         displayBox ( occupancy, score ) =
             case occupancy of
                 InUse ->
@@ -217,7 +215,7 @@ viewScores model =
                     td [ class "available" ]
                         [ a [ onClick (RecordScore location), href "#0" ] [ text score ] ]
 
-        scoreRow : ScorePadRow -> Html Msg
+        scoreRow : ScorePad.Row -> Html Msg
         scoreRow row =
             let
                 capt =

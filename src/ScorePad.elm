@@ -1,9 +1,9 @@
 module ScorePad exposing
-    ( Occupancy(..)
+    ( Box
+    , Occupancy(..)
+    , Row
     , RowKind(..)
     , ScorePad
-    , ScorePadBox
-    , ScorePadRow
     , grandTotal
     , makeScorePad
     , totalScore
@@ -58,17 +58,17 @@ boxToString box =
 
 
 type alias ScorePad =
-    List ScorePadRow
+    List Row
 
 
-type alias ScorePadRow =
+type alias Row =
     { caption : String
     , kind : RowKind
-    , boxes : List ScorePadBox
+    , boxes : List Box
     }
 
 
-type alias ScorePadBox =
+type alias Box =
     ( Occupancy, String )
 
 
@@ -91,10 +91,10 @@ makeScorePad pips scoreRows =
         scorePadRows =
             case pips of
                 Nothing ->
-                    staticScorePadRows scores
+                    staticRows scores
 
                 Just pipList ->
-                    activeScorePadRows pipList scores
+                    activeRows pipList scores
 
         getSectionTotal : List Score.Row -> List Int
         getSectionTotal sectionRows =
@@ -153,8 +153,8 @@ makeScorePad pips scoreRows =
         ]
 
 
-staticScorePadRows : List Score.Row -> List ScorePadRow
-staticScorePadRows scores =
+staticRows : List Score.Row -> List Row
+staticRows scores =
     let
         inUse box =
             ( InUse, boxToString box )
@@ -168,8 +168,8 @@ staticScorePadRows scores =
     List.map2 staticRow Rank.captions scores
 
 
-activeScorePadRows : List Pip -> List Score.Row -> List ScorePadRow
-activeScorePadRows pips scores =
+activeRows : List Pip -> List Score.Row -> List Row
+activeRows pips scores =
     let
         counted =
             Rank.countPips pips

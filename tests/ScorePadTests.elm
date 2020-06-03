@@ -13,8 +13,6 @@ import ScorePad
         ( Occupancy(..)
         , RowKind(..)
         , ScorePad
-        , ScorePadBox
-        , ScorePadRow
         , grandTotal
         , makeScorePad
         , totalScore
@@ -236,12 +234,12 @@ theCaptions =
     ]
 
 
-rolledRows : ScorePad -> List ScorePadRow
+rolledRows : ScorePad -> List ScorePad.Row
 rolledRows scores =
     List.filter (\r -> r.kind == Rolled) scores
 
 
-rolledBoxes : ScorePad -> List ScorePadBox
+rolledBoxes : ScorePad -> List ScorePad.Box
 rolledBoxes scores =
     List.concatMap .boxes (rolledRows scores)
 

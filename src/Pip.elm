@@ -7,7 +7,6 @@ module Pip exposing
     , toInt
     )
 
-import Array
 import Random
 
 
