@@ -28,7 +28,7 @@ chance1 =
 
 randomPips : List Pip
 randomPips =
-    Random.step (DiceBoard.rollForNewDice Nothing) (Random.initialSeed 0) |> Tuple.first
+    Random.step (DiceBoard.rollForNewDice DiceBoard.empty) (Random.initialSeed 0) |> Tuple.first
 
 
 setDice : Model -> PreDice -> Model
@@ -48,7 +48,7 @@ modelAfterFirstRoll =
 
 pipsFuzz : Fuzz.Fuzzer (List Pip)
 pipsFuzz =
-    Fuzz.custom (DiceBoard.rollForNewDice Nothing) Shrink.noShrink
+    Fuzz.custom (DiceBoard.rollForNewDice DiceBoard.empty) Shrink.noShrink
 
 
 find : Model -> List Test.Html.Selector.Selector -> Query.Single Msg
@@ -68,7 +68,7 @@ appTests =
             [ test "We start with no dice" <|
                 \_ ->
                     initialModel.dice
-                        |> Expect.equal Nothing
+                        |> Expect.equal DiceBoard.empty
             , test "We start with three rolls available" <|
                 \_ ->
                     initialModel.rollsLeft
@@ -128,12 +128,12 @@ appTests =
                             List.all (\d -> d.nextRoll == Keep) diceList
 
                         passed =
-                            case modelAfterFirstRoll.dice of
+                            case DiceBoard.toDiceList modelAfterFirstRoll.dice of
                                 Nothing ->
                                     False
 
                                 Just dice ->
-                                    allKeep (DiceBoard.toDiceList dice)
+                                    allKeep dice
                     in
                     passed |> Expect.true "Initially, all dice have an NextRoll of Keep"
             , test "`DieFlipped 0` causes the 0th die to flip its NextRoll status" <|
@@ -198,13 +198,13 @@ appTests =
                 \_ ->
                     updateModel (RecordScore chance1) modelAfterFirstRoll
                         |> .dice
-                        |> Expect.equal Nothing
+                        |> Expect.equal DiceBoard.empty
             , test "(RecordScore (rank, j) sets the new model's score at (rank, j) to the points indicated in the scorePad" <|
                 \_ ->
                     let
                         scoreForRank =
                             modelAfterFirstRoll.dice
-                                |> Maybe.map DiceBoard.toPips
+                                |> DiceBoard.toPips
                                 |> Maybe.map (Rank.tallyPips Rank.arbitraryRank)
                     in
                     updateModel (RecordScore chance1) modelAfterFirstRoll
@@ -256,12 +256,7 @@ appTests =
                             updateModel (GotDice pips) initialModel
 
                         suggestions =
-                            case model.dice of
-                                Nothing ->
-                                    []
-
-                                Just fiveDice ->
-                                    Rank.suggestKeeping (DiceBoard.toPips fiveDice)
+                            Rank.suggestKeeping (DiceBoard.toPips model.dice)
                     in
                     findAll model [ class "suggestion" ]
                         |> Query.count (Expect.equal (List.length suggestions))

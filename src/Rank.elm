@@ -29,35 +29,40 @@ type DiceToKeep
     | OfAKind Int
 
 
-suggestKeeping : List Pip -> List DiceToKeep
-suggestKeeping pipList =
-    let
-        counted =
-            countPips pipList
+suggestKeeping : Maybe (List Pip) -> List DiceToKeep
+suggestKeeping pips =
+    case pips of
+        Nothing ->
+            []
 
-        pairOrBetter =
-            counted
-                |> Array.toList
-                |> List.indexedMap
-                    (\pips count ->
-                        if count >= 2 && count < 5 then
-                            pips
+        Just pipList ->
+            let
+                counted =
+                    countPips pipList
 
-                        else
-                            0
-                    )
-                |> List.filter (\n -> n > 0)
-                |> List.map OfAKind
+                pairOrBetter =
+                    counted
+                        |> Array.toList
+                        |> List.indexedMap
+                            (\pipz count ->
+                                if count >= 2 && count < 5 then
+                                    pipz
 
-        diceToKeep =
-            case straightSuggestion counted of
-                Just straight ->
-                    straight :: pairOrBetter
+                                else
+                                    0
+                            )
+                        |> List.filter (\n -> n > 0)
+                        |> List.map OfAKind
 
-                Nothing ->
-                    pairOrBetter
-    in
-    List.reverse diceToKeep
+                diceToKeep =
+                    case straightSuggestion counted of
+                        Just straight ->
+                            straight :: pairOrBetter
+
+                        Nothing ->
+                            pairOrBetter
+            in
+            List.reverse diceToKeep
 
 
 straightSuggestion : PipsCounted -> Maybe DiceToKeep

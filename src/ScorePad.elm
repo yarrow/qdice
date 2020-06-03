@@ -4,9 +4,8 @@ module ScorePad exposing
     , ScorePad
     , ScorePadBox
     , ScorePadRow
-    , activeScorePad
     , grandTotal
-    , staticScorePad
+    , makeScorePad
     , totalScore
     , upperBonus
     , upperTotal
@@ -83,19 +82,20 @@ type RowKind
     | Calculated
 
 
-staticScorePad : Scores -> ScorePad
-staticScorePad scores =
-    makeScorePad staticScorePadRows (Score.toRows scores)
-
-
-activeScorePad : List Pip -> Scores -> ScorePad
-activeScorePad pipList scores =
-    makeScorePad (activeScorePadRows pipList) (Score.toRows scores)
-
-
-makeScorePad : (List Score.Row -> List ScorePadRow) -> List Score.Row -> ScorePad
-makeScorePad padRows scores =
+makeScorePad : Maybe (List Pip) -> Scores -> ScorePad
+makeScorePad pips scoreRows =
     let
+        scores =
+            Score.toRows scoreRows
+
+        scorePadRows =
+            case pips of
+                Nothing ->
+                    staticScorePadRows scores
+
+                Just pipList ->
+                    activeScorePadRows pipList scores
+
         getSectionTotal : List Score.Row -> List Int
         getSectionTotal sectionRows =
             let
@@ -139,13 +139,12 @@ makeScorePad padRows scores =
             , kind = Calculated
             , boxes = List.map (\n -> ( InUse, String.fromInt n )) row
             }
-
-        scorePadRows =
-            padRows scores
     in
     List.concat
         [ Rank.upper scorePadRows
-        , [ sumRow upperTotal topTotal, sumRow upperBonus bonus ]
+        , [ sumRow upperTotal topTotal
+          , sumRow upperBonus bonus
+          ]
         , Rank.lower scorePadRows
         , [ sumRow totalScore rowTotal
           , sumRow weightedScore withWeights

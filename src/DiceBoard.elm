@@ -1,6 +1,7 @@
 module DiceBoard exposing
     ( DiceBoard
     , display
+    , empty
     , flipNextRoll
     , hasRerolls
     , keepOnly
@@ -19,18 +20,24 @@ import Rank exposing (DiceToKeep(..))
 import Set
 
 
+toPips : DiceBoard -> Maybe (List Pip)
+toPips (DiceBoard diceList) =
+    Maybe.map (List.map .pips) diceList
+
+
 
 -- This module (pretends to) enforce the invariant that a DiceBoard has either
--- zero dice (is Nothing) or five dice (is Just FiveDice). See the mergeDice
--- comment below for a place that we can't check this easily.
+-- zero dice — is (DiceBoard Nothing) or five dice. See the mergeDice comment
+-- below for a place that we can't check this easily.
 
 
-type alias DiceBoard =
-    Maybe FiveDice
+type DiceBoard
+    = DiceBoard (Maybe DiceList)
 
 
-type FiveDice
-    = FiveDice DiceList
+empty : DiceBoard
+empty =
+    DiceBoard Nothing
 
 
 numberOfDice : Int
@@ -39,32 +46,22 @@ numberOfDice =
 
 
 display : a -> (Int -> Die -> a) -> DiceBoard -> List a
-display emptyRow makeRow board =
+display emptyRow makeRow (DiceBoard board) =
     case board of
         Nothing ->
             List.repeat numberOfDice emptyRow
 
-        Just (FiveDice theDice) ->
+        Just theDice ->
             List.indexedMap makeRow theDice
 
 
-toDiceList : FiveDice -> DiceList
-toDiceList (FiveDice dice) =
-    dice
-
-
-toPips : FiveDice -> List Pip
-toPips (FiveDice dice) =
-    List.map .pips dice
-
-
 rerollCount : DiceBoard -> Int
-rerollCount board =
+rerollCount (DiceBoard board) =
     case board of
         Nothing ->
             numberOfDice
 
-        Just (FiveDice dice) ->
+        Just dice ->
             Dice.rerollCount dice
 
 
@@ -76,14 +73,18 @@ rerollCount board =
 -- worse.
 
 
-mergeDice : List Pip -> DiceBoard -> FiveDice
-mergeDice incoming current =
-    case current of
-        Nothing ->
-            FiveDice (Dice.fromPips incoming)
+mergeDice : List Pip -> DiceBoard -> DiceBoard
+mergeDice incoming (DiceBoard current) =
+    let
+        dice =
+            case current of
+                Nothing ->
+                    Dice.fromPips incoming
 
-        Just (FiveDice oldDice) ->
-            FiveDice (Dice.mergeDice incoming oldDice)
+                Just oldDice ->
+                    Dice.mergeDice incoming oldDice
+    in
+    DiceBoard (Just dice)
 
 
 rollForNewDice : DiceBoard -> Generator (List Pip)
@@ -97,30 +98,23 @@ hasRerolls board =
 
 
 flipNextRoll : Int -> DiceBoard -> DiceBoard
-flipNextRoll n board =
-    let
-        flip =
-            \j (FiveDice dice) -> FiveDice (Dice.flipNextRoll j dice)
-    in
-    Maybe.map (flip n) board
+flipNextRoll j (DiceBoard dice) =
+    DiceBoard (Maybe.map (Dice.flipNextRoll j) dice)
 
 
 suggestions : DiceBoard -> List ( DiceToKeep, List String )
 suggestions diceBoard =
     case diceBoard of
-        Nothing ->
+        DiceBoard Nothing ->
             []
 
-        Just fiveDice ->
+        DiceBoard (Just dice) ->
             let
                 keepSets =
-                    case fiveDice of
-                        FiveDice diceList ->
-                            Rank.suggestKeeping (List.map .pips diceList)
+                    Rank.suggestKeeping (toPips diceBoard)
 
                 keptUrls diceToKeep =
-                    justKeepOnly diceToKeep fiveDice
-                        |> toDiceList
+                    justKeepOnly diceToKeep dice
                         |> List.filter (\die -> die.nextRoll == Keep)
                         |> List.map Dice.urlSmall
                         |> List.sort
@@ -132,8 +126,8 @@ type alias Args =
     ( Set.Set Int, DiceList, DiceList )
 
 
-justKeepOnly : DiceToKeep -> FiveDice -> FiveDice
-justKeepOnly suggested (FiveDice diceList) =
+justKeepOnly : DiceToKeep -> DiceList -> DiceList
+justKeepOnly suggested diceList =
     let
         keepByPips pipsToKeep =
             List.map
@@ -179,19 +173,17 @@ justKeepOnly suggested (FiveDice diceList) =
             in
             List.reverse dice
     in
-    FiveDice
-        (case suggested of
-            OfAKind pipsToKeep ->
-                keepByPips pipsToKeep
+    case suggested of
+        OfAKind pipsToKeep ->
+            keepByPips pipsToKeep
 
-            Straight straight ->
-                keepStraight straight
-        )
+        Straight straight ->
+            keepStraight straight
 
 
 keepOnly : DiceToKeep -> DiceBoard -> DiceBoard
-keepOnly suggestion diceBoard =
-    Maybe.map (justKeepOnly suggestion) diceBoard
+keepOnly suggestion (DiceBoard diceBoard) =
+    DiceBoard (Maybe.map (justKeepOnly suggestion) diceBoard)
 
 
 
@@ -200,8 +192,14 @@ keepOnly suggestion diceBoard =
 
 makeDiceBoard : List ( Int, NextRoll ) -> DiceBoard
 makeDiceBoard raw =
-    if List.length raw == numberOfDice then
-        Just <| FiveDice <| Dice.fromPairs raw
+    DiceBoard <|
+        if List.length raw == numberOfDice then
+            Just <| Dice.fromPairs raw
 
-    else
-        Nothing
+        else
+            Nothing
+
+
+toDiceList : DiceBoard -> Maybe DiceList
+toDiceList (DiceBoard diceList) =
+    diceList

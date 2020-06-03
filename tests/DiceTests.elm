@@ -36,9 +36,9 @@ diceTests =
                         |> Tuple.first
                         |> List.length
             in
-            [ test "`rollForNewDice emptyBoard` returns a 5-dice generator" <|
+            [ test "`rollForNewDice DiceBoard.empty` returns a 5-dice generator" <|
                 \_ ->
-                    numberRolled (DiceBoard.rollForNewDice Nothing)
+                    numberRolled (DiceBoard.rollForNewDice DiceBoard.empty)
                         |> Expect.equal 5
             , test "When diceBoard is not empty, `rollForNewDice diceBoard` returns a generator for the number dice with nextRoll==Reroll" <|
                 \_ ->

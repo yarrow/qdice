@@ -3,7 +3,7 @@ module ScorePadTests exposing (fuzzTests, regularTests)
 import Dict exposing (Dict)
 import Expect
 import Fuzz
-import Pip exposing (Pip)
+import Pip
 import Random
 import Random.Extra
 import Rank
@@ -15,9 +15,8 @@ import ScorePad
         , ScorePad
         , ScorePadBox
         , ScorePadRow
-        , activeScorePad
         , grandTotal
-        , staticScorePad
+        , makeScorePad
         , totalScore
         , upperBonus
         , upperTotal
@@ -57,6 +56,20 @@ upperCaptions =
 allScoreCaptions : List String
 allScoreCaptions =
     Rank.captions
+
+
+activeScorePad : Scores -> ScorePad
+activeScorePad scores =
+    let
+        somePips =
+            Pip.mapFromInt [ 1, 3, 2, 5, 6 ]
+    in
+    makeScorePad (Just somePips) scores
+
+
+staticScorePad : Scores -> ScorePad
+staticScorePad scores =
+    makeScorePad Nothing scores
 
 
 sectionSum : List String -> Scores -> List Int
@@ -144,7 +157,7 @@ subtests =
                     staticScorePad scores
 
                 active =
-                    activeScorePad somePips scores
+                    activeScorePad scores
             in
             parse static == parse active
     , subtest "The upperTotal row is the sum of the upperRanks rows" <|
@@ -223,11 +236,6 @@ theCaptions =
     ]
 
 
-somePips : List Pip
-somePips =
-    Pip.mapFromInt [ 1, 3, 2, 5, 6 ]
-
-
 rolledRows : ScorePad -> List ScorePadRow
 rolledRows scores =
     List.filter (\r -> r.kind == Rolled) scores
@@ -245,7 +253,7 @@ emptyStatic =
 
 emptyActive : ScorePad
 emptyActive =
-    activeScorePad somePips emptyScores
+    activeScorePad emptyScores
 
 
 isAvailable : Occupancy -> Bool

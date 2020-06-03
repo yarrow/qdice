@@ -21,8 +21,7 @@ import ScorePad
         , RowKind(..)
         , ScorePadBox
         , ScorePadRow
-        , activeScorePad
-        , staticScorePad
+        , makeScorePad
         )
 
 
@@ -62,7 +61,7 @@ update msg model =
             let
                 newModel =
                     { model
-                        | dice = Just (DiceBoard.mergeDice incomingDice model.dice)
+                        | dice = DiceBoard.mergeDice incomingDice model.dice
                         , rollsLeft = model.rollsLeft - 1
                     }
             in
@@ -86,7 +85,7 @@ update msg model =
             let
                 scoreToInsert =
                     model.dice
-                        |> Maybe.map DiceBoard.toPips
+                        |> DiceBoard.toPips
                         |> Maybe.map (Rank.tallyPips rank)
 
                 scores =
@@ -94,7 +93,7 @@ update msg model =
 
                 newModel =
                     { model
-                        | dice = Nothing
+                        | dice = DiceBoard.empty
                         , rollsLeft = 3
                         , turnsLeft = model.turnsLeft - 1
                         , scores = scores
@@ -244,15 +243,10 @@ viewScores model =
 
         scoreRows =
             let
-                getScorePad =
-                    case model.dice of
-                        Nothing ->
-                            staticScorePad
-
-                        Just dice ->
-                            activeScorePad (DiceBoard.toPips dice)
+                pips =
+                    DiceBoard.toPips model.dice
             in
-            List.map scoreRow (getScorePad model.scores)
+            List.map scoreRow (makeScorePad pips model.scores)
 
         topRow =
             tr [ class "score-top-row" ]
@@ -271,7 +265,7 @@ type alias Model =
 
 initialModel : Model
 initialModel =
-    { dice = Nothing
+    { dice = DiceBoard.empty
     , rollsLeft = 3
     , turnsLeft = Score.numberOfTurns
     , scores = emptyScores
