@@ -11,7 +11,7 @@ module Rank exposing
     , ranks
     , scoreAll
     , suggestKeeping
-    , tallyPips
+    , scoreAt
     , toInt
     , upper
     )
@@ -151,8 +151,8 @@ longestStraight counted =
     findRun counted |> Tuple.second
 
 
-tallyPips : Rank -> List Pip -> Int
-tallyPips (Rank rank) pipList =
+scoreAt : Rank -> List Pip -> Int
+scoreAt (Rank rank) pipList =
     let
         fn : PipsCounted -> Int
         fn =

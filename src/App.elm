@@ -84,7 +84,7 @@ update msg model =
                 scoreToInsert =
                     model.dice
                         |> DiceBoard.toPips
-                        |> Maybe.map (Rank.tallyPips rank)
+                        |> Maybe.map (Rank.scoreAt rank)
 
                 scores =
                     Score.setBox ( rank, column ) scoreToInsert model.scores
