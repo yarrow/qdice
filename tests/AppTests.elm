@@ -21,7 +21,7 @@ type alias PreDice =
     List ( Int, Dice.NextRoll )
 
 
-chance1 : ( Rank, Int )
+chance1 : Score.Location
 chance1 =
     ( Rank.arbitraryRank, 1 )
 
@@ -69,6 +69,10 @@ appTests =
                 \_ ->
                     initialModel.dice
                         |> Expect.equal DiceBoard.empty
+            , test "We start with old == Nothing" <|
+                \_ ->
+                    initialModel.old
+                        |> Expect.equal Nothing
             , test "We start with three rolls available" <|
                 \_ ->
                     initialModel.rollsLeft
@@ -199,6 +203,66 @@ appTests =
                     updateModel (RecordScore chance1) modelAfterFirstRoll
                         |> .dice
                         |> Expect.equal DiceBoard.empty
+            , test "(RecordScore (rank, j)'s newModel has newModel.old == Just(model.dice, (rank, j))" <|
+                \_ ->
+                    let
+                        oldDice =
+                            modelAfterFirstRoll.dice
+                    in
+                    updateModel (RecordScore chance1) modelAfterFirstRoll
+                        |> .old
+                        |> Expect.equal (Just ( oldDice, chance1 ))
+            , test "For a model with old == Just(oldDice, location), UndoScore returns {model | dice =oldDice, scores = setBox location Nothing model.scores, rollsLeft =0, turnsLeft = model.turnsLeft + 1, old = Nothing" <|
+                \_ ->
+                    let
+                        previous =
+                            updateModel (RecordScore chance1) modelAfterFirstRoll
+
+                        ( oldDice, location ) =
+                            case previous.old of
+                                Nothing ->
+                                    ( DiceBoard.empty, ( Rank.arbitraryRank, 3 ) )
+
+                                Just info ->
+                                    info
+
+                        scoresUndone =
+                            Score.setBox location Nothing previous.scores
+
+                        this =
+                            updateModel UndoScore previous
+                    in
+                    this
+                        |> Expect.equal
+                            { previous
+                                | dice = oldDice
+                                , scores = scoresUndone
+                                , rollsLeft = 0
+                                , turnsLeft = previous.turnsLeft + 1
+                                , old = Nothing
+                            }
+            , describe "We see an Undo button if and only if old is non-Nothing" <|
+                let
+                    undoCountIs n model =
+                        findAll model [ tag "button", class "undo" ]
+                            |> Query.count (Expect.equal n)
+
+                    withScoreRecorded =
+                        updateModel (RecordScore chance1) modelAfterFirstRoll
+
+                    afterGotDice =
+                        updateModel (GotDice randomPips) withScoreRecorded
+                in
+                [ test "We see no Undo button in the inital model" <|
+                    \_ ->
+                        undoCountIs 0 initialModel
+                , test "We do see an Undo button immediately after a score is recorded" <|
+                    \_ ->
+                        undoCountIs 1 withScoreRecorded
+                , test "We see no Undo button after GotDice" <|
+                    \_ ->
+                        undoCountIs 0 afterGotDice
+                ]
             , test "(RecordScore (rank, j) sets the new model's score at (rank, j) to the points indicated in the scorePad" <|
                 \_ ->
                     let

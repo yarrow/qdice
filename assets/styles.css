@@ -37,6 +37,11 @@ td.dice-button {
   padding-top: 14px;
   padding-bottom: 7px;
 }
+.undo {
+  height: 25px;
+  font-size: 14px;
+  background-color: #a2da27;
+}
 button.roll-dice:hover {
   background-color: #87c512;
 }
