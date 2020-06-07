@@ -284,7 +284,7 @@ viewScores model =
 
                 Available location ->
                     td [ class "available" ]
-                        [ a [ onClick (RecordScore location), href "#0" ] [ text score ] ]
+                        [ button [ onClick (RecordScore location) ] [ text score ] ]
 
         scoreRow : ScorePad.Row -> Html Msg
         scoreRow row =

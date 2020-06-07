@@ -1,7 +1,7 @@
 module ScorePadTests exposing (fuzzTests, regularTests)
 
 import Dict exposing (Dict)
-import Expect
+import Expect exposing (Expectation)
 import Fuzz
 import Pip
 import Random
@@ -126,30 +126,24 @@ scoreFuzz =
 fuzzTests : Test
 fuzzTests =
     fuzz scoreFuzz "All the fuzz tests at once, so we don't have to refuzz for every test" <|
-        \someScores ->
-            testAll someScores subtests
-                |> Expect.equal ""
+        \scores ->
+            testAll scores subtests
 
 
-testAll : Scores -> List (Scores -> String) -> String
+testAll : Scores -> List (Scores -> Expectation) -> Expectation
 testAll scores tests =
-    String.concat (List.map (\test -> test scores) tests)
+    scores |> Expect.all tests
 
 
-subtest : String -> (Scores -> Bool) -> (Scores -> String)
+subtest : String -> (String -> Scores -> Expectation) -> (Scores -> Expectation)
 subtest label fn =
-    \scores ->
-        if fn scores then
-            ""
-
-        else
-            label
+    fn label
 
 
-subtests : List (Scores -> String)
+subtests : List (Scores -> Expectation)
 subtests =
     [ subtest "static and active ScorePads have the same totals" <|
-        \scores ->
+        \label scores ->
             let
                 static =
                     staticScorePad scores
@@ -157,12 +151,42 @@ subtests =
                 active =
                     activeScorePad scores
             in
-            parse static == parse active
+            parse static
+                == parse active
+                |> Expect.true label
     , subtest "The upperTotal row is the sum of the upperRanks rows" <|
-        \scores ->
-            sectionSum upperCaptions scores == getSumRow upperTotal scores
+        \label scores ->
+            sectionSum upperCaptions scores
+                == getSumRow upperTotal scores
+                |> Expect.true label
+    , subtest "An active ScorePad has blank where the new score would be zero" <|
+        \label scores ->
+            let
+                available : List String
+                available =
+                    scores
+                        |> activeScorePad
+                        |> List.filter (\r -> r.kind == Rolled)
+                        |> List.map .boxes
+                        |> List.concat
+                        |> List.filterMap
+                            (\( o, s ) ->
+                                case o of
+                                    Available _ ->
+                                        Just s
+
+                                    InUse ->
+                                        Nothing
+                            )
+
+                zeros =
+                    List.filter (\b -> b == "0") available
+            in
+            List.length zeros
+                == 0
+                |> Expect.true label
     , subtest "Each upperBonus box is 35 if the corresponding upperTotal box is >= 63, 0 otherwise" <|
-        \scores ->
+        \label scores ->
             let
                 topTotals =
                     getSumRow upperTotal scores
@@ -174,8 +198,9 @@ subtests =
                     (total >= 63 && bonus == 35) || (total < 63 && bonus == 0)
             in
             List.all (\bool -> bool) (List.map2 goodBonus topTotals bonuses)
+                |> Expect.true label
     , subtest "The totalScore row is the sum of the Rolled rows, plus the bonus row" <|
-        \scores ->
+        \label scores ->
             let
                 allBoxes =
                     sectionSum allScoreCaptions scores
@@ -186,9 +211,11 @@ subtests =
                 expected =
                     List.map2 (+) allBoxes bonus
             in
-            expected == getSumRow totalScore scores
+            expected
+                == getSumRow totalScore scores
+                |> Expect.true label
     , subtest "The weightedScore row is the totalScore row, times [1,2,3]" <|
-        \scores ->
+        \label scores ->
             let
                 totals =
                     getSumRow totalScore scores
@@ -196,9 +223,11 @@ subtests =
                 expected =
                     List.map2 (*) [ 1, 2, 3 ] totals
             in
-            expected == getSumRow weightedScore scores
+            expected
+                == getSumRow weightedScore scores
+                |> Expect.true label
     , subtest "The grandTotal box is the sum of the totalScore row" <|
-        \scores ->
+        \label scores ->
             let
                 weighted =
                     getSumRow weightedScore scores
@@ -212,7 +241,9 @@ subtests =
                 grand =
                     Maybe.withDefault -99 (List.head grandRow)
             in
-            expected == grand
+            expected
+                == grand
+                |> Expect.true label
     ]
 
 

@@ -17,15 +17,6 @@ section {
   background-color: #ffffff;
 }
 
-button {
-  background-color: #92ca17;
-  border: 0;
-  color: #444444;
-  font-size: 24px;
-  cursor: pointer;
-  font-family: 'Barlow Semi Condensed', sans-serif;
-  height: 40px;
-}
 td.suggestion {
   height: 35px;
   text-align: center;
@@ -42,12 +33,27 @@ td.dice-button {
   font-size: 14px;
   background-color: #a2da27;
 }
+button.roll-dice {
+  background-color: #92ca17;
+  border: 0;
+  color: #444444;
+  font-size: 24px;
+  cursor: pointer;
+  font-family: 'Barlow Semi Condensed', sans-serif;
+  height: 40px;
+}
 button.roll-dice:hover {
   background-color: #87c512;
 }
 
 button.dont-roll-dice {
   background-color: #c8c8c8;
+  border: 0;
+  color: #444444;
+  font-size: 24px;
+  cursor: pointer;
+  font-family: 'Barlow Semi Condensed', sans-serif;
+  height: 40px;
 }
 
 .dice {
@@ -66,10 +72,6 @@ button.dont-roll-dice {
 }
 table {
     background-color: #80d5ec;
-}
-td a {
-    display:block;
-    width:100%;
 }
 .scorepad {
     font-family: 'Barlow Condensed', sans-serif;
@@ -95,10 +97,17 @@ td a {
     border: 2px solid #306277;
     width: 40px;
 }
-.available {
-    border: 2px solid #306277;
-    width: 40px;
-    background-color: #a7f542;
+td.available {
+  border: 2px solid #306277;
+  width: 40px;
+  background-color: #a7f542;
+}
+td.available button {
+  display:block;
+  width:100%;
+  height:100%;
+  background-color: #a7f542;
+  border: 0;
 }
 .caption {
     border: 2px solid #306277;

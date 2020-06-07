@@ -180,10 +180,17 @@ activeRows pips scores =
                 pointsForThisRoll =
                     fn counted
 
+                blankIfZero n =
+                    if n == 0 then
+                        "\u{00A0}"
+
+                    else
+                        String.fromInt n
+
                 makeBox column box =
                     case box of
                         Nothing ->
-                            ( Available ( rank, column ), String.fromInt pointsForThisRoll )
+                            ( Available ( rank, column ), blankIfZero pointsForThisRoll )
 
                         Just points ->
                             ( InUse, String.fromInt points )
