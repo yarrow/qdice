@@ -6,7 +6,7 @@ import Fuzz
 import Pip
 import Random
 import Random.Extra
-import Rank
+import Rank exposing (Rating(..))
 import Score exposing (Scores, emptyScores)
 import ScorePad
     exposing
@@ -32,10 +32,10 @@ parse : ScorePad -> Info
 parse scorePad =
     -- We're using this to check the sum rows, so available boxes, not yet set, count 0
     let
-        boxParse ( occupancy, pointString ) =
+        boxParse { occupancy, score } =
             case occupancy of
                 InUse ->
-                    Maybe.withDefault 0 (String.toInt pointString)
+                    Maybe.withDefault 0 (String.toInt score)
 
                 _ ->
                     0
@@ -170,10 +170,10 @@ subtests =
                         |> List.map .boxes
                         |> List.concat
                         |> List.filterMap
-                            (\( o, s ) ->
-                                case o of
+                            (\{ occupancy, score } ->
+                                case occupancy of
                                     Available _ ->
-                                        Just s
+                                        Just score
 
                                     InUse ->
                                         Nothing
@@ -300,7 +300,7 @@ regularTests =
     describe "ScorePad tests" <|
         [ test "Every Rolled box in staticScorePad emptyScores is (InUse, '')" <|
             \_ ->
-                List.all (\box -> box == ( InUse, "" )) (rolledBoxes emptyStatic)
+                List.all (\box -> box == ScorePad.Box InUse Sufficient "") (rolledBoxes emptyStatic)
                     |> Expect.true "Every box should be (InUse, '')"
         , test "Each Rolled staticScorePad row has the correct caption" <|
             \_ ->
@@ -312,6 +312,6 @@ regularTests =
                     |> Expect.equalLists theCaptions
         , test "Every Rolled box in ScorePad emptyScores is Available" <|
             \_ ->
-                List.all (\box -> isAvailable (Tuple.first box)) (rolledBoxes emptyActive)
+                List.all (\box -> isAvailable box.occupancy) (rolledBoxes emptyActive)
                     |> Expect.true "Every box should be Available"
         ]

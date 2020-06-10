@@ -277,7 +277,7 @@ viewScores model =
             td [ class "score-top" ] [ text label ]
 
         displayBox : ScorePad.Box -> Html Msg
-        displayBox ( occupancy, score ) =
+        displayBox { occupancy, score } =
             case occupancy of
                 InUse ->
                     td [ class "in-use" ] [ text score ]
@@ -302,8 +302,8 @@ viewScores model =
 
                 scoreDisplay =
                     case row.boxes of
-                        [ ( InUse, score ) ] ->
-                            [ td [ class "in-use", colspan 3 ] [ text score ] ]
+                        [ box ] ->
+                            [ td [ class "in-use", colspan 3 ] [ text box.score ] ]
 
                         _ ->
                             List.map displayBox row.boxes

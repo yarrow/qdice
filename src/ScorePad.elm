@@ -13,7 +13,7 @@ module ScorePad exposing
     )
 
 import Pip exposing (Pip)
-import Rank
+import Rank exposing (Rating(..))
 import Score exposing (Location, Scores)
 
 
@@ -69,7 +69,7 @@ type alias Row =
 
 
 type alias Box =
-    ( Occupancy, String )
+    { occupancy : Occupancy, rating : Rating, score : String }
 
 
 type Occupancy
@@ -139,10 +139,16 @@ makeScorePad pips scoreRows =
         wholeMegilla =
             List.foldr (+) 0 withWeights
 
+        inUse n =
+            { occupancy = InUse
+            , rating = Sufficient
+            , score = String.fromInt n
+            }
+
         sumRow caption row =
             { caption = caption
             , kind = Calculated
-            , boxes = List.map (\n -> ( InUse, String.fromInt n )) row
+            , boxes = List.map (\n -> inUse n) row
             }
     in
     List.concat
@@ -162,7 +168,10 @@ staticRows : List Score.Row -> List Row
 staticRows scores =
     let
         inUse box =
-            ( InUse, boxToString box )
+            { occupancy = InUse
+            , rating = Sufficient
+            , score = boxToString box
+            }
 
         staticRow caption boxes =
             { kind = Rolled
@@ -195,10 +204,16 @@ activeRows pips scores =
                 makeBox column box =
                     case box of
                         Nothing ->
-                            ( Available ( rank, column ), blankIfZero pointsForThisRoll )
+                            { occupancy = Available ( rank, column )
+                            , rating = Sufficient
+                            , score = blankIfZero pointsForThisRoll
+                            }
 
                         Just points ->
-                            ( InUse, String.fromInt points )
+                            { occupancy = InUse
+                            , rating = Sufficient
+                            , score = String.fromInt points
+                            }
             in
             { caption = caption
             , kind = Rolled
