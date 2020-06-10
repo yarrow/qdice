@@ -185,6 +185,60 @@ subtests =
             List.length zeros
                 == 0
                 |> Expect.true label
+    , subtest "An active ScorePad has a Meager Rating for current or potential zero scores" <|
+        \label scores ->
+            let
+                scoreOf box =
+                    Maybe.withDefault -1 (String.toInt box.score)
+
+                rows =
+                    scores
+                        |> activeScorePad
+                        |> List.filter (\r -> r.kind == Rolled)
+
+                nonmeager =
+                    rows
+                        |> List.map .boxes
+                        |> List.concat
+                        |> List.filterMap
+                            (\box ->
+                                if scoreOf box == 0 && box.rating /= Meager then
+                                    Just box.rating
+
+                                else
+                                    Nothing
+                            )
+            in
+            List.length nonmeager
+                == 0
+                |> Expect.true label
+    , subtest "A static ScorePad has a Meager Rating zero scores" <|
+        \label scores ->
+            let
+                scoreOf box =
+                    Maybe.withDefault -1 (String.toInt box.score)
+
+                rows =
+                    scores
+                        |> staticScorePad
+                        |> List.filter (\r -> r.kind == Rolled)
+
+                nonmeager =
+                    rows
+                        |> List.map .boxes
+                        |> List.concat
+                        |> List.filterMap
+                            (\box ->
+                                if scoreOf box == 0 && box.rating /= Meager then
+                                    Just box.rating
+
+                                else
+                                    Nothing
+                            )
+            in
+            List.length nonmeager
+                == 0
+                |> Expect.true label
     , subtest "Each upperBonus box is 35 if the corresponding upperTotal box is >= 63, 0 otherwise" <|
         \label scores ->
             let

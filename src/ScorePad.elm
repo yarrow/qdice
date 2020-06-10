@@ -167,19 +167,23 @@ makeScorePad pips scoreRows =
 staticRows : List Score.Row -> List Row
 staticRows scores =
     let
-        inUse box =
+        inUse rating box =
+            let
+                rated =
+                    Maybe.withDefault Sufficient (Maybe.map rating box)
+            in
             { occupancy = InUse
-            , rating = Sufficient
+            , rating = rated
             , score = boxToString box
             }
 
-        staticRow caption boxes =
+        staticRow caption rating boxes =
             { kind = Rolled
             , caption = caption
-            , boxes = List.map inUse boxes
+            , boxes = List.map (inUse rating) boxes
             }
     in
-    List.map2 staticRow Rank.captions scores
+    List.map3 staticRow Rank.captions Rank.ratings scores
 
 
 activeRows : List Pip -> List Score.Row -> List Row
@@ -188,7 +192,7 @@ activeRows pips scores =
         counted =
             Rank.countPips pips
 
-        activeRow rank caption fn boxes =
+        activeRow rank caption fn rating boxes =
             let
                 pointsForThisRoll : Int
                 pointsForThisRoll =
@@ -205,13 +209,13 @@ activeRows pips scores =
                     case box of
                         Nothing ->
                             { occupancy = Available ( rank, column )
-                            , rating = Sufficient
+                            , rating = rating pointsForThisRoll
                             , score = blankIfZero pointsForThisRoll
                             }
 
                         Just points ->
                             { occupancy = InUse
-                            , rating = Sufficient
+                            , rating = rating points
                             , score = String.fromInt points
                             }
             in
@@ -220,4 +224,4 @@ activeRows pips scores =
             , boxes = List.indexedMap makeBox boxes
             }
     in
-    List.map4 activeRow Rank.ranks Rank.captions Rank.fns scores
+    List.map5 activeRow Rank.ranks Rank.captions Rank.fns Rank.ratings scores
