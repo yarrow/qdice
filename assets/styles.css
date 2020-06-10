@@ -35,7 +35,6 @@ td.dice-button {
 }
 button.roll-dice {
   background-color: #92ca17;
-  border: 0;
   color: #444444;
   font-size: 24px;
   cursor: pointer;
@@ -48,7 +47,6 @@ button.roll-dice:hover {
 
 button.dont-roll-dice {
   background-color: #c8c8c8;
-  border: 0;
   color: #444444;
   font-size: 24px;
   cursor: pointer;
@@ -111,10 +109,10 @@ td.available button {
   font-size: 14px;
   border: 0;
 }
-.available.abundant {
+.available.ample {
   background-color: #3de35c;
 }
-.available.abundant button {
+.available.ample button {
   background-color: #3de35c;
 }
 .available.meager {
@@ -123,6 +121,13 @@ td.available button {
 .available.meager button {
   background-color: #dbffab;
 }
+td.in-use.meager {
+  background-color: #9eeaff;
+}
+td.in-use.ample {
+  background-color: #b673ff;
+}
+
 .caption {
     border: 2px solid #306277;
     height: 25px;

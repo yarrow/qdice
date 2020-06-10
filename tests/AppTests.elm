@@ -371,12 +371,9 @@ appTests =
                     \_ ->
                         True |> Expect.true "I don't know how to test for this"
                 ]
-
-            {-
-               , test "There are 5 rows with (sub-)totals" <|
-                   \_ ->
-                       findAll initialModel [ class "score-total-row" ]
-                           |> Query.count (Expect.equal 5)
-            -}
+            , test "There are 5 rows with (sub-)totals" <|
+                \_ ->
+                    findAll initialModel [ class "summation-row" ]
+                        |> Query.count (Expect.equal 5)
             ]
         ]

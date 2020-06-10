@@ -8,7 +8,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Pip exposing (Pip)
 import Random
-import Rank
+import Rank exposing (Rating(..))
 import Score exposing (Location, Scores, emptyScores)
 import ScorePad exposing (Occupancy(..), RowKind(..), makeScorePad)
 
@@ -277,13 +277,25 @@ viewScores model =
             td [ class "score-top" ] [ text label ]
 
         displayBox : ScorePad.Box -> Html Msg
-        displayBox { occupancy, score } =
+        displayBox { occupancy, rating, score } =
+            let
+                rateClass =
+                    case rating of
+                        Meager ->
+                            "meager"
+
+                        Sufficient ->
+                            "sufficient"
+
+                        Ample ->
+                            "ample"
+            in
             case occupancy of
                 InUse ->
-                    td [ class "in-use" ] [ text score ]
+                    td [ class "in-use", class rateClass ] [ text score ]
 
                 Available location ->
-                    td [ class "available" ]
+                    td [ class "available", class rateClass ]
                         [ button [ onClick (RecordScore location) ] [ text score ] ]
 
         scoreRow : ScorePad.Row -> Html Msg
