@@ -2,6 +2,7 @@ module Rank exposing
     ( DiceToKeep(..)
     , PipsCounted
     , Rank
+    , Rating(..)
     , arbitraryRank
     , captions
     , countPips
@@ -9,9 +10,10 @@ module Rank exposing
     , lower
     , numberOfRanks
     , ranks
+    , ratings
     , scoreAll
-    , suggestKeeping
     , scoreAt
+    , suggestKeeping
     , toInt
     , upper
     )
@@ -249,17 +251,49 @@ numberOfRanks =
     List.length table
 
 
-
-{-
-   goodness : Rank -> Int -> Order
-   goodness =
-       ...
--}
-
-
 toInt : Rank -> Int
 toInt (Rank rank) =
     rank
+
+
+type Rating
+    = Meager -- under par for upper section, 0 for lower
+    | Sufficient -- at par for upper section, non-zero for lower
+    | Ample -- over par for upper section
+
+
+ratings : List (Int -> Rating)
+ratings =
+    let
+        rateUpper : List (Int -> Rating)
+        rateUpper =
+            List.map compareToPar [ 3, 6, 9, 12, 15, 18 ]
+
+        compareToPar : Int -> Int -> Rating
+        compareToPar par n =
+            case compare n par of
+                LT ->
+                    Meager
+
+                EQ ->
+                    Sufficient
+
+                GT ->
+                    Ample
+
+        rateLower : List (Int -> Rating)
+        rateLower =
+            List.repeat (numberOfRanks - numberOfUppers) compareToZero
+
+        compareToZero : Int -> Rating
+        compareToZero n =
+            if n == 0 then
+                Meager
+
+            else
+                Sufficient
+    in
+    rateUpper ++ rateLower
 
 
 

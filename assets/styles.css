@@ -109,6 +109,18 @@ td.available button {
   background-color: #a7f542;
   border: 0;
 }
+.available.abundant {
+  background-color: #3de35c;
+}
+.available.abundant button {
+  background-color: #3de35c;
+}
+.available.meager {
+  background-color: #dbffab;
+}
+.available.meager button {
+  background-color: #dbffab;
+}
 .caption {
     border: 2px solid #306277;
     height: 25px;

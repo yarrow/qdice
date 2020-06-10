@@ -7,7 +7,7 @@ import Expect
 import Fuzz exposing (intRange)
 import Pip exposing (Pip)
 import Random
-import Rank exposing (DiceToKeep(..), PipsCounted, Rank(..))
+import Rank exposing (DiceToKeep(..), PipsCounted, Rank(..), Rating(..))
 import Test exposing (..)
 
 
@@ -217,5 +217,41 @@ rankTests =
                 \_ ->
                     suggestion [ 1, 6, 1, 6, 6 ]
                         |> Expect.equalLists [ OfAKind 6, OfAKind 1 ]
+            ]
+        , describe "rating" <|
+            let
+                upperPar =
+                    [ 3, 6, 9, 12, 15, 18 ]
+
+                lowerPar =
+                    List.repeat (List.length (Rank.lower Rank.fns)) 1
+
+                par =
+                    upperPar ++ lowerPar
+
+                subPar =
+                    List.map (\n -> n - 1) par
+
+                overPar =
+                    List.map (\n -> n + 1) par
+
+                repeat =
+                    List.repeat Rank.numberOfRanks
+
+                ( meager, sufficient, ample ) =
+                    ( repeat Meager, repeat Sufficient, repeat Ample )
+            in
+            [ test "Sufficient" <|
+                \_ ->
+                    List.map2 (\f x -> f x) Rank.ratings par
+                        |> Expect.equalLists sufficient
+            , test "Meager" <|
+                \_ ->
+                    List.map2 (\f x -> f x) Rank.ratings subPar
+                        |> Expect.equalLists meager
+            , test "Upper over par is Ample, lower merely Sufficient" <|
+                \_ ->
+                    List.map2 (\f x -> f x) Rank.ratings overPar
+                        |> Expect.equal (Rank.upper ample ++ Rank.lower sufficient)
             ]
         ]

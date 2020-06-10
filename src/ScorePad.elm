@@ -82,6 +82,11 @@ type RowKind
     | Calculated
 
 
+
+-- Uses staticRows if there are no pips to score, and activeRows if there are
+-- section totals are the same either way
+
+
 makeScorePad : Maybe (List Pip) -> Scores -> ScorePad
 makeScorePad pips scoreRows =
     let
