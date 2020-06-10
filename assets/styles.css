@@ -107,6 +107,8 @@ td.available button {
   width:100%;
   height:100%;
   background-color: #a7f542;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
   border: 0;
 }
 .available.abundant {
