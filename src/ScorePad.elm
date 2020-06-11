@@ -264,7 +264,7 @@ activeRows pips scores =
 
                         Just points ->
                             { occupancy = InUse
-                            , rating = rating points
+                            , rating = Sufficient
                             , score = String.fromInt points
                             }
             in

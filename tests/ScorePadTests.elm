@@ -185,31 +185,38 @@ subtests =
             List.length zeros
                 == 0
                 |> Expect.true label
-    , subtest "An active ScorePad has a Meager Rating for current or potential zero scores" <|
+    , subtest "An active ScorePad has a Meager Rating for potential zero scores" <|
         \label scores ->
             let
                 scoreOf box =
                     Maybe.withDefault -1 (String.toInt box.score)
 
-                rows =
+                nonmeager =
                     scores
                         |> activeScorePad
                         |> List.filter (\r -> r.kind == Rolled)
-
-                nonmeager =
-                    rows
                         |> List.map .boxes
                         |> List.concat
-                        |> List.filterMap
-                            (\box ->
-                                if scoreOf box == 0 && box.rating /= Meager then
-                                    Just box.rating
-
-                                else
-                                    Nothing
-                            )
+                        |> List.filter (\box -> isAvailable box.occupancy)
+                        |> List.filter
+                            (\box -> scoreOf box == 0 && box.rating /= Meager)
             in
             List.length nonmeager
+                == 0
+                |> Expect.true label
+    , subtest "An active ScorePad has a Sufficient Rating for InUse boxes" <|
+        \label scores ->
+            let
+                notSufficient =
+                    scores
+                        |> activeScorePad
+                        |> List.filter (\r -> r.kind == Rolled)
+                        |> List.map .boxes
+                        |> List.concat
+                        |> List.filter (\box -> box.occupancy == InUse)
+                        |> List.filter (\box -> box.rating /= Sufficient)
+            in
+            List.length notSufficient
                 == 0
                 |> Expect.true label
     , subtest "A static ScorePad has a Sufficient rating for all scores" <|
@@ -221,14 +228,7 @@ subtests =
                         |> List.filter (\r -> r.kind == Rolled)
                         |> List.map .boxes
                         |> List.concat
-                        |> List.filterMap
-                            (\box ->
-                                if box.rating /= Sufficient then
-                                    Just box.rating
-
-                                else
-                                    Nothing
-                            )
+                        |> List.filter (\box -> box.rating /= Sufficient)
             in
             List.length notSufficient
                 == 0
