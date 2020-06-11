@@ -212,31 +212,25 @@ subtests =
             List.length nonmeager
                 == 0
                 |> Expect.true label
-    , subtest "A static ScorePad has a Meager Rating zero scores" <|
+    , subtest "A static ScorePad has a Sufficient rating for all scores" <|
         \label scores ->
             let
-                scoreOf box =
-                    Maybe.withDefault -1 (String.toInt box.score)
-
-                rows =
+                notSufficient =
                     scores
                         |> staticScorePad
                         |> List.filter (\r -> r.kind == Rolled)
-
-                nonmeager =
-                    rows
                         |> List.map .boxes
                         |> List.concat
                         |> List.filterMap
                             (\box ->
-                                if scoreOf box == 0 && box.rating /= Meager then
+                                if box.rating /= Sufficient then
                                     Just box.rating
 
                                 else
                                     Nothing
                             )
             in
-            List.length nonmeager
+            List.length notSufficient
                 == 0
                 |> Expect.true label
     , subtest "Each upperBonus box is 35 if the corresponding upperTotal box is >= 63, 0 otherwise" <|

@@ -145,6 +145,12 @@ makeScorePad pips scoreRows =
                 , score = "35"
                 }
 
+            else if par == Rank.maxPar then
+                { occupancy = InUse
+                , rating = Meager
+                , score = ""
+                }
+
             else if total > par then
                 { occupancy = InUse
                 , rating = Ample
@@ -214,20 +220,16 @@ makeScorePad pips scoreRows =
 staticRows : List Score.Row -> List Row
 staticRows scores =
     let
-        inUse rating box =
-            let
-                rated =
-                    Maybe.withDefault Sufficient (Maybe.map rating box)
-            in
+        inUse box =
             { occupancy = InUse
-            , rating = rated
+            , rating = Sufficient
             , score = boxToString box
             }
 
-        staticRow { caption, rating } boxes =
+        staticRow { caption } boxes =
             { kind = Rolled
             , caption = caption
-            , boxes = List.map (inUse rating) boxes
+            , boxes = List.map inUse boxes
             }
     in
     List.map2 staticRow rankInfo scores

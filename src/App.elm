@@ -276,7 +276,7 @@ viewScores model =
         topBox label =
             td [ class "score-top" ] [ text label ]
 
-        displayBox kind { occupancy, rating, score } =
+        displayBox { occupancy, rating, score } =
             let
                 rateClass =
                     case rating of
@@ -291,16 +291,7 @@ viewScores model =
             in
             case occupancy of
                 InUse ->
-                    let
-                        klass =
-                            case kind of
-                                Rolled ->
-                                    "sufficient"
-
-                                Calculated ->
-                                    rateClass
-                    in
-                    td [ class "in-use", class klass ] [ text score ]
+                    td [ class "in-use", class rateClass ] [ text score ]
 
                 Available location ->
                     td [ class "available", class rateClass ]
@@ -326,7 +317,7 @@ viewScores model =
                             [ td [ class "in-use", colspan 3 ] [ text box.score ] ]
 
                         _ ->
-                            List.map (displayBox row.kind) row.boxes
+                            List.map displayBox row.boxes
             in
             tr [ class rowClass ] <| capt :: scoreDisplay
 
