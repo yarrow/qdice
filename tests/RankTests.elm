@@ -7,7 +7,7 @@ import Expect
 import Fuzz exposing (intRange)
 import Pip exposing (Pip)
 import Random
-import Rank exposing (DiceToKeep(..), PipsCounted, Rank(..), Rating(..))
+import Rank exposing (DiceToKeep(..), PipsCounted, Rank(..), Rating(..), rankInfo)
 import Test exposing (..)
 
 
@@ -45,7 +45,7 @@ ofAKind pips =
 
 fnDict : Dict String (PipsCounted -> Int)
 fnDict =
-    Dict.fromList (List.map2 (\name fn -> ( name, fn )) Rank.captions Rank.fns)
+    Dict.fromList (List.map (\{ caption, fn } -> ( caption, fn )) rankInfo)
 
 
 tally : String -> PipsCounted -> Int
@@ -224,7 +224,7 @@ rankTests =
                     [ 3, 6, 9, 12, 15, 18 ]
 
                 lowerPar =
-                    List.repeat (List.length (Rank.lower Rank.fns)) 1
+                    List.repeat (List.length (Rank.lower rankInfo)) 1
 
                 par =
                     upperPar ++ lowerPar
@@ -243,15 +243,19 @@ rankTests =
             in
             [ test "Sufficient" <|
                 \_ ->
-                    List.map2 (\f x -> f x) Rank.ratings par
+                    List.map2 (\r x -> r.rating x) rankInfo par
                         |> Expect.equalLists sufficient
             , test "Meager" <|
                 \_ ->
-                    List.map2 (\f x -> f x) Rank.ratings subPar
+                    List.map2 (\r x -> r.rating x) rankInfo subPar
                         |> Expect.equalLists meager
             , test "Upper over par is Ample, lower merely Sufficient" <|
                 \_ ->
-                    List.map2 (\f x -> f x) Rank.ratings overPar
+                    List.map2 (\r x -> r.rating x) rankInfo overPar
                         |> Expect.equal (Rank.upper ample ++ Rank.lower sufficient)
             ]
+        , test "columnPar" <|
+            \_ ->
+                Rank.columnPar [ Just 1, Nothing, Just 4, Just 8, Nothing, Just 32 ]
+                    |> Expect.equal (3 + 9 + 12 + 18)
         ]

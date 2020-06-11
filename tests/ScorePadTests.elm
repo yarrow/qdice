@@ -6,7 +6,7 @@ import Fuzz
 import Pip
 import Random
 import Random.Extra
-import Rank exposing (Rating(..))
+import Rank exposing (Rating(..), rankInfo)
 import Score exposing (Scores, emptyScores)
 import ScorePad
     exposing
@@ -46,14 +46,14 @@ parse scorePad =
     Dict.fromList (List.map rowParse scorePad)
 
 
-upperCaptions : List String
-upperCaptions =
-    Rank.upper Rank.captions
-
-
 allScoreCaptions : List String
 allScoreCaptions =
-    Rank.captions
+    List.map .caption rankInfo
+
+
+upperCaptions : List String
+upperCaptions =
+    Rank.upper allScoreCaptions
 
 
 activeScorePad : Scores -> ScorePad

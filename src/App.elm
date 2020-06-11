@@ -276,8 +276,7 @@ viewScores model =
         topBox label =
             td [ class "score-top" ] [ text label ]
 
-        displayBox : ScorePad.Box -> Html Msg
-        displayBox { occupancy, rating, score } =
+        displayBox kind { occupancy, rating, score } =
             let
                 rateClass =
                     case rating of
@@ -292,7 +291,16 @@ viewScores model =
             in
             case occupancy of
                 InUse ->
-                    td [ class "in-use", class rateClass ] [ text score ]
+                    let
+                        klass =
+                            case kind of
+                                Rolled ->
+                                    "sufficient"
+
+                                Calculated ->
+                                    rateClass
+                    in
+                    td [ class "in-use", class klass ] [ text score ]
 
                 Available location ->
                     td [ class "available", class rateClass ]
@@ -318,7 +326,7 @@ viewScores model =
                             [ td [ class "in-use", colspan 3 ] [ text box.score ] ]
 
                         _ ->
-                            List.map displayBox row.boxes
+                            List.map (displayBox row.kind) row.boxes
             in
             tr [ class rowClass ] <| capt :: scoreDisplay
 

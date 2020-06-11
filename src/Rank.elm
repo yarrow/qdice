@@ -4,13 +4,12 @@ module Rank exposing
     , Rank
     , Rating(..)
     , arbitraryRank
-    , captions
+    , columnPar
     , countPips
-    , fns
     , lower
+    , maxPar
     , numberOfRanks
-    , ranks
-    , ratings
+    , rankInfo
     , scoreAll
     , scoreAt
     , suggestKeeping
@@ -184,76 +183,8 @@ fullHouse counted =
     nWhen 25 (max == 5 || (max == 3 && hasPair counted))
 
 
-table : List ( String, PipsCounted -> Int )
-table =
-    [ ( "Ones", valueTimesCount 1 )
-    , ( "Twos", valueTimesCount 2 )
-    , ( "Threes", valueTimesCount 3 )
-    , ( "Fours", valueTimesCount 4 )
-    , ( "Fives", valueTimesCount 5 )
-    , ( "Sixes", valueTimesCount 6 )
-    , ( "3 of a kind", sumDiceIfAtLeast 3 )
-    , ( "4 of a kind", sumDiceIfAtLeast 4 )
-    , ( "Full House", fullHouse )
-    , ( "Sm Strght", \counted -> nWhen 30 (longestStraight counted >= 4) )
-    , ( "Lg Strght", \counted -> nWhen 40 (longestStraight counted >= 5) )
-    , ( "5 of a kind", \counted -> nWhen 50 (List.any (\n -> n == 5) (Array.toList counted)) )
-    , ( "Chance", sumDice )
-    ]
-
-
-numberOfUppers : Int
-numberOfUppers =
-    6
-
-
-captions : List String
-captions =
-    List.map Tuple.first table
-
-
-fns : List (PipsCounted -> Int)
-fns =
-    List.map Tuple.second table
-
-
-fnArray : Array (PipsCounted -> Int)
-fnArray =
-    Array.fromList fns
-
-
-scoreAll : PipsCounted -> List Int
-scoreAll counted =
-    List.map (\f -> f counted) fns
-
-
-upper : List a -> List a
-upper list =
-    List.take numberOfUppers list
-
-
-lower : List a -> List a
-lower list =
-    List.drop numberOfUppers list
-
-
 type Rank
     = Rank Int
-
-
-ranks : List Rank
-ranks =
-    List.indexedMap (\j _ -> Rank j) table
-
-
-numberOfRanks : Int
-numberOfRanks =
-    List.length table
-
-
-toInt : Rank -> Int
-toInt (Rank rank) =
-    rank
 
 
 type Rating
@@ -262,13 +193,32 @@ type Rating
     | Ample -- over par for upper section
 
 
-ratings : List (Int -> Rating)
-ratings =
-    let
-        rateUpper : List (Int -> Rating)
-        rateUpper =
-            List.map compareToPar [ 3, 6, 9, 12, 15, 18 ]
+type alias RankInfo =
+    { rank : Rank, caption : String, fn : PipsCounted -> Int, rating : Int -> Rating }
 
+
+maxPar : Int
+maxPar =
+    63
+
+
+columnPar : List (Maybe Int) -> Int
+columnPar col =
+    let
+        thisPar par n =
+            case n of
+                Nothing ->
+                    0
+
+                Just _ ->
+                    par
+    in
+    List.sum (List.map2 thisPar [ 3, 6, 9, 12, 15, 18 ] col)
+
+
+rankInfo : List RankInfo
+rankInfo =
+    let
         compareToPar : Int -> Int -> Rating
         compareToPar par n =
             case compare n par of
@@ -281,10 +231,6 @@ ratings =
                 GT ->
                     Ample
 
-        rateLower : List (Int -> Rating)
-        rateLower =
-            List.repeat (numberOfRanks - numberOfUppers) compareToZero
-
         compareToZero : Int -> Rating
         compareToZero n =
             if n == 0 then
@@ -292,8 +238,121 @@ ratings =
 
             else
                 Sufficient
+
+        base =
+            [ { caption = "Ones"
+              , fn = valueTimesCount 1
+              , rating = compareToPar 3
+              }
+            , { caption = "Twos"
+              , fn = valueTimesCount 2
+              , rating = compareToPar 6
+              }
+            , { caption = "Threes"
+              , fn = valueTimesCount 3
+              , rating = compareToPar 9
+              }
+            , { caption = "Fours"
+              , fn = valueTimesCount 4
+              , rating = compareToPar 12
+              }
+            , { caption = "Fives"
+              , fn = valueTimesCount 5
+              , rating = compareToPar 15
+              }
+            , { caption = "Sixes"
+              , fn = valueTimesCount 6
+              , rating = compareToPar 18
+              }
+            , { caption = "3 of a kind"
+              , fn = sumDiceIfAtLeast 3
+              , rating = compareToZero
+              }
+            , { caption = "4 of a kind"
+              , fn = sumDiceIfAtLeast 4
+              , rating = compareToZero
+              }
+            , { caption = "Full House"
+              , fn = fullHouse
+              , rating = compareToZero
+              }
+            , { caption = "Sm Strght"
+              , fn = \counted -> nWhen 30 (longestStraight counted >= 4)
+              , rating = compareToZero
+              }
+            , { caption = "Lg Strght"
+              , fn = \counted -> nWhen 40 (longestStraight counted >= 5)
+              , rating = compareToZero
+              }
+            , { caption = "5 of a kind"
+              , fn = \counted -> nWhen 50 (List.any (\n -> n == 5) (Array.toList counted))
+              , rating = compareToZero
+              }
+            , { caption = "Chance"
+              , fn = sumDice
+              , rating = compareToZero
+              }
+            ]
+
+        addRank j { caption, fn, rating } =
+            { rank = Rank j, caption = caption, fn = fn, rating = rating }
     in
-    rateUpper ++ rateLower
+    List.indexedMap addRank base
+
+
+captions : List String
+captions =
+    List.map .caption rankInfo
+
+
+fns : List (PipsCounted -> Int)
+fns =
+    List.map .fn rankInfo
+
+
+ratings : List (Int -> Rating)
+ratings =
+    List.map .rating rankInfo
+
+
+ranks : List Rank
+ranks =
+    List.map .rank rankInfo
+
+
+fnArray : Array (PipsCounted -> Int)
+fnArray =
+    Array.fromList (List.map .fn rankInfo)
+
+
+scoreAll : PipsCounted -> List Int
+scoreAll counted =
+    List.map (\f -> f counted) fns
+
+
+numberOfUppers : Int
+numberOfUppers =
+    6
+
+
+upper : List a -> List a
+upper list =
+    List.take numberOfUppers list
+
+
+lower : List a -> List a
+lower list =
+    List.drop numberOfUppers list
+
+
+numberOfRanks : Int
+numberOfRanks =
+    List.length rankInfo
+
+
+toInt : Rank -> Int
+toInt (Rank rank) =
+    rank
 
 
 

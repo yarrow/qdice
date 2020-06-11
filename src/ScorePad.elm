@@ -13,7 +13,7 @@ module ScorePad exposing
     )
 
 import Pip exposing (Pip)
-import Rank exposing (Rating(..))
+import Rank exposing (Rating(..), rankInfo)
 import Score exposing (Location, Scores)
 
 
@@ -119,10 +119,57 @@ makeScorePad pips scoreRows =
         bottomTotal =
             getSectionTotal (Rank.lower scores)
 
-        bonus =
+        currentPar =
+            let
+                hed =
+                    Maybe.withDefault Nothing << List.head
+
+                upper =
+                    Rank.upper scores
+
+                c1 =
+                    List.map hed upper
+
+                c2 =
+                    List.map hed (List.map (List.drop 1) upper)
+
+                c3 =
+                    List.map hed (List.map (List.drop 2) upper)
+            in
+            List.map Rank.columnPar [ c1, c2, c3 ]
+
+        bonusBox par total =
+            if total >= Rank.maxPar then
+                { occupancy = InUse
+                , rating = Ample
+                , score = "35"
+                }
+
+            else if total > par then
+                { occupancy = InUse
+                , rating = Ample
+                , score = "⬆︎" ++ String.fromInt (total - par)
+                }
+
+            else if total == par then
+                { occupancy = InUse
+                , rating = Sufficient
+                , score = ""
+                }
+
+            else
+                { occupancy = InUse
+                , rating = Meager
+                , score = "⬇︎" ++ String.fromInt (par - total)
+                }
+
+        bonusBoxes =
+            List.map2 bonusBox currentPar topTotal
+
+        bonusScores =
             List.map
-                (\t ->
-                    if t >= 63 then
+                (\total ->
+                    if total >= Rank.maxPar then
                         35
 
                     else
@@ -131,7 +178,7 @@ makeScorePad pips scoreRows =
                 topTotal
 
         rowTotal =
-            List.map3 (\a b c -> a + b + c) topTotal bonus bottomTotal
+            List.map3 (\a b c -> a + b + c) topTotal bonusScores bottomTotal
 
         withWeights =
             List.map2 (*) [ 1, 2, 3 ] rowTotal
@@ -154,7 +201,7 @@ makeScorePad pips scoreRows =
     List.concat
         [ Rank.upper scorePadRows
         , [ sumRow upperTotal topTotal
-          , sumRow upperBonus bonus
+          , { caption = upperBonus, kind = Calculated, boxes = bonusBoxes }
           ]
         , Rank.lower scorePadRows
         , [ sumRow totalScore rowTotal
@@ -177,13 +224,13 @@ staticRows scores =
             , score = boxToString box
             }
 
-        staticRow caption rating boxes =
+        staticRow { caption, rating } boxes =
             { kind = Rolled
             , caption = caption
             , boxes = List.map (inUse rating) boxes
             }
     in
-    List.map3 staticRow Rank.captions Rank.ratings scores
+    List.map2 staticRow rankInfo scores
 
 
 activeRows : List Pip -> List Score.Row -> List Row
@@ -192,7 +239,7 @@ activeRows pips scores =
         counted =
             Rank.countPips pips
 
-        activeRow rank caption fn rating boxes =
+        activeRow { rank, caption, fn, rating } boxes =
             let
                 pointsForThisRoll : Int
                 pointsForThisRoll =
@@ -224,4 +271,4 @@ activeRows pips scores =
             , boxes = List.indexedMap makeBox boxes
             }
     in
-    List.map5 activeRow Rank.ranks Rank.captions Rank.fns Rank.ratings scores
+    List.map2 activeRow rankInfo scores
