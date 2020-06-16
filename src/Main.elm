@@ -1,4 +1,4 @@
-module App exposing (Model, Msg(..), initialModel, main, update, view)
+module Main exposing (Model, Msg(..), initialModel, main, update, view)
 
 import Browser
 import Dice

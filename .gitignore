@@ -1,5 +1,8 @@
-elm-stuff
-outtakes
+node_modules/
+elm-stuff/
+dist/
+.cache/
+outtakes/
 app.js
 app.min.js
 app.tar

@@ -1,6 +1,6 @@
-module AppTests exposing (appTests)
+module MainTests exposing (appTests)
 
-import App exposing (Model, Msg(..), initialModel, update, view)
+import Main exposing (Model, Msg(..), initialModel, update, view)
 import Dice exposing (NextRoll(..))
 import DiceBoard
 import Expect
@@ -63,7 +63,7 @@ findAll model attributes =
 
 appTests : Test
 appTests =
-    describe "Tests for App.elm" <|
+    describe "Tests for Main.elm" <|
         [ describe "Properties of initial model" <|
             [ test "We start with no dice" <|
                 \_ ->

@@ -13,7 +13,7 @@ import Test exposing (..)
 diceTests : Test
 diceTests =
     describe "Tests for Dice.elm and DiceBoard.elm" <|
-        [ fuzz (intRange 1 6) "The url for a die with `n` pips contains '/die-`n`.`" <|
+        [ fuzz (intRange 1 6) "The url for a die with `n` pips contains 'die-`n`.`" <|
             \n ->
                 let
                     die =
@@ -23,7 +23,7 @@ diceTests =
                         Dice.url die
 
                     fragment =
-                        "/die-" ++ String.fromInt n ++ "."
+                        "die-" ++ String.fromInt n ++ "."
                 in
                 theUrl
                     |> String.contains fragment

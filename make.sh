@@ -1,2 +1,2 @@
 #/usr/bin/env sh
-elm make src/App.elm --output=app.js $1
+elm make src/Main.elm --output=app.js $1

@@ -51,18 +51,18 @@ dieFromPair ( n, nextStatus ) =
 
 
 aUrl : String -> Die -> String
-aUrl location d =
-    location ++ "/die-" ++ String.fromInt (Pip.toInt d.pips) ++ ".png"
+aUrl kind d =
+    kind ++ "-" ++ String.fromInt (Pip.toInt d.pips) ++ ".png"
 
 
 url : Die -> String
 url =
-    aUrl "assets"
+    aUrl "die"
 
 
 urlSmall : Die -> String
 urlSmall =
-    aUrl "assets/smol"
+    aUrl "smol"
 
 
 
