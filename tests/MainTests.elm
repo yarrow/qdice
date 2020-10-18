@@ -1,12 +1,12 @@
 module MainTests exposing (appTests)
 
-import Main exposing (Model, Msg(..), initialModel, update, view)
 import Dice exposing (NextRoll(..))
 import DiceBoard
 import Expect
 import Fuzz
 import Html
 import Html.Attributes as Attr
+import Main exposing (Model, Msg(..), initialModel, update, view)
 import Pip exposing (Pip)
 import Random
 import Rank exposing (Rank)
@@ -69,9 +69,9 @@ appTests =
                 \_ ->
                     initialModel.dice
                         |> Expect.equal DiceBoard.empty
-            , test "We start with old == Nothing" <|
+            , test "We start with undoInfo == Nothing" <|
                 \_ ->
-                    initialModel.old
+                    initialModel.undoInfo
                         |> Expect.equal Nothing
             , test "We start with three rolls available" <|
                 \_ ->
@@ -203,23 +203,23 @@ appTests =
                     updateModel (RecordScore chance1) modelAfterFirstRoll
                         |> .dice
                         |> Expect.equal DiceBoard.empty
-            , test "(RecordScore (rank, j)'s newModel has newModel.old == Just(model.dice, (rank, j))" <|
+            , test "(RecordScore (rank, j)'s newModel has newModel.undoInfo == Just(model.dice, (rank, j))" <|
                 \_ ->
                     let
                         oldDice =
                             modelAfterFirstRoll.dice
                     in
                     updateModel (RecordScore chance1) modelAfterFirstRoll
-                        |> .old
+                        |> .undoInfo
                         |> Expect.equal (Just ( oldDice, chance1 ))
-            , test "For a model with old == Just(oldDice, location), UndoScore returns {model | dice =oldDice, scores = setBox location Nothing model.scores, rollsLeft =0, turnsLeft = model.turnsLeft + 1, old = Nothing" <|
+            , test "For a model with undoInfo == Just(oldDice, location), UndoScore returns {model | dice =oldDice, scores = setBox location Nothing model.scores, rollsLeft =0, turnsLeft = model.turnsLeft + 1, undoInfo = Nothing" <|
                 \_ ->
                     let
                         previous =
                             updateModel (RecordScore chance1) modelAfterFirstRoll
 
                         ( oldDice, location ) =
-                            case previous.old of
+                            case previous.undoInfo of
                                 Nothing ->
                                     ( DiceBoard.empty, ( Rank.arbitraryRank, 3 ) )
 
@@ -239,9 +239,9 @@ appTests =
                                 , scores = scoresUndone
                                 , rollsLeft = 0
                                 , turnsLeft = previous.turnsLeft + 1
-                                , old = Nothing
+                                , undoInfo = Nothing
                             }
-            , describe "We see an Undo button if and only if old is non-Nothing" <|
+            , describe "We see an Undo button if and only if undoInfo is non-Nothing" <|
                 let
                     undoCountIs n model =
                         findAll model [ tag "button", class "undo" ]

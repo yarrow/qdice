@@ -22,7 +22,7 @@ type alias Model =
     , rollsLeft : Int
     , turnsLeft : Int
     , scores : Scores
-    , old : Maybe ( DiceBoard, Location )
+    , undoInfo : Maybe ( DiceBoard, Location )
     }
 
 
@@ -32,7 +32,7 @@ initialModel =
     , rollsLeft = 3
     , turnsLeft = Score.numberOfTurns
     , scores = emptyScores
-    , old = Nothing
+    , undoInfo = Nothing
     }
 
 
@@ -89,7 +89,7 @@ update msg model =
                     { model
                         | dice = DiceBoard.mergeDice incomingDice model.dice
                         , rollsLeft = model.rollsLeft - 1
-                        , old = Nothing
+                        , undoInfo = Nothing
                     }
             in
             ( newModel, Cmd.none )
@@ -124,13 +124,13 @@ update msg model =
                         , rollsLeft = 3
                         , turnsLeft = model.turnsLeft - 1
                         , scores = scores
-                        , old = Just ( model.dice, ( rank, column ) )
+                        , undoInfo = Just ( model.dice, ( rank, column ) )
                     }
             in
             ( newModel, Cmd.none )
 
         UndoScore ->
-            case model.old of
+            case model.undoInfo of
                 Nothing ->
                     ( model, Cmd.none )
 
@@ -145,7 +145,7 @@ update msg model =
                                 , rollsLeft = 0
                                 , turnsLeft = model.turnsLeft + 1
                                 , scores = scores
-                                , old = Nothing
+                                , undoInfo = Nothing
                             }
                     in
                     ( newModel, Cmd.none )
@@ -194,7 +194,7 @@ viewDice model =
             buttonRow <| button [ class "undo", onClick UndoScore ] [ text "Undo" ]
 
         buttonSection =
-            case model.old of
+            case model.undoInfo of
                 Nothing ->
                     [ rollButton ]
 
