@@ -19,5 +19,8 @@
     "parcel-bundler": "^1.12.0",
     "parcel-plugin-asset-copier": "^1.1.0"
   },
+  "resolutions": {
+    "node-forge": "0.10.0"
+  },
   "assetsPath": "assets"
 }
