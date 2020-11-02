@@ -4,7 +4,7 @@
   "description": "Compare to Milton Bradley Triple Yahtzee",
   "scripts": {
     "start": "parcel src/index.html",
-    "build": "rm -r dist && parcel build src/index.html --public-url ./",
+    "build": "parcel build src/index.html --public-url ./",
     "test": "elm-test",
     "autotest": "elm-test --watch"
   },
@@ -15,6 +15,7 @@
     "elm-debug-transformer": "^1.0.0",
     "elm-hot": "^1.1.0",
     "elm-test": "^0.19.1",
+    "netlify-cli": "^2.58.0",
     "node-elm-compiler": "^5.0.0",
     "parcel-bundler": "^1.12.0",
     "parcel-plugin-asset-copier": "^1.1.0"
