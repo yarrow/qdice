@@ -1,4 +1,4 @@
-module Main exposing (Model, Msg(..), initialModel, main, update, view)
+module Main exposing (Model, ModelChange(..), Msg(..), changeModel, initialModel, main, update, view)
 
 import Browser
 import Dice
@@ -50,14 +50,18 @@ main =
 -- Update
 
 
-type Msg
-    = RollDice
-    | GotDice (List Pip)
+type ModelChange
+    = GotDice (List Pip)
     | DieFlipped Int
     | KeepSet Rank.DiceToKeep
     | RecordScore Location
     | UndoScore
     | NewGame
+
+
+type Msg
+    = RollDice
+    | Do ModelChange
 
 
 rollAllowed : Model -> Bool
@@ -76,37 +80,41 @@ update msg model =
             let
                 cmd =
                     if rollAllowed model then
-                        Random.generate GotDice (DiceBoard.rollForNewDice model.dice)
+                        let
+                            rollDice : Random.Generator ModelChange
+                            rollDice =
+                                Random.map (\roller -> GotDice roller) (DiceBoard.rollForNewDice model.dice)
+                        in
+                        Random.generate Do rollDice
 
                     else
                         Cmd.none
             in
             ( model, cmd )
 
+        Do modelChange ->
+            ( changeModel modelChange model, Cmd.none )
+
+
+changeModel : ModelChange -> Model -> Model
+changeModel action model =
+    case action of
         GotDice incomingDice ->
-            let
-                newModel =
-                    { model
-                        | dice = DiceBoard.mergeDice incomingDice model.dice
-                        , rollsLeft = model.rollsLeft - 1
-                        , undoInfo = Nothing
-                    }
-            in
-            ( newModel, Cmd.none )
+            { model
+                | dice = DiceBoard.mergeDice incomingDice model.dice
+                , rollsLeft = model.rollsLeft - 1
+                , undoInfo = Nothing
+            }
 
         DieFlipped j ->
-            let
-                newModel =
-                    if model.rollsLeft == 0 then
-                        model
+            if model.rollsLeft == 0 then
+                model
 
-                    else
-                        { model | dice = DiceBoard.flipNextRoll j model.dice }
-            in
-            ( newModel, Cmd.none )
+            else
+                { model | dice = DiceBoard.flipNextRoll j model.dice }
 
         KeepSet diceToKeep ->
-            ( { model | dice = DiceBoard.keepOnly diceToKeep model.dice }, Cmd.none )
+            { model | dice = DiceBoard.keepOnly diceToKeep model.dice }
 
         RecordScore ( rank, column ) ->
             let
@@ -117,41 +125,35 @@ update msg model =
 
                 scores =
                     Score.setBox ( rank, column ) scoreToInsert model.scores
-
-                newModel =
-                    { model
-                        | dice = DiceBoard.empty
-                        , rollsLeft = 3
-                        , turnsLeft = model.turnsLeft - 1
-                        , scores = scores
-                        , undoInfo = Just ( model.dice, ( rank, column ) )
-                    }
             in
-            ( newModel, Cmd.none )
+            { model
+                | dice = DiceBoard.empty
+                , rollsLeft = 3
+                , turnsLeft = model.turnsLeft - 1
+                , scores = scores
+                , undoInfo = Just ( model.dice, ( rank, column ) )
+            }
 
         UndoScore ->
             case model.undoInfo of
                 Nothing ->
-                    ( model, Cmd.none )
+                    model
 
                 Just ( oldDice, location ) ->
                     let
                         scores =
                             Score.setBox location Nothing model.scores
-
-                        newModel =
-                            { model
-                                | dice = oldDice
-                                , rollsLeft = 0
-                                , turnsLeft = model.turnsLeft + 1
-                                , scores = scores
-                                , undoInfo = Nothing
-                            }
                     in
-                    ( newModel, Cmd.none )
+                    { model
+                        | dice = oldDice
+                        , rollsLeft = 0
+                        , turnsLeft = model.turnsLeft + 1
+                        , scores = scores
+                        , undoInfo = Nothing
+                    }
 
         NewGame ->
-            ( initialModel, Cmd.none )
+            initialModel
 
 
 
@@ -182,7 +184,7 @@ viewDice model =
         rollButton =
             buttonRow <|
                 if model.turnsLeft == 0 then
-                    button [ class "roll-dice", onClick NewGame ] [ text "New Game" ]
+                    button [ class "roll-dice", onClick (Do NewGame) ] [ text "New Game" ]
 
                 else if rollAllowed model then
                     button [ class "roll-dice", onClick RollDice ] [ text "Roll Dice" ]
@@ -191,7 +193,7 @@ viewDice model =
                     button [ class "dont-roll-dice" ] [ text "Roll Dice" ]
 
         undoButton =
-            buttonRow <| button [ class "undo", onClick UndoScore ] [ text "Undo" ]
+            buttonRow <| button [ class "undo", onClick (Do UndoScore) ] [ text "Undo" ]
 
         buttonSection =
             case model.undoInfo of
@@ -233,7 +235,7 @@ suggestionRows diceBoard =
                     List.map (\u -> img [ src u ] []) urls
 
                 attrs =
-                    [ class "suggestion", colspan 2, onClick (KeepSet diceToKeep) ]
+                    [ class "suggestion", colspan 2, onClick (Do (KeepSet diceToKeep)) ]
             in
             tr [] [ td attrs contents ]
     in
@@ -247,7 +249,7 @@ tdDie d =
 
 diceRow : Int -> Dice.Die -> Html Msg
 diceRow j d =
-    tr [ class "dice-row", onClick (DieFlipped j) ] <|
+    tr [ class "dice-row", onClick (Do (DieFlipped j)) ] <|
         case d.nextRoll of
             Dice.Keep ->
                 [ tdBlank, tdDie d ]
@@ -295,7 +297,7 @@ viewScores model =
 
                 Available location ->
                     td [ class "available", class rateClass ]
-                        [ button [ onClick (RecordScore location) ] [ text score ] ]
+                        [ button [ onClick (Do (RecordScore location)) ] [ text score ] ]
 
         scoreRow : ScorePad.Row -> Html Msg
         scoreRow row =

@@ -6,10 +6,10 @@ import Expect
 import Fuzz
 import Html
 import Html.Attributes as Attr
-import Main exposing (Model, Msg(..), initialModel, update, view)
+import Main exposing (Model, ModelChange(..), Msg(..), changeModel, initialModel, update, view)
 import Pip exposing (Pip)
 import Random
-import Rank exposing (Rank)
+import Rank
 import Score exposing (numberOfTurns)
 import Shrink
 import Test exposing (..)
@@ -36,14 +36,9 @@ setDice model dice =
     { model | dice = DiceBoard.makeDiceBoard dice }
 
 
-updateModel : Msg -> Model -> Model
-updateModel msg model =
-    update msg model |> Tuple.first
-
-
 modelAfterFirstRoll : Model
 modelAfterFirstRoll =
-    updateModel (GotDice randomPips) initialModel
+    changeModel (GotDice randomPips) initialModel
 
 
 pipsFuzz : Fuzz.Fuzzer (List Pip)
@@ -98,12 +93,13 @@ appTests =
                     [ keep, keep, keep, keep, keep ]
 
                 rollableModel =
-                    updateModel (GotDice randomPips) initialModel
-                        |> updateModel (DieFlipped 0)
+                    changeModel (GotDice randomPips) initialModel
+                        |> changeModel (DieFlipped 0)
             in
             [ test "RollDice doesn't change the model" <|
                 \_ ->
-                    updateModel RollDice rollableModel
+                    update RollDice rollableModel
+                        |> Tuple.first
                         |> Expect.equal rollableModel
             , test "RollDice sends a nontrivial Cmd (GotDice, but we can't test that) rollsLeft > 0, turnsLeft >0, and at least one die is Reroll" <|
                 \_ ->
@@ -146,7 +142,7 @@ appTests =
                         rerollFirst =
                             DiceBoard.makeDiceBoard [ reroll, keep, keep, keep, keep ]
                     in
-                    updateModel (DieFlipped 0) (setDice initialModel keepAll)
+                    changeModel (DieFlipped 0) (setDice initialModel keepAll)
                         |> .dice
                         |> Expect.equal rerollFirst
             , test "`DieFlipped` does nothing if model.rollsLeft == 0" <|
@@ -161,7 +157,7 @@ appTests =
                         originalDice =
                             outOfRolls.dice
                     in
-                    updateModel (DieFlipped 0) outOfRolls
+                    changeModel (DieFlipped 0) outOfRolls
                         |> .dice
                         |> Expect.equal originalDice
             , test "Incoming dice replace dice to be rerolled" <|
@@ -176,17 +172,17 @@ appTests =
                         resultingDice =
                             DiceBoard.makeDiceBoard [ keep, ( 2, Keep ), keep, ( 3, Keep ), keep ]
                     in
-                    updateModel (GotDice (Pip.mapFromInt incomingDice)) (setDice initialModel startingDice)
+                    changeModel (GotDice (Pip.mapFromInt incomingDice)) (setDice initialModel startingDice)
                         |> .dice
                         |> Expect.equal resultingDice
             , test "After the first roll, we have 2 rolls remaining" <|
                 \_ ->
-                    updateModel (GotDice randomPips) initialModel
+                    changeModel (GotDice randomPips) initialModel
                         |> .rollsLeft
                         |> Expect.equal 2
             , test "RecordScore sets model.rollsLeft to 3" <|
                 \_ ->
-                    updateModel (RecordScore chance1) modelAfterFirstRoll
+                    changeModel (RecordScore chance1) modelAfterFirstRoll
                         |> .rollsLeft
                         |> Expect.equal 3
             , test "RecordScore decrements model.turnsLeft" <|
@@ -195,12 +191,12 @@ appTests =
                         startingTurns =
                             modelAfterFirstRoll.turnsLeft
                     in
-                    updateModel (RecordScore chance1) modelAfterFirstRoll
+                    changeModel (RecordScore chance1) modelAfterFirstRoll
                         |> .turnsLeft
                         |> Expect.equal (startingTurns - 1)
             , test "RecordScore sets model.dice to Nothing" <|
                 \_ ->
-                    updateModel (RecordScore chance1) modelAfterFirstRoll
+                    changeModel (RecordScore chance1) modelAfterFirstRoll
                         |> .dice
                         |> Expect.equal DiceBoard.empty
             , test "(RecordScore (rank, j)'s newModel has newModel.undoInfo == Just(model.dice, (rank, j))" <|
@@ -209,14 +205,14 @@ appTests =
                         oldDice =
                             modelAfterFirstRoll.dice
                     in
-                    updateModel (RecordScore chance1) modelAfterFirstRoll
+                    changeModel (RecordScore chance1) modelAfterFirstRoll
                         |> .undoInfo
                         |> Expect.equal (Just ( oldDice, chance1 ))
             , test "For a model with undoInfo == Just(oldDice, location), UndoScore returns {model | dice =oldDice, scores = setBox location Nothing model.scores, rollsLeft =0, turnsLeft = model.turnsLeft + 1, undoInfo = Nothing" <|
                 \_ ->
                     let
                         previous =
-                            updateModel (RecordScore chance1) modelAfterFirstRoll
+                            changeModel (RecordScore chance1) modelAfterFirstRoll
 
                         ( oldDice, location ) =
                             case previous.undoInfo of
@@ -230,7 +226,7 @@ appTests =
                             Score.setBox location Nothing previous.scores
 
                         this =
-                            updateModel UndoScore previous
+                            changeModel UndoScore previous
                     in
                     this
                         |> Expect.equal
@@ -248,10 +244,10 @@ appTests =
                             |> Query.count (Expect.equal n)
 
                     withScoreRecorded =
-                        updateModel (RecordScore chance1) modelAfterFirstRoll
+                        changeModel (RecordScore chance1) modelAfterFirstRoll
 
                     afterGotDice =
-                        updateModel (GotDice randomPips) withScoreRecorded
+                        changeModel (GotDice randomPips) withScoreRecorded
                 in
                 [ test "We see no Undo button in the inital model" <|
                     \_ ->
@@ -271,13 +267,13 @@ appTests =
                                 |> DiceBoard.toPips
                                 |> Maybe.map (Rank.scoreAt Rank.arbitraryRank)
                     in
-                    updateModel (RecordScore chance1) modelAfterFirstRoll
+                    changeModel (RecordScore chance1) modelAfterFirstRoll
                         |> .scores
                         |> Score.getBox chance1
                         |> Expect.equal scoreForRank
             , test "NewGame resets the model to the initial model" <|
                 \_ ->
-                    updateModel NewGame rollableModel
+                    changeModel NewGame rollableModel
                         |> Expect.equal initialModel
             ]
         , describe "Properties of viewing dice" <|
@@ -317,7 +313,7 @@ appTests =
                 \pips ->
                     let
                         model =
-                            updateModel (GotDice pips) initialModel
+                            changeModel (GotDice pips) initialModel
 
                         suggestions =
                             Rank.suggestKeeping (DiceBoard.toPips model.dice)
