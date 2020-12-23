@@ -1,12 +1,12 @@
-module MainTests exposing (appTests)
+module GameTests exposing (appTests)
 
 import Dice exposing (NextRoll(..))
 import DiceBoard
 import Expect
 import Fuzz
+import Game exposing (Model, ModelChange(..), Msg(..), changeModel, initialModel, update, view)
 import Html
 import Html.Attributes as Attr
-import Main exposing (Model, ModelChange(..), Msg(..), changeModel, initialModel, update, view)
 import Pip exposing (Pip)
 import Random
 import Rank
@@ -58,7 +58,7 @@ findAll model attributes =
 
 appTests : Test
 appTests =
-    describe "Tests for Main.elm" <|
+    describe "Tests for Game.elm" <|
         [ describe "Properties of initial model" <|
             [ test "We start with no dice" <|
                 \_ ->
