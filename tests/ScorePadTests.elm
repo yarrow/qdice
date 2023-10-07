@@ -20,8 +20,8 @@ import ScorePad
         , upperTotal
         , weightedScore
         )
-import Shrink
 import Test exposing (Test, describe, fuzz, test)
+import Xpect
 
 
 type alias Info =
@@ -120,19 +120,14 @@ genScores =
 
 scoreFuzz : Fuzz.Fuzzer Scores
 scoreFuzz =
-    Fuzz.custom genScores Shrink.noShrink
+    Fuzz.fromGenerator genScores
 
 
 fuzzTests : Test
 fuzzTests =
     fuzz scoreFuzz "All the fuzz tests at once, so we don't have to refuzz for every test" <|
         \scores ->
-            testAll scores subtests
-
-
-testAll : Scores -> List (Scores -> Expectation) -> Expectation
-testAll scores tests =
-    scores |> Expect.all tests
+            scores |> Expect.all subtests
 
 
 subtest : String -> (String -> Scores -> Expectation) -> (Scores -> Expectation)
@@ -153,12 +148,12 @@ subtests =
             in
             parse static
                 == parse active
-                |> Expect.true label
+                |> Xpect.true label
     , subtest "The upperTotal row is the sum of the upperRanks rows" <|
         \label scores ->
             sectionSum upperCaptions scores
                 == getSumRow upperTotal scores
-                |> Expect.true label
+                |> Xpect.true label
     , subtest "An active ScorePad has blank where the new score would be zero" <|
         \label scores ->
             let
@@ -184,7 +179,7 @@ subtests =
             in
             List.length zeros
                 == 0
-                |> Expect.true label
+                |> Xpect.true label
     , subtest "An active ScorePad has a Meager Rating for potential zero scores" <|
         \label scores ->
             let
@@ -203,7 +198,7 @@ subtests =
             in
             List.length nonmeager
                 == 0
-                |> Expect.true label
+                |> Xpect.true label
     , subtest "An active ScorePad has a Sufficient Rating for InUse boxes" <|
         \label scores ->
             let
@@ -218,7 +213,7 @@ subtests =
             in
             List.length notSufficient
                 == 0
-                |> Expect.true label
+                |> Xpect.true label
     , subtest "A static ScorePad has a Sufficient rating for all scores" <|
         \label scores ->
             let
@@ -232,7 +227,7 @@ subtests =
             in
             List.length notSufficient
                 == 0
-                |> Expect.true label
+                |> Xpect.true label
     , subtest "Each upperBonus box is 35 if the corresponding upperTotal box is >= 63, 0 otherwise" <|
         \label scores ->
             let
@@ -246,7 +241,7 @@ subtests =
                     (total >= 63 && bonus == 35) || (total < 63 && bonus == 0)
             in
             List.all (\bool -> bool) (List.map2 goodBonus topTotals bonuses)
-                |> Expect.true label
+                |> Xpect.true label
     , subtest "The totalScore row is the sum of the Rolled rows, plus the bonus row" <|
         \label scores ->
             let
@@ -261,7 +256,7 @@ subtests =
             in
             expected
                 == getSumRow totalScore scores
-                |> Expect.true label
+                |> Xpect.true label
     , subtest "The weightedScore row is the totalScore row, times [1,2,3]" <|
         \label scores ->
             let
@@ -273,7 +268,7 @@ subtests =
             in
             expected
                 == getSumRow weightedScore scores
-                |> Expect.true label
+                |> Xpect.true label
     , subtest "The grandTotal box is the sum of the totalScore row" <|
         \label scores ->
             let
@@ -291,7 +286,7 @@ subtests =
             in
             expected
                 == grand
-                |> Expect.true label
+                |> Xpect.true label
     ]
 
 
@@ -349,7 +344,7 @@ regularTests =
         [ test "Every Rolled box in staticScorePad emptyScores is (InUse, '')" <|
             \_ ->
                 List.all (\box -> box == ScorePad.Box InUse Sufficient "") (rolledBoxes emptyStatic)
-                    |> Expect.true "Every box should be (InUse, '')"
+                    |> Xpect.true "Every box should be (InUse, '')"
         , test "Each Rolled staticScorePad row has the correct caption" <|
             \_ ->
                 List.map .caption (rolledRows emptyStatic)
@@ -361,5 +356,5 @@ regularTests =
         , test "Every Rolled box in ScorePad emptyScores is Available" <|
             \_ ->
                 List.all (\box -> isAvailable box.occupancy) (rolledBoxes emptyActive)
-                    |> Expect.true "Every box should be Available"
+                    |> Xpect.true "Every box should be Available"
         ]

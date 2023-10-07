@@ -8,6 +8,7 @@ import Pip exposing (Pip)
 import Random
 import Rank exposing (DiceToKeep(..))
 import Test exposing (..)
+import Xpect
 
 
 diceTests : Test
@@ -27,7 +28,7 @@ diceTests =
                 in
                 theUrl
                     |> String.contains fragment
-                    |> Expect.true ("Expected to see " ++ fragment)
+                    |> Xpect.true ("Expected to see " ++ fragment)
         , describe "`rollForNewDice diceBoard` returns a generator for the appropriate number of new dice for diceBoard" <|
             let
                 numberRolled : Random.Generator (List Pip) -> Int

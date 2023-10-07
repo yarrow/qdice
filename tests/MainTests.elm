@@ -11,10 +11,10 @@ import Pip exposing (Pip)
 import Random
 import Rank
 import Score exposing (numberOfTurns)
-import Shrink
 import Test exposing (..)
 import Test.Html.Query as Query
 import Test.Html.Selector exposing (attribute, class, id, tag, text)
+import Xpect
 
 
 type alias PreDice =
@@ -43,7 +43,7 @@ modelAfterFirstRoll =
 
 pipsFuzz : Fuzz.Fuzzer (List Pip)
 pipsFuzz =
-    Fuzz.custom (DiceBoard.rollForNewDice DiceBoard.empty) Shrink.noShrink
+    Fuzz.fromGenerator (DiceBoard.rollForNewDice DiceBoard.empty)
 
 
 find : Model -> List Test.Html.Selector.Selector -> Query.Single Msg
@@ -135,7 +135,7 @@ appTests =
                                 Just dice ->
                                     allKeep dice
                     in
-                    passed |> Expect.true "Initially, all dice have an NextRoll of Keep"
+                    passed |> Xpect.true "Initially, all dice have an NextRoll of Keep"
             , test "`DieFlipped 0` causes the 0th die to flip its NextRoll status" <|
                 \_ ->
                     let
@@ -365,7 +365,7 @@ appTests =
                             |> Query.count (Expect.equal numberOfTurns)
                 , test "... and no available score box is blank" <|
                     \_ ->
-                        True |> Expect.true "I don't know how to test for this"
+                        True |> Xpect.true "I don't know how to test for this"
                 ]
             , test "There are 5 rows with (sub-)totals" <|
                 \_ ->
